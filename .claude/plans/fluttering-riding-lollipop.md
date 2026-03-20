@@ -3,6 +3,7 @@
 ## Context
 
 현재 CLAUDE.md(121줄)가 참고 자료의 모범 사례와 괴리가 있음:
+
 - 공식 문서 권장: **200줄 미만**, 짧을수록 좋음
 - "계획된" 항목(미설치 스택, 미래 구조)이 노이즈로 작용
 - 글로벌 `~/.claude/CLAUDE.md`와 중복 (strict, Server Components, camelCase 등)
@@ -19,19 +20,19 @@
 
 ### 제거 항목과 이유
 
-| 제거 내용 | 이유 |
-|-----------|------|
-| "This file provides guidance..." 첫 줄 | Claude가 이미 CLAUDE.md 용도를 앎 |
-| MVP 기능 상세 설명 | 한 줄 요약으로 축소 |
-| 계획된 추가 스택 (미설치) | 존재하지 않는 것은 노이즈 |
-| 현재 디렉토리 구조 트리 | Claude가 직접 탐색 가능 |
-| 계획된 디렉토리 구조 | 아직 존재하지 않음 |
-| Path Aliases 섹션 | `tsconfig.json`에서 확인 가능 |
-| 레이어드 아키텍처 (향후) | 글로벌에 이미 있고, 아직 미구현 |
-| TypeScript strict, any 금지 | 글로벌 CLAUDE.md에 이미 정의 |
-| Server Components 우선 | 글로벌에 이미 정의 |
-| lucide-react 개별 임포트 | 글로벌에 이미 정의 |
-| next-themes, shadcn 상세 | `components.json` + 글로벌에서 확인 가능 |
+| 제거 내용                              | 이유                                     |
+| -------------------------------------- | ---------------------------------------- |
+| "This file provides guidance..." 첫 줄 | Claude가 이미 CLAUDE.md 용도를 앎        |
+| MVP 기능 상세 설명                     | 한 줄 요약으로 축소                      |
+| 계획된 추가 스택 (미설치)              | 존재하지 않는 것은 노이즈                |
+| 현재 디렉토리 구조 트리                | Claude가 직접 탐색 가능                  |
+| 계획된 디렉토리 구조                   | 아직 존재하지 않음                       |
+| Path Aliases 섹션                      | `tsconfig.json`에서 확인 가능            |
+| 레이어드 아키텍처 (향후)               | 글로벌에 이미 있고, 아직 미구현          |
+| TypeScript strict, any 금지            | 글로벌 CLAUDE.md에 이미 정의             |
+| Server Components 우선                 | 글로벌에 이미 정의                       |
+| lucide-react 개별 임포트               | 글로벌에 이미 정의                       |
+| next-themes, shadcn 상세               | `components.json` + 글로벌에서 확인 가능 |
 
 ### 새 CLAUDE.md 구조
 
@@ -44,9 +45,9 @@ PL(프리미어리그) 선수·경기 데이터를 맥락과 함께 시각적으
 
 ## 개발 명령어
 
-npm run dev       # 개발 서버
-npm run build     # 프로덕션 빌드
-npm run lint      # ESLint 검사
+npm run dev # 개발 서버
+npm run build # 프로덕션 빌드
+npm run lint # ESLint 검사
 
 ## 기술 스택 특이사항
 
@@ -72,12 +73,14 @@ npm run lint      # ESLint 검사
 ## 환경 변수
 
 `.env.local` 필수:
+
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
 ## Summary Instructions
 
 대화 압축 시 반드시 유지할 내용:
+
 1. PL 데이터 플랫폼, 모든 숫자에 맥락 필수
 2. Tailwind v3 사용 (v4 아님)
 3. Supabase 서버 클라이언트는 매 요청마다 새 인스턴스
@@ -101,6 +104,7 @@ paths:
 ```
 
 **내용**: Supabase 클라이언트 사용 패턴 상세
+
 - Fluid Compute 호환: 서버 클라이언트를 전역 변수에 저장 금지
 - `proxy.ts`: `createServerClient`와 `supabase.auth.getClaims()` 사이에 코드 삽입 금지
 - Server Component에서 `setAll` 호출 시 에러 무시 패턴 (정상 동작)
@@ -121,6 +125,7 @@ paths:
 ```
 
 **내용**: UX 원칙 + UI 규칙
+
 - 모든 숫자에 맥락: 단독 숫자 표시 금지, 비교 대상과 함께
 - 3초 안에 핵심 파악: 색상·아이콘·크기로 정보 우선순위 시각화
 - 공유하고 싶은 디자인: 배틀카드·프로필의 SNS 공유 최적화
@@ -142,6 +147,7 @@ paths:
 ```
 
 **내용**: API 설계 규칙 (해당 경로가 생길 때 자동 적용)
+
 - 레이어드 아키텍처: API Route → Service → Repository
 - `ApiResponse<T> = { data: T | null; error: string | null }` 래퍼
 - DTO 패턴 사용
