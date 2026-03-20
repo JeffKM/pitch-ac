@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { GoogleOAuthButton, OAuthDivider } from "@/components/oauth-buttons";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -58,6 +59,8 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <GoogleOAuthButton />
+          <OAuthDivider />
           <form onSubmit={handleLogin}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
