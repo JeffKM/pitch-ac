@@ -37,7 +37,6 @@ const eslintConfig = [
       "**/template.tsx",
       "**/default.tsx",
       "next.config.ts",
-      "tailwind.config.ts",
       "postcss.config.mjs",
       "prettier.config.mjs",
       "eslint.config.mjs",

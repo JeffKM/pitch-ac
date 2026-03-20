@@ -7,14 +7,28 @@ PL(프리미어리그) 선수·경기 데이터를 맥락과 함께 시각적으
 ## 개발 명령어
 
 ```bash
-npm run dev       # 개발 서버
-npm run build     # 프로덕션 빌드
-npm run lint      # ESLint 검사
+npm run dev          # 개발 서버
+npm run build        # 프로덕션 빌드
+npm run lint         # ESLint 검사
+npm run lint:fix     # ESLint 자동 수정
+npm run format       # Prettier 포매팅
+npm run format:check # Prettier 검사
+npm run type-check   # TypeScript 타입 체크
+npm run validate     # type-check + lint + format:check 통합 검증
 ```
+
+## 코드 품질 자동화
+
+- **Prettier** — `prettier.config.mjs` (prettier-plugin-tailwindcss, tailwindStylesheet 방식)
+- **ESLint** — `eslint-config-prettier` + `simple-import-sort` + named export 강제
+- **Husky** — pre-commit 훅에서 `lint-staged` + `tsc --noEmit` 실행
+- **lint-staged** — 커밋 시 변경 파일만 ESLint + Prettier 자동 적용
 
 ## 기술 스택 특이사항
 
-- Tailwind CSS **v3** 사용 (글로벌 설정의 v4와 다름 — v3 문법 사용할 것)
+- Tailwind CSS **v4** 사용 (CSS-first 설정, `@theme inline` 방식)
+- tailwind.config.ts 없음 — 모든 테마 설정은 `app/globals.css`에 정의
+- 색상: OKLCH 색상 공간, 애니메이션: tw-animate-css
 - Next.js `cacheComponents: true` 활성화 (`next.config.ts`)
 - shadcn/ui 설정은 `components.json` 참조
 - Supabase 인증: `@supabase/ssr` 기반, `lib/supabase/proxy.ts`로 세션 관리
@@ -45,5 +59,5 @@ npm run lint      # ESLint 검사
 대화 압축 시 반드시 유지할 내용:
 
 1. PL 데이터 플랫폼, 모든 숫자에 맥락 필수
-2. Tailwind v3 사용 (v4 아님)
+2. Tailwind v4 사용 (CSS-first, @theme inline)
 3. Supabase 서버 클라이언트는 매 요청마다 새 인스턴스

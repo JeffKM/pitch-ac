@@ -9,7 +9,7 @@ const config = {
   arrowParens: "always",
   endOfLine: "lf",
   plugins: ["prettier-plugin-tailwindcss"],
-  tailwindConfig: "./tailwind.config.ts",
+  tailwindStylesheet: "./app/globals.css",
 };
 
 export default config;
