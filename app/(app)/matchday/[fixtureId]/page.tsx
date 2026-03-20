@@ -1,3 +1,7 @@
+// 경기 상세 페이지 — 현재 기본 구현, 추후 확장 예정
+
+import { notFound } from "next/navigation";
+
 import { getFixtureById, getTeamById } from "@/lib/mock";
 
 export default async function FixtureDetailPage({
@@ -8,14 +12,7 @@ export default async function FixtureDetailPage({
   const { fixtureId } = await params;
   const fixture = getFixtureById(Number(fixtureId));
 
-  if (!fixture) {
-    return (
-      <div className="space-y-6">
-        <h1 className="text-3xl font-bold">경기를 찾을 수 없습니다</h1>
-        <p className="text-muted-foreground">경기 ID: {fixtureId}</p>
-      </div>
-    );
-  }
+  if (!fixture) notFound();
 
   const homeTeam = getTeamById(fixture.homeTeamId);
   const awayTeam = getTeamById(fixture.awayTeamId);

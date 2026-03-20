@@ -1,8 +1,10 @@
 // 날짜별 경기 그룹 래퍼
 
+import type { ReactNode } from "react";
+
 interface FixtureDateGroupProps {
   dateLabel: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function FixtureDateGroup({

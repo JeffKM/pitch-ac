@@ -12,6 +12,7 @@ import { FixtureCard } from "./_components/fixture-card";
 import { FixtureDateGroup } from "./_components/fixture-date-group";
 import { GameweekHeader } from "./_components/gameweek-header";
 
+// TODO: 실제 서비스에서는 현재 진행 중인 게임위크를 API/DB에서 동적으로 조회해야 함
 const DEFAULT_GW = 28;
 
 /** UTC 날짜 문자열 → 로컬 날짜 키 (YYYY-MM-DD) */
@@ -67,10 +68,17 @@ function buildDateRange(fixtures: Fixture[]): string {
     timeZone: "Asia/Seoul",
   });
 
+  const firstDateKey = first.toLocaleDateString("sv-SE", {
+    timeZone: "Asia/Seoul",
+  });
+  const lastDateKey = last.toLocaleDateString("sv-SE", {
+    timeZone: "Asia/Seoul",
+  });
+
   const firstStr = fmt.format(first);
   const lastStr = fmt.format(last);
 
-  return firstStr === lastStr ? firstStr : `${firstStr} – ${lastStr}`;
+  return firstDateKey === lastDateKey ? firstStr : `${firstStr} – ${lastStr}`;
 }
 
 interface PageProps {

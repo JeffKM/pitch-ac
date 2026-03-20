@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { cn } from "@/lib/utils";
+
 import { mobileNavItems } from "./nav-config";
 
 export function MobileTabBar() {
@@ -20,13 +22,17 @@ export function MobileTabBar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors ${
-                isActive ? "text-foreground" : "text-muted-foreground"
-              }`}
+              className={cn(
+                "flex flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors",
+                isActive ? "text-foreground" : "text-muted-foreground",
+              )}
             >
               <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
               <span
-                className={`text-xs ${isActive ? "font-medium" : "font-normal"}`}
+                className={cn(
+                  "text-xs",
+                  isActive ? "font-medium" : "font-normal",
+                )}
               >
                 {item.label}
               </span>
