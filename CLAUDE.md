@@ -36,12 +36,14 @@ npm run lint      # ESLint 검사
 ## 환경 변수
 
 `.env.local` 필수:
+
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
 ## Summary Instructions
 
 대화 압축 시 반드시 유지할 내용:
+
 1. PL 데이터 플랫폼, 모든 숫자에 맥락 필수
 2. Tailwind v3 사용 (v4 아님)
 3. Supabase 서버 클라이언트는 매 요청마다 새 인스턴스
