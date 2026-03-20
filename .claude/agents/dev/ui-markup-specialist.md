@@ -71,11 +71,11 @@ thought 4 (Synthesis):
 ```typescript
 mcp__sequential -
   thinking__sequentialthinking({
-    thought: '대시보드 통계 카드 컴포넌트를 설계합니다...',
+    thought: "대시보드 통계 카드 컴포넌트를 설계합니다...",
     thoughtNumber: 1,
     totalThoughts: 4,
     nextThoughtNeeded: true,
-  })
+  });
 ```
 
 ---
@@ -91,10 +91,10 @@ mcp__sequential -
 ```typescript
 // 컴포넌트 이름이나 기능으로 검색
 mcp__shadcn__search_items_in_registries({
-  query: 'card', // "button", "table", "form", "dialog" 등
-  registries: ['@shadcn'],
+  query: "card", // "button", "table", "form", "dialog" 등
+  registries: ["@shadcn"],
   limit: 5,
-})
+});
 ```
 
 #### `mcp__shadcn__view_items_in_registries` — 컴포넌트 상세 정보
@@ -102,8 +102,8 @@ mcp__shadcn__search_items_in_registries({
 ```typescript
 // 컴포넌트의 정확한 파일 내용, 서브 컴포넌트, exports 확인
 mcp__shadcn__view_items_in_registries({
-  items: ['@shadcn/card', '@shadcn/button', '@shadcn/badge'],
-})
+  items: ["@shadcn/card", "@shadcn/button", "@shadcn/badge"],
+});
 ```
 
 #### `mcp__shadcn__get_item_examples_from_registries` — 실제 사용 예제
@@ -111,16 +111,16 @@ mcp__shadcn__view_items_in_registries({
 ```typescript
 // 실제 구현 코드와 의존성을 포함한 예제 검색
 mcp__shadcn__get_item_examples_from_registries({
-  query: 'card-demo', // "{컴포넌트명}-demo" 패턴 우선 시도
-  registries: ['@shadcn'],
-})
+  query: "card-demo", // "{컴포넌트명}-demo" 패턴 우선 시도
+  registries: ["@shadcn"],
+});
 ```
 
 #### `mcp__shadcn__get_audit_checklist` — 구현 후 검증
 
 ```typescript
 // 컴포넌트 생성 완료 후 품질 체크리스트 확인
-mcp__shadcn__get_audit_checklist()
+mcp__shadcn__get_audit_checklist();
 ```
 
 **Shadcn MCP 활용 워크플로우:**
@@ -147,9 +147,9 @@ mcp__shadcn__get_audit_checklist()
 mcp__context7__resolve -
   library -
   id({
-    libraryName: 'next.js', // "tailwindcss", "radix-ui", "lucide-react"
-    query: 'App Router layout patterns',
-  })
+    libraryName: "next.js", // "tailwindcss", "radix-ui", "lucide-react"
+    query: "App Router layout patterns",
+  });
 ```
 
 #### `mcp__context7__query-docs` — 최신 문서 조회
@@ -158,9 +158,9 @@ mcp__context7__resolve -
 // resolve-library-id에서 얻은 ID로 특정 주제 문서 조회
 mcp__context7__query -
   docs({
-    libraryId: '/vercel/next.js', // resolve-library-id 결과값 사용
-    query: 'App Router layout Server Component responsive',
-  })
+    libraryId: "/vercel/next.js", // resolve-library-id 결과값 사용
+    query: "App Router layout Server Component responsive",
+  });
 ```
 
 **Context7 활용 시나리오별 쿼리 예시:**
@@ -247,8 +247,8 @@ mcp__context7__query -
 // 컴포넌트 설명 (한국어)
 interface ComponentNameProps {
   // prop 타입 정의만
-  title?: string
-  className?: string
+  title?: string;
+  className?: string;
 }
 
 export function ComponentName({ title, className }: ComponentNameProps) {
@@ -260,7 +260,7 @@ export function ComponentName({ title, className }: ComponentNameProps) {
         Click Me
       </Button>
     </div>
-  )
+  );
 }
 ```
 
@@ -303,7 +303,7 @@ Shadcn Card 컴포넌트 기반으로 구성 예상.
     thoughtNumber: 1,
     totalThoughts: 3,
     nextThoughtNeeded: true,
-  })
+  });
 ```
 
 #### Step 2 — Shadcn + Context7 병렬 조회
@@ -311,15 +311,15 @@ Shadcn Card 컴포넌트 기반으로 구성 예상.
 ```typescript
 // 동시 실행
 mcp__shadcn__view_items_in_registries({
-  items: ['@shadcn/card', '@shadcn/badge'],
-})
+  items: ["@shadcn/card", "@shadcn/badge"],
+});
 mcp__shadcn__get_item_examples_from_registries({
-  query: 'card-demo',
-  registries: ['@shadcn'],
-})
+  query: "card-demo",
+  registries: ["@shadcn"],
+});
 mcp__context7__resolve -
   library -
-  id({ libraryName: 'tailwindcss', query: 'grid responsive layout' })
+  id({ libraryName: "tailwindcss", query: "grid responsive layout" });
 ```
 
 #### Step 3 — 구현
@@ -327,11 +327,11 @@ mcp__context7__resolve -
 ```tsx
 // 대시보드 통계 카드 컴포넌트
 interface StatsCardProps {
-  title: string
-  value: string
-  icon: React.ReactNode
-  trend?: 'up' | 'down'
-  trendLabel?: string
+  title: string;
+  value: string;
+  icon: React.ReactNode;
+  trend?: "up" | "down";
+  trendLabel?: string;
 }
 
 export function StatsCard({
@@ -344,7 +344,7 @@ export function StatsCard({
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-muted-foreground text-sm font-medium">
+        <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}
         </CardTitle>
         <span className="text-muted-foreground" aria-hidden="true">
@@ -354,21 +354,21 @@ export function StatsCard({
       <CardContent>
         <p className="text-2xl font-bold tabular-nums">{value}</p>
         {trend && trendLabel && (
-          <p className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
+          <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
             {/* TODO: 트렌드 방향에 따른 아이콘 및 색상 로직 구현 */}
             {trendLabel}
           </p>
         )}
       </CardContent>
     </Card>
-  )
+  );
 }
 ```
 
 #### Step 4 — 검증
 
 ```typescript
-mcp__shadcn__get_audit_checklist()
+mcp__shadcn__get_audit_checklist();
 ```
 
 ---
@@ -382,12 +382,12 @@ mcp__shadcn__get_audit_checklist()
 ```typescript
 // 동시 실행
 mcp__shadcn__get_item_examples_from_registries({
-  query: 'table-demo',
-  registries: ['@shadcn'],
-})
+  query: "table-demo",
+  registries: ["@shadcn"],
+});
 mcp__context7__resolve -
   library -
-  id({ libraryName: 'tailwindcss', query: 'overflow scroll responsive table' })
+  id({ libraryName: "tailwindcss", query: "overflow scroll responsive table" });
 ```
 
 #### 개선된 마크업
@@ -396,11 +396,11 @@ mcp__context7__resolve -
 {
   /* 모바일 스크롤 가능한 테이블 래퍼 */
 }
-;<div className="w-full overflow-x-auto rounded-md border">
+<div className="w-full overflow-x-auto rounded-md border">
   <table className="w-full text-sm">
     <thead className="bg-muted/50">
       <tr>
-        <th className="text-muted-foreground h-10 px-4 text-left font-medium whitespace-nowrap">
+        <th className="h-10 px-4 text-left font-medium whitespace-nowrap text-muted-foreground">
           항목명
         </th>
         {/* ... */}
@@ -408,5 +408,5 @@ mcp__context7__resolve -
     </thead>
     <tbody>{/* TODO: 데이터 렌더링 로직 */}</tbody>
   </table>
-</div>
+</div>;
 ```

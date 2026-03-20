@@ -120,15 +120,15 @@ memory: project
 ```typescript
 // 페이지 Props 타입 (Next.js 15 기준)
 type PageProps = {
-  params: Promise<{ slug: string }>
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
-}
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
 
 // 레이아웃 Props 타입
 type LayoutProps = {
-  children: React.ReactNode
-  params: Promise<{ slug: string }>
-}
+  children: React.ReactNode;
+  params: Promise<{ slug: string }>;
+};
 ```
 
 ### 4. 에러 처리 패턴
@@ -157,29 +157,29 @@ export default function Error({
 
 ```typescript
 // actions.ts
-'use server'
+"use server";
 
-import { z } from 'zod'
+import { z } from "zod";
 
 const schema = z.object({
   // 스키마 정의
-})
+});
 
 export async function submitAction(
   prevState: unknown,
-  formData: FormData
+  formData: FormData,
 ): Promise<ApiResponse<T>> {
-  const validated = schema.safeParse(Object.fromEntries(formData))
+  const validated = schema.safeParse(Object.fromEntries(formData));
 
   if (!validated.success) {
-    return { success: false, error: validated.error.flatten() }
+    return { success: false, error: validated.error.flatten() };
   }
 
   try {
     // 비즈니스 로직
-    return { success: true, data: result }
+    return { success: true, data: result };
   } catch (error) {
-    return { success: false, error: '처리 중 오류가 발생했습니다.' }
+    return { success: false, error: "처리 중 오류가 발생했습니다." };
   }
 }
 ```

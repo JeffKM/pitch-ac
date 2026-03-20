@@ -105,15 +105,15 @@ memory: project
 
 ```typescript
 // ✅ 올바른 임포트 방식
-import { Button } from '@/components/ui/button'
-import { Search } from 'lucide-react'
+import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 
 // ✅ API 응답 형식
 interface ApiResponse<T> {
-  data: T
-  success: boolean
-  message?: string
-  error?: string
+  data: T;
+  success: boolean;
+  message?: string;
+  error?: string;
 }
 
 // ✅ 컴포넌트 구조
@@ -123,7 +123,7 @@ export default async function PageComponent() {
 }
 
 // Client Component는 명시적으로
-;('use client')
+("use client");
 export function InteractiveComponent() {
   // 클라이언트 상호작용 로직
 }
