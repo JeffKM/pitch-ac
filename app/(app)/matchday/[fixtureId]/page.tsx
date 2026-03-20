@@ -1,8 +1,26 @@
-// 경기 상세 페이지 — 현재 기본 구현, 추후 확장 예정
+// 경기 상세 페이지 — 헤더 + 상태별 탭 (프리매치/라이브/포스트매치)
 
 import { notFound } from "next/navigation";
 
-import { getFixtureById, getTeamById } from "@/lib/mock";
+import {
+  getFixtureById,
+  getH2HResults,
+  getInjuriesByTeamId,
+  getStandingByTeamId,
+  getTeamById,
+} from "@/lib/mock";
+import type { FixtureStatus } from "@/types";
+
+import { FixtureTabs } from "./_components/fixture-tabs";
+import { MatchHeader } from "./_components/match-header";
+
+function resolveDefaultTab(
+  status: FixtureStatus,
+): "prematch" | "live" | "postmatch" {
+  if (status === "NS") return "prematch";
+  if (status === "LIVE") return "live";
+  return "postmatch";
+}
 
 export default async function FixtureDetailPage({
   params,
@@ -16,21 +34,37 @@ export default async function FixtureDetailPage({
 
   const homeTeam = getTeamById(fixture.homeTeamId);
   const awayTeam = getTeamById(fixture.awayTeamId);
-  const scoreText =
-    fixture.homeScore !== null && fixture.awayScore !== null
-      ? `${fixture.homeScore} - ${fixture.awayScore}`
-      : "vs";
+
+  if (!homeTeam || !awayTeam) notFound();
+
+  const homeStanding = getStandingByTeamId(fixture.homeTeamId);
+  const awayStanding = getStandingByTeamId(fixture.awayTeamId);
+  const h2hResults = getH2HResults(fixture.homeTeamId, fixture.awayTeamId);
+  const homeInjuries = getInjuriesByTeamId(fixture.homeTeamId);
+  const awayInjuries = getInjuriesByTeamId(fixture.awayTeamId);
+  const defaultTab = resolveDefaultTab(fixture.status);
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">
-        {homeTeam?.name ?? fixture.homeTeamId} {scoreText}{" "}
-        {awayTeam?.name ?? fixture.awayTeamId}
-      </h1>
-      <p className="text-muted-foreground">
-        GW{fixture.gameweek} · {fixture.status}
-        {fixture.minute !== null ? ` ${fixture.minute}'` : ""}
-      </p>
+    <div className="space-y-4">
+      <MatchHeader
+        fixture={fixture}
+        homeTeam={homeTeam}
+        awayTeam={awayTeam}
+        homeStanding={homeStanding}
+        awayStanding={awayStanding}
+      />
+
+      <FixtureTabs
+        fixture={fixture}
+        homeTeam={homeTeam}
+        awayTeam={awayTeam}
+        homeStanding={homeStanding}
+        awayStanding={awayStanding}
+        h2hResults={h2hResults}
+        homeInjuries={homeInjuries}
+        awayInjuries={awayInjuries}
+        defaultTab={defaultTab}
+      />
     </div>
   );
 }

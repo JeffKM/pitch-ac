@@ -57,6 +57,25 @@ export interface Lineup {
   substitutes: LineupPlayer[];
 }
 
+/** H2H 경기 결과 */
+export interface H2HResult {
+  fixtureId: number;
+  date: string;
+  homeTeamId: number;
+  awayTeamId: number;
+  homeScore: number;
+  awayScore: number;
+}
+
+/** 부상/결장 선수 */
+export interface InjuredPlayer {
+  playerId: number;
+  playerName: string;
+  teamId: number;
+  reason: string;
+  expectedReturn: string | null;
+}
+
 /** 경기 정보 */
 export interface Fixture {
   id: number;

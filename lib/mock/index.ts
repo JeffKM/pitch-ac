@@ -2,6 +2,8 @@
 
 export * from "./fixtures";
 export * from "./glossary";
+export * from "./h2h";
+export * from "./injuries";
 export * from "./player-stats";
 export * from "./players";
 export * from "./teams";
