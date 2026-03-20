@@ -1,0 +1,80 @@
+// 경기(Fixture) 관련 타입 정의
+
+/** 경기 상태 */
+export type FixtureStatus = "NS" | "LIVE" | "FT";
+
+/** 경기 이벤트 타입 */
+export type FixtureEventType =
+  | "goal"
+  | "substitution"
+  | "yellow_card"
+  | "red_card";
+
+/** 경기 이벤트 (골, 교체, 카드 등) */
+export interface FixtureEvent {
+  type: FixtureEventType;
+  /** 발생 분 */
+  minute: number;
+  teamId: number;
+  playerId: number;
+  playerName: string;
+  /** 골 이벤트일 때만 존재하는 Expected Goals 수치 */
+  xg?: number;
+}
+
+/** 팀별 실시간 스탯 */
+export interface TeamLiveStats {
+  /** 점유율 (%) */
+  possession: number;
+  shots: number;
+  shotsOnTarget: number;
+  xg: number;
+  corners: number;
+  fouls: number;
+}
+
+/** 홈/어웨이 실시간 스탯 */
+export interface FixtureLiveStats {
+  home: TeamLiveStats;
+  away: TeamLiveStats;
+}
+
+/** 라인업 선수 */
+export interface LineupPlayer {
+  playerId: number;
+  playerName: string;
+  number: number;
+  position: string;
+  /** 그리드 포지션 (예: "1:1", "2:3") */
+  grid?: string;
+}
+
+/** 팀 라인업 */
+export interface Lineup {
+  /** 포메이션 (예: "4-3-3") */
+  formation: string;
+  startXI: LineupPlayer[];
+  substitutes: LineupPlayer[];
+}
+
+/** 경기 정보 */
+export interface Fixture {
+  id: number;
+  gameweek: number;
+  date: string;
+  homeTeamId: number;
+  awayTeamId: number;
+  status: FixtureStatus;
+  /** NS(예정)일 때 null */
+  homeScore: number | null;
+  /** NS(예정)일 때 null */
+  awayScore: number | null;
+  /** LIVE 경기의 현재 진행 분 (LIVE가 아닐 때 null) */
+  minute: number | null;
+  /** 이벤트 목록 (NS일 때 빈 배열) */
+  events: FixtureEvent[];
+  /** 실시간 스탯 (NS일 때 null) */
+  liveStats: FixtureLiveStats | null;
+  /** 라인업 (NS일 때 null) */
+  lineups: { home: Lineup; away: Lineup } | null;
+}
