@@ -107,10 +107,10 @@ export function Card({ type }: { type: 'primary' | 'secondary' }) {
 import styles from './button.module.css'
 import clsx from 'clsx'
 
-export function Button({ 
+export function Button({
   variant,
-  disabled 
-}: { 
+  disabled
+}: {
   variant: 'primary' | 'secondary'
   disabled?: boolean
 }) {
@@ -148,14 +148,14 @@ npx tailwindcss init -p
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {},
   },
   plugins: [],
-}
+};
 ```
 
 ```css
@@ -204,10 +204,10 @@ export default function Page() {
 ```typescript
 import clsx from 'clsx'
 
-export function Button({ 
+export function Button({
   variant,
-  disabled 
-}: { 
+  disabled
+}: {
   variant: 'primary' | 'secondary'
   disabled?: boolean
 }) {
@@ -236,18 +236,18 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          500: '#3b82f6',
-          900: '#1e3a8a',
+          50: "#eff6ff",
+          100: "#dbeafe",
+          500: "#3b82f6",
+          900: "#1e3a8a",
         },
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ["Inter", "sans-serif"],
       },
     },
   },
-}
+};
 ```
 
 ```typescript
@@ -326,7 +326,7 @@ body {
 ```typescript
 export function Page() {
   return (
-    <div style={{ 
+    <div style={{
       color: 'var(--color-primary)',
       padding: 'calc(var(--spacing-unit) * 4)'
     }}>
@@ -442,7 +442,7 @@ const StyledButton = styled.button`
   color: white;
   border: none;
   border-radius: 4px;
-  
+
   &:hover {
     background: darkblue;
   }
@@ -492,18 +492,18 @@ export default function EmotionRegistry({ children }) {
 
 ```typescript
 // components/button.tsx
-'use client'
+"use client";
 
-import styled from '@emotion/styled'
+import styled from "@emotion/styled";
 
 const Button = styled.button`
   padding: 0.5rem 1rem;
   background: blue;
   color: white;
   border-radius: 4px;
-`
+`;
 
-export default Button
+export default Button;
 ```
 
 ---
@@ -528,20 +528,20 @@ $secondary-color: gray;
 .button {
   padding: 0.5rem 1rem;
   border-radius: 4px;
-  
+
   &.primary {
     background: $primary-color;
     color: white;
-    
+
     &:hover {
       background: darken($primary-color, 10%);
     }
   }
-  
+
   &.secondary {
     background: $secondary-color;
     color: white;
-    
+
     &:hover {
       background: darken($secondary-color, 10%);
     }
@@ -581,13 +581,13 @@ export function Button({ variant }: { variant: 'primary' | 'secondary' }) {
 
 ```scss
 /* app/components/card.module.scss */
-@use '../styles/mixins' as *;
+@use "../styles/mixins" as *;
 
 .card {
   @include flex-center;
   padding: 2rem;
   background: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .button {
@@ -636,7 +636,7 @@ function Card() {
   --text-primary: #000000;
 }
 
-[data-theme='dark'] {
+[data-theme="dark"] {
   --bg-primary: #000000;
   --text-primary: #ffffff;
 }
@@ -654,7 +654,7 @@ import { useState } from 'react'
 
 export default function Page() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
-  
+
   return (
     <div data-theme={theme}>
       <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
@@ -714,10 +714,10 @@ type ButtonProps = {
   children: React.ReactNode
 }
 
-export function Button({ 
-  variant = 'primary', 
+export function Button({
+  variant = 'primary',
   size,
-  children 
+  children
 }: ButtonProps) {
   return (
     <button
@@ -759,17 +759,17 @@ module.exports = {
   theme: {
     extend: {
       animation: {
-        fadeIn: 'fadeIn 0.5s ease-in',
+        fadeIn: "fadeIn 0.5s ease-in",
       },
       keyframes: {
         fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
         },
       },
     },
   },
-}
+};
 ```
 
 ### Pattern 5: Layout Components
@@ -785,12 +785,12 @@ export function Container({ children }: { children: React.ReactNode }) {
 }
 
 // components/grid.tsx
-export function Grid({ 
+export function Grid({
   cols = 3,
-  children 
-}: { 
+  children
+}: {
   cols?: number
-  children: React.ReactNode 
+  children: React.ReactNode
 }) {
   return (
     <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${cols} gap-6`}>
@@ -898,41 +898,42 @@ function Button({ children, variant = 'primary' }) {
 
 ```typescript
 // CSS Module
-import styles from './component.module.css'
+import styles from "./component.module.css";
 
 // Global CSS (only in layout.tsx)
-import './globals.css'
+import "./globals.css";
 
 // Sass Module
-import styles from './component.module.scss'
+import styles from "./component.module.scss";
 ```
 
 ### Tailwind Common Classes
 
 ```typescript
 // Layout
-'flex flex-col items-center justify-center'
-'grid grid-cols-3 gap-4'
+"flex flex-col items-center justify-center";
+"grid grid-cols-3 gap-4";
 
 // Spacing
-'p-4 px-6 py-2 m-4 mx-auto'
+"p-4 px-6 py-2 m-4 mx-auto";
 
 // Typography
-'text-lg font-bold text-gray-900'
+"text-lg font-bold text-gray-900";
 
 // Colors
-'bg-blue-500 text-white'
+"bg-blue-500 text-white";
 
 // Borders
-'border border-gray-300 rounded-lg'
+"border border-gray-300 rounded-lg";
 
 // Effects
-'shadow-md hover:shadow-lg transition-shadow'
+"shadow-md hover:shadow-lg transition-shadow";
 ```
 
 ---
 
 **Related Documentation:**
+
 - [Font Optimization](16-font-optimization.md)
 - [Image Optimization](15-image-optimization.md)
 - [Tailwind CSS Docs](https://tailwindcss.com/docs)
