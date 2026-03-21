@@ -8,9 +8,15 @@ import type {
   FixtureLiveStats,
   InjuredPlayer,
   Lineup,
+  Player,
+  PlayerMatchStats,
+  PlayerPosition,
+  PlayerSeasonStats,
+  StatContext,
   Team,
   TeamStanding,
 } from "@/types";
+import type { RadarData } from "@/types/radar";
 
 /** fixtures 테이블 행 타입 (Supabase 반환값) */
 export interface FixtureRow {
@@ -99,6 +105,107 @@ export function injuryRowToInjuredPlayer(row: InjuryRow): InjuredPlayer {
     teamId: row.team_id,
     reason: row.reason,
     expectedReturn: row.expected_return,
+  };
+}
+
+/** players 테이블 행 타입 */
+export interface PlayerRow {
+  id: number;
+  team_id: number | null;
+  name: string;
+  position: string;
+  jersey_number: number | null;
+  nationality: string;
+  photo_url: string;
+}
+
+/** player_season_stats 테이블 행 타입 */
+export interface PlayerSeasonStatsRow {
+  id: number;
+  player_id: number;
+  season: string;
+  goals: number;
+  assists: number;
+  xg: number | null;
+  xa: number | null;
+  key_passes: number;
+  dribbles: number;
+  average_rating: number;
+  context: Record<string, StatContext | null>;
+  radar_data: RadarData;
+}
+
+/** player_match_stats 테이블 행 타입 */
+export interface PlayerMatchStatsRow {
+  id: number;
+  player_id: number;
+  fixture_id: number;
+  rating: number;
+  goals: number;
+  assists: number;
+  minutes_played: number;
+}
+
+/** context JSONB 기본값 */
+const DEFAULT_STAT_CONTEXT: StatContext = {
+  rank: 0,
+  percentile: 0,
+  prevSeason: null,
+};
+
+/** players 테이블 행 → Player 앱 타입 */
+export function playerRowToPlayer(row: PlayerRow): Player {
+  return {
+    id: row.id,
+    name: row.name,
+    photoUrl: row.photo_url,
+    teamId: row.team_id ?? 0,
+    position: row.position as PlayerPosition,
+    number: row.jersey_number ?? 0,
+    nationality: row.nationality,
+  };
+}
+
+/** player_season_stats 테이블 행 → PlayerSeasonStats 앱 타입 */
+export function playerSeasonStatsRowToStats(
+  row: PlayerSeasonStatsRow,
+): PlayerSeasonStats {
+  const ctx = row.context ?? {};
+  const getCtx = (key: string): StatContext =>
+    (ctx[key] as StatContext) ?? DEFAULT_STAT_CONTEXT;
+
+  return {
+    playerId: row.player_id,
+    season: row.season,
+    goals: row.goals,
+    goalsContext: getCtx("goals"),
+    assists: row.assists,
+    assistsContext: getCtx("assists"),
+    xg: row.xg,
+    xgContext: row.xg !== null ? getCtx("xg") : null,
+    xa: row.xa,
+    xaContext: row.xa !== null ? getCtx("xa") : null,
+    keyPasses: row.key_passes,
+    keyPassesContext: getCtx("keyPasses"),
+    dribbles: row.dribbles,
+    dribblesContext: getCtx("dribbles"),
+    averageRating: row.average_rating,
+    averageRatingContext: getCtx("averageRating"),
+    radarData: row.radar_data as RadarData,
+  };
+}
+
+/** player_match_stats 테이블 행 → PlayerMatchStats 앱 타입 */
+export function playerMatchStatsRowToStats(
+  row: PlayerMatchStatsRow,
+): PlayerMatchStats {
+  return {
+    playerId: row.player_id,
+    fixtureId: row.fixture_id,
+    rating: row.rating,
+    goals: row.goals,
+    assists: row.assists,
+    minutesPlayed: row.minutes_played,
   };
 }
 

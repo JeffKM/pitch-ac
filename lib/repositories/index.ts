@@ -6,6 +6,21 @@ export {
   getFixturesByGameweek,
 } from "./fixture-repository";
 export { getInjuriesByTeamId } from "./injury-repository";
-export type { FixtureRow, InjuryRow, StandingRow, TeamRow } from "./mappers";
+export type {
+  FixtureRow,
+  InjuryRow,
+  PlayerMatchStatsRow,
+  PlayerRow,
+  PlayerSeasonStatsRow,
+  StandingRow,
+  TeamRow,
+} from "./mappers";
+export {
+  getAllPlayers,
+  getMatchStatsByPlayerId,
+  getPlayerById,
+  getPlayerSeasonStats,
+  getPlayerSeasonStatsByIds,
+} from "./player-repository";
 export { getStandingsByTeamIds } from "./standing-repository";
-export { getTeamsByIds } from "./team-repository";
+export { getAllTeams, getTeamsByIds } from "./team-repository";

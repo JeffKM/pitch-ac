@@ -65,8 +65,8 @@ export function PlayerCard({ player, team, seasonStats }: PlayerCardProps) {
           </div>
           {primaryStat && (
             <Badge variant="secondary" className="shrink-0">
-              {primaryStat.label} {primaryStat.value} · 리그 {primaryStat.rank}
-              위
+              {primaryStat.label} {primaryStat.value}
+              {primaryStat.rank > 0 && ` · 리그 ${primaryStat.rank}위`}
             </Badge>
           )}
         </CardContent>

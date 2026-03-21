@@ -42,13 +42,17 @@ export function StatContextCard({
             {/* 수치 */}
             <p className="text-2xl font-bold tabular-nums">{format(value)}</p>
 
-            {/* 리그 순위 */}
-            <p className="text-xs font-medium text-foreground">
-              리그 {context.rank}위
-            </p>
+            {/* 리그 순위 (context 미계산 시 숨김) */}
+            {context.rank > 0 && (
+              <p className="text-xs font-medium text-foreground">
+                리그 {context.rank}위
+              </p>
+            )}
 
-            {/* 백분위 바 */}
-            <PercentileBar percentile={context.percentile} />
+            {/* 백분위 바 (context 미계산 시 숨김) */}
+            {context.percentile > 0 && (
+              <PercentileBar percentile={context.percentile} />
+            )}
 
             {/* 전 시즌 비교 */}
             <SeasonDeltaIndicator

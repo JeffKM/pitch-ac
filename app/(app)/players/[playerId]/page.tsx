@@ -1,12 +1,13 @@
 import { notFound } from "next/navigation";
 
 import { PlayerRadarChart } from "@/components/charts/player-radar-chart";
+import { CURRENT_SEASON_LABEL } from "@/lib/api/sportmonks/constants";
 import {
-  getMatchStatsByPlayer,
+  getMatchStatsByPlayerId,
   getPlayerById,
   getPlayerSeasonStats,
-  getTeamById,
-} from "@/lib/mock";
+  getTeamsByIds,
+} from "@/lib/repositories";
 
 import { CompareButton } from "./_components/compare-button";
 import { PlayerHeaderCard } from "./_components/player-header-card";
@@ -22,18 +23,25 @@ export default async function PlayerProfilePage({
   const id = Number(playerId);
   if (isNaN(id) || id <= 0) notFound();
 
-  const player = getPlayerById(id);
+  const player = await getPlayerById(id);
   if (!player) notFound();
 
-  const team = getTeamById(player.teamId);
-  if (!team) notFound();
+  const [teamsMap, seasonStats, matchStats] = await Promise.all([
+    getTeamsByIds([player.teamId]),
+    getPlayerSeasonStats(id, CURRENT_SEASON_LABEL),
+    getMatchStatsByPlayerId(id),
+  ]);
 
-  const seasonStats = getPlayerSeasonStats(id);
-  const matchStats = getMatchStatsByPlayer(id);
+  const team = teamsMap.get(player.teamId);
+  if (!team) notFound();
 
   return (
     <div className="space-y-6">
-      <PlayerHeaderCard player={player} team={team} seasonStats={seasonStats} />
+      <PlayerHeaderCard
+        player={player}
+        team={team}
+        seasonStats={seasonStats ?? undefined}
+      />
 
       {seasonStats && <StatContextGrid seasonStats={seasonStats} />}
 

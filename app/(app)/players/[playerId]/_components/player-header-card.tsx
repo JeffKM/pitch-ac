@@ -80,10 +80,12 @@ export function PlayerHeaderCard({
                 </span>
                 <div className="space-y-0.5">
                   <p className="text-xs font-medium">평균 평점</p>
-                  <p className="text-xs text-muted-foreground">
-                    리그 {seasonStats.averageRatingContext.rank}위 · 상위{" "}
-                    {100 - seasonStats.averageRatingContext.percentile + 1}%
-                  </p>
+                  {seasonStats.averageRatingContext.rank > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      리그 {seasonStats.averageRatingContext.rank}위 · 상위{" "}
+                      {100 - seasonStats.averageRatingContext.percentile + 1}%
+                    </p>
+                  )}
                 </div>
               </div>
             )}
