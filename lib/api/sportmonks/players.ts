@@ -59,6 +59,27 @@ export async function getSquadByTeamAndSeason(
   return response.data;
 }
 
+/**
+ * 시즌 PL 선수 기본정보 (팀·포지션·국적 포함, 페이지네이션)
+ * squads 엔드포인트가 Starter 플랜 미지원 → statistics 엔드포인트를 profile includes로 대체
+ */
+export async function getLeaguePlayerProfiles(
+  page = 1,
+  seasonId: number = CURRENT_SEASON_ID,
+): Promise<SmPaginatedResponse<SmPlayer>> {
+  return sportMonksFetch<SmPaginatedResponse<SmPlayer>>(
+    `/football/statistics/seasons/players/${seasonId}`,
+    {
+      includes: ["teams.team", "nationality", "position"],
+      filters: { playerLeagueIds: PL_LEAGUE_ID },
+      page,
+      perPage: 50,
+      revalidate: 86400,
+      tags: [`pl-player-profiles-season-${seasonId}-page-${page}`],
+    },
+  );
+}
+
 /** 시즌 선수 통계 (순위/백분위 계산용, 페이지네이션) */
 export async function getSeasonPlayerStats(
   page = 1,
