@@ -2,6 +2,8 @@
 
 import type { Player } from "@/types";
 
+import { getTeamById } from "./teams";
+
 export const mockPlayers: Player[] = [
   // GK (2명)
   {
@@ -122,14 +124,19 @@ export function getPlayerById(id: number): Player | undefined {
   return mockPlayers.find((player) => player.id === id);
 }
 
-/** 이름/팀/포지션으로 선수 검색 */
+/** 이름/팀명/포지션/국적으로 선수 검색 */
 export function searchPlayers(query: string): Player[] {
   const q = query.toLowerCase();
-  return mockPlayers.filter(
-    (player) =>
+  return mockPlayers.filter((player) => {
+    const team = getTeamById(player.teamId);
+    return (
       player.name.toLowerCase().includes(q) ||
-      player.nationality.toLowerCase().includes(q),
-  );
+      player.nationality.toLowerCase().includes(q) ||
+      player.position.toLowerCase().includes(q) ||
+      team?.name.toLowerCase().includes(q) ||
+      team?.shortName.toLowerCase().includes(q)
+    );
+  });
 }
 
 /** 팀 ID로 선수 목록 조회 */
