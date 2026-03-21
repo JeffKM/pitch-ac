@@ -1,4 +1,5 @@
 export { verifyCronAuth } from "./auth";
+export { calculateContext } from "./calculate-context";
 export {
   fixtureToDbRow,
   matchStatsToDbRow,
