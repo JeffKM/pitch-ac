@@ -52,10 +52,10 @@ export const COMPARE_STAT_DEFINITIONS = [
 
 interface StatRowProps {
   label: string;
-  value1: number;
-  value2: number;
-  context1: StatContext;
-  context2: StatContext;
+  value1: number | null;
+  value2: number | null;
+  context1: StatContext | null;
+  context2: StatContext | null;
   format?: (v: number) => string;
   isLast?: boolean;
   glossaryId?: string;
@@ -71,8 +71,14 @@ function StatRow({
   isLast,
   glossaryId,
 }: StatRowProps) {
-  const winner =
-    value1 > value2 ? "player1" : value2 > value1 ? "player2" : "draw";
+  const isUnavailable = value1 === null || value2 === null;
+  const winner = isUnavailable
+    ? "draw"
+    : value1 > value2
+      ? "player1"
+      : value2 > value1
+        ? "player2"
+        : "draw";
 
   return (
     <div
@@ -86,14 +92,18 @@ function StatRow({
         <span
           className={cn(
             "text-base tabular-nums",
-            winner === "player1" && "font-bold",
+            isUnavailable
+              ? "text-muted-foreground"
+              : winner === "player1" && "font-bold",
           )}
         >
-          {format(value1)}
+          {value1 === null ? "N/A" : format(value1)}
         </span>
-        <span className="block text-xs text-muted-foreground">
-          리그 {context1.rank}위
-        </span>
+        {context1 !== null && (
+          <span className="block text-xs text-muted-foreground">
+            리그 {context1.rank}위
+          </span>
+        )}
       </div>
 
       {/* 중앙: 지표명 + 트로피 */}
@@ -102,7 +112,7 @@ function StatRow({
           {label}
           {glossaryId && <GlossaryPopover glossaryId={glossaryId} />}
         </span>
-        {winner !== "draw" && (
+        {!isUnavailable && winner !== "draw" && (
           <Trophy
             className={cn(
               "size-4",
@@ -118,14 +128,18 @@ function StatRow({
         <span
           className={cn(
             "text-base tabular-nums",
-            winner === "player2" && "font-bold",
+            isUnavailable
+              ? "text-muted-foreground"
+              : winner === "player2" && "font-bold",
           )}
         >
-          {format(value2)}
+          {value2 === null ? "N/A" : format(value2)}
         </span>
-        <span className="block text-xs text-muted-foreground">
-          리그 {context2.rank}위
-        </span>
+        {context2 !== null && (
+          <span className="block text-xs text-muted-foreground">
+            리그 {context2.rank}위
+          </span>
+        )}
       </div>
     </div>
   );

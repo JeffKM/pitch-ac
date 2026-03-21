@@ -9,9 +9,9 @@ import { SeasonDeltaIndicator } from "./season-delta-indicator";
 
 interface StatContextCardProps {
   label: string;
-  value: number;
+  value: number | null;
   format?: (v: number) => string;
-  context: StatContext;
+  context: StatContext | null;
   /** 전문 용어 ID (xG, xA 등에만 제공) */
   glossaryId?: string;
 }
@@ -34,23 +34,30 @@ export function StatContextCard({
           {glossaryId && <GlossaryPopover glossaryId={glossaryId} />}
         </div>
 
-        {/* 수치 */}
-        <p className="text-2xl font-bold tabular-nums">{format(value)}</p>
+        {/* 데이터 없음 처리 */}
+        {value === null || context === null ? (
+          <p className="text-sm text-muted-foreground">N/A</p>
+        ) : (
+          <>
+            {/* 수치 */}
+            <p className="text-2xl font-bold tabular-nums">{format(value)}</p>
 
-        {/* 리그 순위 */}
-        <p className="text-xs font-medium text-foreground">
-          리그 {context.rank}위
-        </p>
+            {/* 리그 순위 */}
+            <p className="text-xs font-medium text-foreground">
+              리그 {context.rank}위
+            </p>
 
-        {/* 백분위 바 */}
-        <PercentileBar percentile={context.percentile} />
+            {/* 백분위 바 */}
+            <PercentileBar percentile={context.percentile} />
 
-        {/* 전 시즌 비교 */}
-        <SeasonDeltaIndicator
-          currentValue={value}
-          prevSeasonValue={context.prevSeason}
-          format={format}
-        />
+            {/* 전 시즌 비교 */}
+            <SeasonDeltaIndicator
+              currentValue={value}
+              prevSeasonValue={context.prevSeason}
+              format={format}
+            />
+          </>
+        )}
       </CardContent>
     </Card>
   );

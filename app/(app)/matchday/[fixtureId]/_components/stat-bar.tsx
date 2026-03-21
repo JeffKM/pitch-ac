@@ -14,8 +14,8 @@ interface StatBarProps {
 
 interface StatRowProps {
   label: string;
-  homeValue: number;
-  awayValue: number;
+  homeValue: number | null;
+  awayValue: number | null;
   format?: (v: number) => string;
   glossaryId?: string;
 }
@@ -27,6 +27,26 @@ function StatRow({
   format,
   glossaryId,
 }: StatRowProps) {
+  // null 값은 "N/A" 표시 후 바 숨김
+  if (homeValue === null || awayValue === null) {
+    return (
+      <div className="space-y-1">
+        <div className="flex items-center justify-between text-sm">
+          <span className="font-medium text-muted-foreground tabular-nums">
+            N/A
+          </span>
+          <span className="flex items-center gap-0.5 text-xs text-muted-foreground">
+            {label}
+            {glossaryId && <GlossaryPopover glossaryId={glossaryId} />}
+          </span>
+          <span className="font-medium text-muted-foreground tabular-nums">
+            N/A
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   const total = homeValue + awayValue;
   const homePercent = total === 0 ? 50 : (homeValue / total) * 100;
   const awayPercent = 100 - homePercent;

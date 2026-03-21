@@ -18,12 +18,16 @@ export function CompareVerdict({
   stats1,
   stats2,
 }: CompareVerdictProps) {
-  const player1Wins = COMPARE_STAT_DEFINITIONS.filter(
-    ({ key }) => stats1[key] > stats2[key],
-  ).length;
-  const player2Wins = COMPARE_STAT_DEFINITIONS.filter(
-    ({ key }) => stats2[key] > stats1[key],
-  ).length;
+  const player1Wins = COMPARE_STAT_DEFINITIONS.filter(({ key }) => {
+    const v1 = stats1[key];
+    const v2 = stats2[key];
+    return v1 !== null && v2 !== null && v1 > v2;
+  }).length;
+  const player2Wins = COMPARE_STAT_DEFINITIONS.filter(({ key }) => {
+    const v1 = stats1[key];
+    const v2 = stats2[key];
+    return v1 !== null && v2 !== null && v2 > v1;
+  }).length;
 
   const isDraw = player1Wins === player2Wins;
   const leader = player1Wins > player2Wins ? player1 : player2;

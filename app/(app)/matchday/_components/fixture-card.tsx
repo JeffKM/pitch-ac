@@ -100,9 +100,9 @@ export function FixtureCard({
           {isFt && fixture.liveStats && (
             <div className="mt-3 border-t pt-3">
               <div className="grid grid-cols-3 gap-2 text-center text-xs text-muted-foreground">
-                <span>{fixture.liveStats.home.xg.toFixed(2)}</span>
+                <span>{fixture.liveStats.home.xg?.toFixed(2) ?? "N/A"}</span>
                 <span className="font-medium text-foreground">xG</span>
-                <span>{fixture.liveStats.away.xg.toFixed(2)}</span>
+                <span>{fixture.liveStats.away.xg?.toFixed(2) ?? "N/A"}</span>
 
                 <span>{fixture.liveStats.home.possession}%</span>
                 <span className="font-medium text-foreground">점유율</span>
