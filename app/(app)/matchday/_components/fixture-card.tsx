@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { formatKickoffTime } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import type { Fixture, Team, TeamStanding } from "@/types";
 
@@ -27,12 +28,7 @@ export function FixtureCard({
   const isLive = fixture.status === "LIVE";
   const isFt = fixture.status === "FT";
 
-  // 킥오프 시간 포맷 (KST 기준)
-  const kickoffTime = new Intl.DateTimeFormat("ko-KR", {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Asia/Seoul",
-  }).format(new Date(fixture.date));
+  const kickoffTime = formatKickoffTime(fixture.date);
 
   return (
     <Link href={`/matchday/${fixture.id}`} className="block">

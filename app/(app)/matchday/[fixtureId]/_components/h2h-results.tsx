@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { formatH2HDate } from "@/lib/date-utils";
 import type { H2HResult } from "@/types";
 
 import { TeamFormBadge } from "./team-form-badge";
@@ -77,11 +78,7 @@ export function H2HResults({
             >
               {/* 날짜 */}
               <span className="w-24 shrink-0 text-xs text-muted-foreground">
-                {new Intl.DateTimeFormat("ko-KR", {
-                  year: "2-digit",
-                  month: "short",
-                  day: "numeric",
-                }).format(new Date(result.date))}
+                {formatH2HDate(result.date)}
               </span>
 
               {/* 스코어 */}

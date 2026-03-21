@@ -3,6 +3,7 @@
 import Image from "next/image";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { formatKickoffDate, formatKickoffTime } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import type { Fixture, Team, TeamStanding } from "@/types";
 
@@ -25,19 +26,8 @@ export function MatchHeader({
 }: MatchHeaderProps) {
   const isLive = fixture.status === "LIVE";
 
-  // 킥오프 날짜/시간 포맷 (KST)
-  const kickoffDate = new Intl.DateTimeFormat("ko-KR", {
-    month: "long",
-    day: "numeric",
-    weekday: "short",
-    timeZone: "Asia/Seoul",
-  }).format(new Date(fixture.date));
-
-  const kickoffTime = new Intl.DateTimeFormat("ko-KR", {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Asia/Seoul",
-  }).format(new Date(fixture.date));
+  const kickoffDate = formatKickoffDate(fixture.date);
+  const kickoffTime = formatKickoffTime(fixture.date);
 
   return (
     <Card
