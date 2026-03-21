@@ -13,6 +13,7 @@ const STAT_DEFINITIONS = [
     key: "goals" as const,
     label: "골",
     contextKey: "goalsContext" as const,
+    glossaryId: "goal",
   },
   {
     key: "assists" as const,
@@ -49,6 +50,7 @@ const STAT_DEFINITIONS = [
     key: "averageRating" as const,
     label: "평균 평점",
     contextKey: "averageRatingContext" as const,
+    glossaryId: "average-rating",
     format: (v: number) => v.toFixed(1),
   },
 ] as const;

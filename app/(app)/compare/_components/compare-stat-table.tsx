@@ -4,6 +4,7 @@
 
 import { Trophy } from "lucide-react";
 
+import { GlossaryPopover } from "@/components/glossary-popover";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { Player, PlayerSeasonStats, StatContext } from "@/types";
@@ -14,11 +15,13 @@ export const COMPARE_STAT_DEFINITIONS = [
     key: "goals" as const,
     contextKey: "goalsContext" as const,
     label: "골",
+    glossaryId: "goal",
   },
   {
     key: "xg" as const,
     contextKey: "xgContext" as const,
     label: "xG",
+    glossaryId: "xg",
     format: (v: number) => v.toFixed(1),
   },
   {
@@ -30,16 +33,19 @@ export const COMPARE_STAT_DEFINITIONS = [
     key: "keyPasses" as const,
     contextKey: "keyPassesContext" as const,
     label: "키패스",
+    glossaryId: "key-pass",
   },
   {
     key: "dribbles" as const,
     contextKey: "dribblesContext" as const,
     label: "드리블",
+    glossaryId: "dribble",
   },
   {
     key: "averageRating" as const,
     contextKey: "averageRatingContext" as const,
     label: "평균 평점",
+    glossaryId: "average-rating",
     format: (v: number) => v.toFixed(1),
   },
 ] as const;
@@ -52,6 +58,7 @@ interface StatRowProps {
   context2: StatContext;
   format?: (v: number) => string;
   isLast?: boolean;
+  glossaryId?: string;
 }
 
 function StatRow({
@@ -62,6 +69,7 @@ function StatRow({
   context2,
   format = String,
   isLast,
+  glossaryId,
 }: StatRowProps) {
   const winner =
     value1 > value2 ? "player1" : value2 > value1 ? "player2" : "draw";
@@ -89,9 +97,10 @@ function StatRow({
       </div>
 
       {/* 중앙: 지표명 + 트로피 */}
-      <div className="flex min-w-[72px] flex-col items-center gap-1 px-2">
-        <span className="text-center text-xs text-muted-foreground">
+      <div className="flex min-w-[84px] flex-col items-center gap-1 px-2">
+        <span className="flex items-center gap-0.5 text-center text-xs text-muted-foreground">
           {label}
+          {glossaryId && <GlossaryPopover glossaryId={glossaryId} />}
         </span>
         {winner !== "draw" && (
           <Trophy
@@ -164,6 +173,7 @@ export function CompareStatTable({
             context1={stats1[def.contextKey]}
             context2={stats2[def.contextKey]}
             format={"format" in def ? def.format : undefined}
+            glossaryId={"glossaryId" in def ? def.glossaryId : undefined}
             isLast={index === COMPARE_STAT_DEFINITIONS.length - 1}
           />
         ))}

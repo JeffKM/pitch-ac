@@ -1,9 +1,9 @@
 // 개별 맥락 스탯 카드 — 수치 + 리그 순위 + 백분위 + 전년 비교
 
+import { GlossaryPopover } from "@/components/glossary-popover";
 import { Card, CardContent } from "@/components/ui/card";
 import type { StatContext } from "@/types";
 
-import { GlossaryPopover } from "./glossary-popover";
 import { PercentileBar } from "./percentile-bar";
 import { SeasonDeltaIndicator } from "./season-delta-indicator";
 
