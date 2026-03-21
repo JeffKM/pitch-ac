@@ -1,58 +1,17 @@
-// 매치데이 대시보드 페이지
+// 매치데이 대시보드 페이지 — Supabase DB에서 실제 PL 경기 데이터 조회
 
-import { formatDateLabel, formatShortDate, toDateKey } from "@/lib/date-utils";
+import { CURRENT_SEASON_LABEL } from "@/lib/api/sportmonks/constants";
 import {
+  getCurrentGameweek,
   getFixturesByGameweek,
-  getStandingByTeamId,
-  getTeamById,
-} from "@/lib/mock";
-import type { Fixture } from "@/types";
+  getStandingsByTeamIds,
+  getTeamsByIds,
+} from "@/lib/repositories";
 
 import { EmptyGameweek } from "./_components/empty-gameweek";
-import { FixtureCard } from "./_components/fixture-card";
-import { FixtureDateGroup } from "./_components/fixture-date-group";
 import { GameweekHeader } from "./_components/gameweek-header";
-
-// TODO: 실제 서비스에서는 현재 진행 중인 게임위크를 API/DB에서 동적으로 조회해야 함
-const DEFAULT_GW = 28;
-
-/** 날짜별 경기 그룹핑 */
-function groupFixturesByDate(
-  fixtures: Fixture[],
-): { dateKey: string; dateLabel: string; fixtures: Fixture[] }[] {
-  const map = new Map<string, Fixture[]>();
-
-  for (const fixture of fixtures) {
-    const key = toDateKey(fixture.date);
-    const group = map.get(key) ?? [];
-    group.push(fixture);
-    map.set(key, group);
-  }
-
-  return Array.from(map.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([dateKey, group]) => ({
-      dateKey,
-      dateLabel: formatDateLabel(dateKey),
-      fixtures: group,
-    }));
-}
-
-/** GW 날짜 범위 문자열 (예: "3월 15일 – 3월 17일") */
-function buildDateRange(fixtures: Fixture[]): string {
-  if (fixtures.length === 0) return "";
-
-  const dates = fixtures.map((f) => new Date(f.date));
-  const first = new Date(Math.min(...dates.map((d) => d.getTime())));
-  const last = new Date(Math.max(...dates.map((d) => d.getTime())));
-
-  const firstDateKey = toDateKey(first.toISOString());
-  const lastDateKey = toDateKey(last.toISOString());
-  const firstStr = formatShortDate(first.toISOString());
-  const lastStr = formatShortDate(last.toISOString());
-
-  return firstDateKey === lastDateKey ? firstStr : `${firstStr} – ${lastStr}`;
-}
+import { MatchdayContent } from "./_components/matchday-content";
+import { buildDateRange } from "./_utils";
 
 interface PageProps {
   searchParams: Promise<{ gw?: string }>;
@@ -60,11 +19,34 @@ interface PageProps {
 
 export default async function MatchdayPage({ searchParams }: PageProps) {
   const { gw } = await searchParams;
-  const gameweek = Number(gw) || DEFAULT_GW;
 
-  const fixtures = getFixturesByGameweek(gameweek);
-  const dateGroups = groupFixturesByDate(fixtures);
+  // gw 파라미터 없으면 현재 게임위크 자동 감지
+  const currentGw = await getCurrentGameweek();
+  const gameweek = Number(gw) || currentGw;
+
+  const fixtures = await getFixturesByGameweek(gameweek);
+
+  // 팀/순위 배치 조회 (중복 제거)
+  const teamIds = [
+    ...new Set(
+      fixtures.flatMap((f) => [f.homeTeamId, f.awayTeamId]).filter(Boolean),
+    ),
+  ];
+
+  const [teamsMap, standingsMap] = await Promise.all([
+    getTeamsByIds(teamIds),
+    getStandingsByTeamIds(teamIds, CURRENT_SEASON_LABEL),
+  ]);
+
   const dateRange = buildDateRange(fixtures);
+
+  const initialData = {
+    fixtures,
+    teams: Object.fromEntries(teamsMap),
+    standings: Object.fromEntries(standingsMap),
+    gameweek,
+    hasLive: fixtures.some((f) => f.status === "LIVE"),
+  };
 
   return (
     <div className="space-y-8">
@@ -73,27 +55,7 @@ export default async function MatchdayPage({ searchParams }: PageProps) {
       {fixtures.length === 0 ? (
         <EmptyGameweek />
       ) : (
-        dateGroups.map(({ dateKey, dateLabel, fixtures: groupFixtures }) => (
-          <FixtureDateGroup key={dateKey} dateLabel={dateLabel}>
-            {groupFixtures.map((fixture) => {
-              const homeTeam = getTeamById(fixture.homeTeamId);
-              const awayTeam = getTeamById(fixture.awayTeamId);
-
-              if (!homeTeam || !awayTeam) return null;
-
-              return (
-                <FixtureCard
-                  key={fixture.id}
-                  fixture={fixture}
-                  homeTeam={homeTeam}
-                  awayTeam={awayTeam}
-                  homeStanding={getStandingByTeamId(fixture.homeTeamId)}
-                  awayStanding={getStandingByTeamId(fixture.awayTeamId)}
-                />
-              );
-            })}
-          </FixtureDateGroup>
-        ))
+        <MatchdayContent initialData={initialData} />
       )}
     </div>
   );

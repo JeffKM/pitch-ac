@@ -9,6 +9,9 @@ export const PL_LEAGUE_ID = 8;
 /** 현재 시즌 ID (2025/2026) */
 export const CURRENT_SEASON_ID = 25583;
 
+/** 현재 시즌 레이블 — DB standings/teams 테이블의 season 컬럼 값과 일치 */
+export const CURRENT_SEASON_LABEL = "2025/2026";
+
 /** 시간당 요청 제한 */
 export const RATE_LIMIT_PER_HOUR = 2000;
 
