@@ -1,38 +1,42 @@
 import { Suspense } from "react";
 
-import { PlayerRadarChart } from "@/components/charts/player-radar-chart";
-import { getPlayerById, getPlayerSeasonStats } from "@/lib/mock";
+import {
+  getPlayerById,
+  getPlayerSeasonStats,
+  mockPlayers,
+  mockTeams,
+} from "@/lib/mock";
 
-interface CompareContentProps {
+import { CompareClient } from "./_components/compare-client";
+
+// searchParams를 Suspense 내부에서 await해야 블로킹 없이 스트리밍 가능
+async function CompareContent({
+  searchParams,
+}: {
   searchParams: Promise<{ p1?: string; p2?: string }>;
-}
-
-async function CompareContent({ searchParams }: CompareContentProps) {
+}) {
   const { p1, p2 } = await searchParams;
 
   const player1Id = p1 ? Number(p1) : undefined;
   const player2Id = p2 ? Number(p2) : undefined;
 
-  const player1 = player1Id ? getPlayerById(player1Id) : undefined;
-  const player2 = player2Id ? getPlayerById(player2Id) : undefined;
-  const stats1 = player1Id ? getPlayerSeasonStats(player1Id) : undefined;
-  const stats2 = player2Id ? getPlayerSeasonStats(player2Id) : undefined;
-
-  const canCompare = player1 && player2 && stats1 && stats2;
-
-  if (!canCompare) {
-    return (
-      <p className="text-muted-foreground">
-        두 선수를 선택하면 능력치 비교 차트가 표시됩니다.
-      </p>
-    );
-  }
+  const initialPlayer1 = player1Id ? getPlayerById(player1Id) : undefined;
+  const initialPlayer2 = player2Id ? getPlayerById(player2Id) : undefined;
+  const initialStats1 = initialPlayer1
+    ? getPlayerSeasonStats(initialPlayer1.id)
+    : undefined;
+  const initialStats2 = initialPlayer2
+    ? getPlayerSeasonStats(initialPlayer2.id)
+    : undefined;
 
   return (
-    <PlayerRadarChart
-      mode="compare"
-      player1={{ name: player1.name, data: stats1.radarData.player }}
-      player2={{ name: player2.name, data: stats2.radarData.player }}
+    <CompareClient
+      allPlayers={mockPlayers}
+      teams={mockTeams}
+      initialPlayer1={initialPlayer1}
+      initialPlayer2={initialPlayer2}
+      initialStats1={initialStats1}
+      initialStats2={initialStats2}
     />
   );
 }
