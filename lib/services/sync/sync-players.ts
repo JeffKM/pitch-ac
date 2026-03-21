@@ -13,8 +13,6 @@ import { playerToDbRow, seasonStatsToDbRow } from "./db-mappers";
 import { extractErrorMessage, type SyncResult, writeSyncLog } from "./log";
 
 const SEASON_LABEL = "2025/2026";
-/** 1회 Cron 실행당 처리할 선수 수 (Vercel 함수 시간 제한 대응) */
-const BATCH_SIZE = 50;
 
 /**
  * 선수 기본정보 + 시즌 스탯 동기화
@@ -56,7 +54,7 @@ export async function syncPlayers(): Promise<SyncResult> {
       }
     }
 
-    const playerIds = Array.from(playerIdSet).slice(0, BATCH_SIZE);
+    const playerIds = Array.from(playerIdSet);
 
     if (playerIds.length === 0) {
       const result: SyncResult = {
@@ -70,6 +68,7 @@ export async function syncPlayers(): Promise<SyncResult> {
     }
 
     // 4. getPlayerById 배치 처리 → players + player_season_stats 동시 upsert
+    let failedCount = 0;
     for (const playerId of playerIds) {
       try {
         const raw = await getPlayerById(playerId);
@@ -91,6 +90,7 @@ export async function syncPlayers(): Promise<SyncResult> {
             });
         }
       } catch {
+        failedCount++;
         continue;
       }
     }
@@ -100,8 +100,8 @@ export async function syncPlayers(): Promise<SyncResult> {
       status: "success",
       recordsSynced: totalSynced,
       errorMessage:
-        playerIdSet.size > BATCH_SIZE
-          ? `총 ${playerIdSet.size}명 중 ${BATCH_SIZE}명 처리 (배치 크기 제한)`
+        failedCount > 0
+          ? `${failedCount}/${playerIds.length}명 동기화 실패 (건너뜀)`
           : undefined,
     };
     await writeSyncLog(supabase, result);

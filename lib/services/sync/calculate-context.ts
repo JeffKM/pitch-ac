@@ -246,7 +246,15 @@ export async function calculateContext(): Promise<SyncResult> {
     // Step 5: 레이더 positionAverage 실제 평균으로 계산
     const posAvgMap = computePositionAverageRadar(byPosition);
 
-    // Step 6: DB 일괄 UPDATE
+    // Step 6: DB 배치 upsert (순차 UPDATE N회 → upsert 1회로 최적화)
+    const upsertRows: Array<{
+      id: number;
+      player_id: number;
+      season: string;
+      context: Record<string, StatContext>;
+      radar_data?: RadarData;
+    }> = [];
+
     for (const row of rows) {
       const context = contextMap.get(row.player_id);
       if (!context) continue;
@@ -258,15 +266,24 @@ export async function calculateContext(): Promise<SyncResult> {
         updatedRadar = { ...updatedRadar, positionAverage: posAvg };
       }
 
-      const { error: updateError } = await supabase
-        .from("player_season_stats")
-        .update({
-          context,
-          ...(updatedRadar ? { radar_data: updatedRadar } : {}),
-        })
-        .eq("id", row.id);
+      upsertRows.push({
+        id: row.id,
+        player_id: row.player_id,
+        season: CURRENT_SEASON,
+        context,
+        ...(updatedRadar ? { radar_data: updatedRadar } : {}),
+      });
+    }
 
-      if (!updateError) totalUpdated++;
+    if (upsertRows.length > 0) {
+      const { error: upsertError } = await supabase
+        .from("player_season_stats")
+        .upsert(upsertRows, { onConflict: "id", ignoreDuplicates: false });
+
+      if (upsertError) {
+        throw new Error(`context 배치 upsert 실패: ${upsertError.message}`);
+      }
+      totalUpdated = upsertRows.length;
     }
 
     const result: SyncResult = {

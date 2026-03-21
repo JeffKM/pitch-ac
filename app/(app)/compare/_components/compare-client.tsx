@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { PlayerRadarChart } from "@/components/charts/player-radar-chart";
-import { getPlayerSeasonStats, getTeamById } from "@/lib/mock";
 import type { Player, PlayerSeasonStats, Team } from "@/types";
 
 import { CompareStatTable } from "./compare-stat-table";
@@ -22,6 +21,7 @@ interface PlayerSlotState {
 interface CompareClientProps {
   allPlayers: Player[];
   teams: Team[];
+  seasonStatsMap: Record<number, PlayerSeasonStats>;
   initialPlayer1: Player | undefined;
   initialPlayer2: Player | undefined;
   initialStats1: PlayerSeasonStats | undefined;
@@ -31,6 +31,7 @@ interface CompareClientProps {
 export function CompareClient({
   allPlayers,
   teams,
+  seasonStatsMap,
   initialPlayer1,
   initialPlayer2,
   initialStats1,
@@ -60,13 +61,13 @@ export function CompareClient({
   };
 
   const handleSelectPlayer1 = (player: Player) => {
-    const stats = getPlayerSeasonStats(player.id);
+    const stats = seasonStatsMap[player.id];
     if (stats) setSlot1({ player, stats });
     updateUrl(player.id, slot2?.player.id);
   };
 
   const handleSelectPlayer2 = (player: Player) => {
-    const stats = getPlayerSeasonStats(player.id);
+    const stats = seasonStatsMap[player.id];
     if (stats) setSlot2({ player, stats });
     updateUrl(slot1?.player.id, player.id);
   };
@@ -81,8 +82,9 @@ export function CompareClient({
     updateUrl(slot1?.player.id, undefined);
   };
 
-  const team1 = slot1 ? getTeamById(slot1.player.teamId) : undefined;
-  const team2 = slot2 ? getTeamById(slot2.player.teamId) : undefined;
+  const teamsById = new Map(teams.map((t) => [t.id, t]));
+  const team1 = slot1 ? teamsById.get(slot1.player.teamId) : undefined;
+  const team2 = slot2 ? teamsById.get(slot2.player.teamId) : undefined;
 
   return (
     <div className="space-y-6">

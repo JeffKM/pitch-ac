@@ -15,38 +15,38 @@ import { type FixtureRow, fixtureRowToFixture } from "./mappers";
 export async function getCurrentGameweek(): Promise<number> {
   const supabase = await createClient();
 
-  // 1) LIVE 경기
-  const { data: liveFixture } = await supabase
-    .from("fixtures")
-    .select("gameweek")
-    .eq("status", "LIVE")
-    .limit(1)
-    .maybeSingle();
+  // 3개 쿼리를 병렬 실행 후 우선순위 판정
+  const [liveResult, nextResult, lastResult] = await Promise.all([
+    // 1) LIVE 경기
+    supabase
+      .from("fixtures")
+      .select("gameweek")
+      .eq("status", "LIVE")
+      .limit(1)
+      .maybeSingle(),
+    // 2) 가장 가까운 미래 NS 경기
+    supabase
+      .from("fixtures")
+      .select("gameweek")
+      .eq("status", "NS")
+      .gte("date", new Date().toISOString())
+      .order("date", { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+    // 3) 가장 최근 FT 경기
+    supabase
+      .from("fixtures")
+      .select("gameweek")
+      .eq("status", "FT")
+      .order("date", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
 
-  if (liveFixture) return liveFixture.gameweek;
-
-  // 2) 가장 가까운 미래 NS 경기
-  const { data: nextFixture } = await supabase
-    .from("fixtures")
-    .select("gameweek")
-    .eq("status", "NS")
-    .gte("date", new Date().toISOString())
-    .order("date", { ascending: true })
-    .limit(1)
-    .maybeSingle();
-
-  if (nextFixture) return nextFixture.gameweek;
-
-  // 3) 가장 최근 FT 경기
-  const { data: lastFixture } = await supabase
-    .from("fixtures")
-    .select("gameweek")
-    .eq("status", "FT")
-    .order("date", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (lastFixture) return lastFixture.gameweek;
+  // 우선순위: LIVE > NS(미래) > FT(과거) > fallback(1)
+  if (liveResult.data) return liveResult.data.gameweek;
+  if (nextResult.data) return nextResult.data.gameweek;
+  if (lastResult.data) return lastResult.data.gameweek;
 
   return 1;
 }
