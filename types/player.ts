@@ -35,12 +35,12 @@ export interface PlayerSeasonStats {
   goalsContext: StatContext;
   assists: number;
   assistsContext: StatContext;
-  /** Expected Goals */
-  xg: number;
-  xgContext: StatContext;
-  /** Expected Assists */
-  xa: number;
-  xaContext: StatContext;
+  /** Expected Goals — Starter 플랜 미지원 시 null */
+  xg: number | null;
+  xgContext: StatContext | null;
+  /** Expected Assists — Starter 플랜 미지원 시 null */
+  xa: number | null;
+  xaContext: StatContext | null;
   keyPasses: number;
   keyPassesContext: StatContext;
   dribbles: number;

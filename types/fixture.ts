@@ -28,7 +28,8 @@ export interface TeamLiveStats {
   possession: number;
   shots: number;
   shotsOnTarget: number;
-  xg: number;
+  /** xG — Starter 플랜 미지원 시 null */
+  xg: number | null;
   corners: number;
   fouls: number;
 }
