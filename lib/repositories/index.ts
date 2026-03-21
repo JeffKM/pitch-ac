@@ -1,4 +1,5 @@
 // Repository 레이어 re-export
+import "server-only";
 
 export {
   getCurrentGameweek,

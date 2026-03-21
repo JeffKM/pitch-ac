@@ -1,5 +1,7 @@
 // 경기(Fixture) 관련 타입 정의
 
+import type { Team, TeamStanding } from "./team";
+
 /** 경기 상태 */
 export type FixtureStatus = "NS" | "LIVE" | "FT";
 
@@ -75,6 +77,18 @@ export interface InjuredPlayer {
   teamId: number;
   reason: string;
   expectedReturn: string | null;
+}
+
+/** 경기 상세 페이지 데이터 (SSR + API 폴링 공통) */
+export interface FixtureDetailData {
+  fixture: Fixture;
+  homeTeam: Team;
+  awayTeam: Team;
+  homeStanding: TeamStanding | null;
+  awayStanding: TeamStanding | null;
+  h2hResults: H2HResult[];
+  homeInjuries: InjuredPlayer[];
+  awayInjuries: InjuredPlayer[];
 }
 
 /** 경기 정보 */

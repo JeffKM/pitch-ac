@@ -1,3 +1,5 @@
+import "server-only";
+
 import { getLeagueTeams, getStandings } from "@/lib/api/sportmonks";
 import {
   mapSmStandingToTeamStanding,

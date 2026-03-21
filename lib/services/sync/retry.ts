@@ -1,3 +1,5 @@
+import "server-only";
+
 import { RateLimitError } from "@/lib/api/sportmonks/client";
 
 /**

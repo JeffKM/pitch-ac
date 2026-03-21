@@ -1,4 +1,7 @@
 // fixtures 테이블 쿼리 함수 및 현재 게임위크 감지
+import "server-only";
+
+import { cache } from "react";
 
 import { createClient } from "@/lib/supabase/server";
 import type { Fixture } from "@/types";
@@ -12,7 +15,7 @@ import { type FixtureRow, fixtureRowToFixture } from "./mappers";
  * 3) 가장 최근 종료된 FT 경기의 gameweek
  * 4) fallback: 1
  */
-export async function getCurrentGameweek(): Promise<number> {
+export const getCurrentGameweek = cache(async (): Promise<number> => {
   const supabase = await createClient();
 
   // 3개 쿼리를 병렬 실행 후 우선순위 판정
@@ -49,23 +52,25 @@ export async function getCurrentGameweek(): Promise<number> {
   if (lastResult.data) return lastResult.data.gameweek;
 
   return 1;
-}
+});
 
 /** ID로 경기 상세 조회 */
-export async function getFixtureById(id: number): Promise<Fixture | null> {
-  const supabase = await createClient();
+export const getFixtureById = cache(
+  async (id: number): Promise<Fixture | null> => {
+    const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("fixtures")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
+    const { data, error } = await supabase
+      .from("fixtures")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
 
-  if (error) throw new Error(`fixture 조회 실패: ${error.message}`);
-  if (!data) return null;
+    if (error) throw new Error(`fixture 조회 실패: ${error.message}`);
+    if (!data) return null;
 
-  return fixtureRowToFixture(data as FixtureRow);
-}
+    return fixtureRowToFixture(data as FixtureRow);
+  },
+);
 
 /** 게임위크별 경기 목록 조회 */
 export async function getFixturesByGameweek(

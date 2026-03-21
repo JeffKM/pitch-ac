@@ -1,4 +1,5 @@
 // H2H(맞대결) 데이터 조회 서비스 — SportMonks API 직접 호출
+import "server-only";
 
 import { getH2HFixtures } from "@/lib/api/sportmonks/fixtures";
 import { mapSmFixtureToH2HResult } from "@/lib/api/sportmonks/mappers";

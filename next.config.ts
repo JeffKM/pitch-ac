@@ -1,4 +1,21 @@
+import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
+
+// CSP (Content Security Policy) — Report-Only 모드로 위반 모니터링
+const cspHeader = `
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' 'unsafe-eval';
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' blob: data: https://cdn.sportmonks.com;
+  font-src 'self';
+  connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+  frame-ancestors 'none';
+  form-action 'self';
+  base-uri 'self';
+  object-src 'none';
+`
+  .replace(/\n/g, " ")
+  .trim();
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
@@ -30,10 +47,22 @@ const nextConfig: NextConfig = {
           },
           // XSS 필터 (레거시 브라우저용)
           { key: "X-XSS-Protection", value: "1; mode=block" },
+          // CSP Report-Only — 위반 로그만 기록, 차단하지 않음
+          {
+            key: "Content-Security-Policy-Report-Only",
+            value: cspHeader,
+          },
         ],
       },
     ];
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  // DSN 없으면 Sentry 비활성화 (로컬 개발 시)
+  silent: !process.env.CI,
+  // 소스맵 업로드 (CI에서만)
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: true,
+  },
+});

@@ -1,6 +1,7 @@
 // DB row(snake_case) → 앱 타입(camelCase) 역방향 변환
 // fixtureToDbRow 등이 camelCase 객체를 JSONB에 그대로 저장하므로
 // JSONB 내부(events, live_stats, lineups)는 변환 없이 타입 캐스팅만 수행
+import "server-only";
 
 import type {
   Fixture,

@@ -1,3 +1,5 @@
+import "server-only";
+
 import { getFixturesByRound, getSeasonRounds } from "@/lib/api/sportmonks";
 import {
   mapSmFixtureToFixture,

@@ -2,6 +2,7 @@
 
 // 앱 런타임 에러 바운더리 — 예상치 못한 에러 발생 시 표시
 
+import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -14,8 +15,7 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // 에러 로깅 (추후 Sentry 연동 포인트)
-    console.error("[앱 에러]", error);
+    Sentry.captureException(error);
   }, [error]);
 
   return (

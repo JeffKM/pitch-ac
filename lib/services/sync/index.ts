@@ -1,3 +1,5 @@
+import "server-only";
+
 export { verifyCronAuth } from "./auth";
 export { calculateContext } from "./calculate-context";
 export {

@@ -1,4 +1,5 @@
 // injuries 테이블 쿼리 함수
+import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
 import type { InjuredPlayer } from "@/types";

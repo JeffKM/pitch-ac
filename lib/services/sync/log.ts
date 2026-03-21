@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 /** unknown 에러에서 메시지 추출 (Supabase PostgrestError 포함) */

@@ -1,6 +1,7 @@
 // 맥락 데이터 계산 엔진
 // DB의 player_season_stats를 읽어 포지션별 순위/백분위/전년비교를 계산하고
 // context JSONB + radar_data JSONB를 일괄 업데이트한다
+import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { PlayerPosition, StatContext } from "@/types";
@@ -63,7 +64,7 @@ interface PrevSeasonRow {
  * Standard Competition Ranking (동점 처리)
  * 예: [19, 19, 14, 10] → {playerA: 1, playerB: 1, playerC: 3, playerD: 4}
  */
-function computeRanks(
+export function computeRanks(
   entries: Array<{ playerId: number; value: number }>,
 ): Map<number, number> {
   const sorted = [...entries].sort((a, b) => b.value - a.value);
@@ -85,7 +86,7 @@ function computeRanks(
  * 백분위 계산: 1위→100, 꼴찌→0에 가까움
  * ((totalCount - rank) / (totalCount - 1)) * 100
  */
-function computePercentile(rank: number, totalCount: number): number {
+export function computePercentile(rank: number, totalCount: number): number {
   if (totalCount <= 1) return 100;
   const raw = ((totalCount - rank) / (totalCount - 1)) * 100;
   return Math.round(Math.max(0, Math.min(100, raw)));

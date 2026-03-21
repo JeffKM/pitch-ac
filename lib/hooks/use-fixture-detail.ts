@@ -5,7 +5,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import type { FixtureDetailData } from "@/app/api/matchday/fixture/route";
+import type { FixtureDetailData } from "@/types";
 
 async function fetchFixtureDetail(id: number): Promise<FixtureDetailData> {
   const res = await fetch(`/api/matchday/fixture?id=${id}`);

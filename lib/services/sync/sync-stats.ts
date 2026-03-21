@@ -1,3 +1,5 @@
+import "server-only";
+
 import { getPlayerById } from "@/lib/api/sportmonks";
 import { mapSmPlayerToSeasonStats } from "@/lib/api/sportmonks/mappers";
 import { createAdminClient } from "@/lib/supabase/admin";

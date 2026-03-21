@@ -1,5 +1,6 @@
 // 앱 내부 타입(camelCase) → DB row(snake_case) 변환
 // 기존 mappers.ts는 수정하지 않고, DB 저장 시점에만 이 함수들을 사용
+import "server-only";
 
 import type {
   Fixture,

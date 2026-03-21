@@ -1,4 +1,7 @@
 // 선수 관련 테이블 쿼리 함수
+import "server-only";
+
+import { cache } from "react";
 
 import { createClient } from "@/lib/supabase/server";
 import type { Player, PlayerMatchStats, PlayerSeasonStats } from "@/types";
@@ -27,40 +30,45 @@ export async function getAllPlayers(): Promise<Player[]> {
 }
 
 /** ID로 선수 단건 조회 */
-export async function getPlayerById(id: number): Promise<Player | null> {
-  const supabase = await createClient();
+export const getPlayerById = cache(
+  async (id: number): Promise<Player | null> => {
+    const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("players")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
+    const { data, error } = await supabase
+      .from("players")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
 
-  if (error) throw new Error(`player 조회 실패: ${error.message}`);
-  if (!data) return null;
+    if (error) throw new Error(`player 조회 실패: ${error.message}`);
+    if (!data) return null;
 
-  return playerRowToPlayer(data as PlayerRow);
-}
+    return playerRowToPlayer(data as PlayerRow);
+  },
+);
 
 /** 선수 ID + 시즌으로 시즌 스탯 조회 */
-export async function getPlayerSeasonStats(
-  playerId: number,
-  season: string,
-): Promise<PlayerSeasonStats | null> {
-  const supabase = await createClient();
+export const getPlayerSeasonStats = cache(
+  async (
+    playerId: number,
+    season: string,
+  ): Promise<PlayerSeasonStats | null> => {
+    const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("player_season_stats")
-    .select("*")
-    .eq("player_id", playerId)
-    .eq("season", season)
-    .maybeSingle();
+    const { data, error } = await supabase
+      .from("player_season_stats")
+      .select("*")
+      .eq("player_id", playerId)
+      .eq("season", season)
+      .maybeSingle();
 
-  if (error) throw new Error(`player_season_stats 조회 실패: ${error.message}`);
-  if (!data) return null;
+    if (error)
+      throw new Error(`player_season_stats 조회 실패: ${error.message}`);
+    if (!data) return null;
 
-  return playerSeasonStatsRowToStats(data as PlayerSeasonStatsRow);
-}
+    return playerSeasonStatsRowToStats(data as PlayerSeasonStatsRow);
+  },
+);
 
 /** 여러 선수 ID의 시즌 스탯 배치 조회 → Map<playerId, PlayerSeasonStats> (N+1 방지) */
 export async function getPlayerSeasonStatsByIds(
