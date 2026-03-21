@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { PlayerRadarChart } from "@/components/charts/player-radar-chart";
 import {
   getMatchStatsByPlayer,
   getPlayerById,
@@ -34,6 +35,14 @@ export default async function PlayerProfilePage({
       <PlayerHeaderCard player={player} team={team} seasonStats={seasonStats} />
 
       {seasonStats && <StatContextGrid seasonStats={seasonStats} />}
+
+      {seasonStats && (
+        <PlayerRadarChart
+          mode="profile"
+          radarData={seasonStats.radarData}
+          playerName={player.name}
+        />
+      )}
 
       {matchStats.length > 0 && <RecentFormSparkline matchStats={matchStats} />}
 
