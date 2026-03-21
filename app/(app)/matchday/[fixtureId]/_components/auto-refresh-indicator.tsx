@@ -1,5 +1,3 @@
-"use client";
-
 // 자동 갱신 인디케이터 — UI만 표시 (실제 폴링은 Phase 3 Task 017에서 구현)
 
 import { RefreshCw } from "lucide-react";

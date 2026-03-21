@@ -14,6 +14,11 @@ import { CompareVerdict } from "./compare-verdict";
 import { PlayerSlot } from "./player-slot";
 import { ShareButton } from "./share-button";
 
+interface PlayerSlotState {
+  player: Player;
+  stats: PlayerSeasonStats;
+}
+
 interface CompareClientProps {
   allPlayers: Player[];
   teams: Team[];
@@ -33,16 +38,18 @@ export function CompareClient({
 }: CompareClientProps) {
   const router = useRouter();
 
-  const [player1, setPlayer1] = useState<Player | undefined>(initialPlayer1);
-  const [player2, setPlayer2] = useState<Player | undefined>(initialPlayer2);
-  const [stats1, setStats1] = useState<PlayerSeasonStats | undefined>(
-    initialStats1,
+  const [slot1, setSlot1] = useState<PlayerSlotState | undefined>(
+    initialPlayer1 && initialStats1
+      ? { player: initialPlayer1, stats: initialStats1 }
+      : undefined,
   );
-  const [stats2, setStats2] = useState<PlayerSeasonStats | undefined>(
-    initialStats2,
+  const [slot2, setSlot2] = useState<PlayerSlotState | undefined>(
+    initialPlayer2 && initialStats2
+      ? { player: initialPlayer2, stats: initialStats2 }
+      : undefined,
   );
 
-  const canCompare = !!(player1 && player2 && stats1 && stats2);
+  const canCompare = !!(slot1 && slot2);
 
   const updateUrl = (p1Id?: number, p2Id?: number) => {
     const params = new URLSearchParams();
@@ -53,33 +60,29 @@ export function CompareClient({
   };
 
   const handleSelectPlayer1 = (player: Player) => {
-    const s = getPlayerSeasonStats(player.id);
-    setPlayer1(player);
-    setStats1(s);
-    updateUrl(player.id, player2?.id);
+    const stats = getPlayerSeasonStats(player.id);
+    if (stats) setSlot1({ player, stats });
+    updateUrl(player.id, slot2?.player.id);
   };
 
   const handleSelectPlayer2 = (player: Player) => {
-    const s = getPlayerSeasonStats(player.id);
-    setPlayer2(player);
-    setStats2(s);
-    updateUrl(player1?.id, player.id);
+    const stats = getPlayerSeasonStats(player.id);
+    if (stats) setSlot2({ player, stats });
+    updateUrl(slot1?.player.id, player.id);
   };
 
   const handleClearPlayer1 = () => {
-    setPlayer1(undefined);
-    setStats1(undefined);
-    updateUrl(undefined, player2?.id);
+    setSlot1(undefined);
+    updateUrl(undefined, slot2?.player.id);
   };
 
   const handleClearPlayer2 = () => {
-    setPlayer2(undefined);
-    setStats2(undefined);
-    updateUrl(player1?.id, undefined);
+    setSlot2(undefined);
+    updateUrl(slot1?.player.id, undefined);
   };
 
-  const team1 = player1 ? getTeamById(player1.teamId) : undefined;
-  const team2 = player2 ? getTeamById(player2.teamId) : undefined;
+  const team1 = slot1 ? getTeamById(slot1.player.teamId) : undefined;
+  const team2 = slot2 ? getTeamById(slot2.player.teamId) : undefined;
 
   return (
     <div className="space-y-6">
@@ -87,7 +90,7 @@ export function CompareClient({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <PlayerSlot
           label="선수 A"
-          player={player1}
+          player={slot1?.player}
           team={team1}
           allPlayers={allPlayers}
           teams={teams}
@@ -97,7 +100,7 @@ export function CompareClient({
         />
         <PlayerSlot
           label="선수 B"
-          player={player2}
+          player={slot2?.player}
           team={team2}
           allPlayers={allPlayers}
           teams={teams}
@@ -113,24 +116,30 @@ export function CompareClient({
           {/* 레이더 차트 오버레이 */}
           <PlayerRadarChart
             mode="compare"
-            player1={{ name: player1.name, data: stats1.radarData.player }}
-            player2={{ name: player2.name, data: stats2.radarData.player }}
+            player1={{
+              name: slot1.player.name,
+              data: slot1.stats.radarData.player,
+            }}
+            player2={{
+              name: slot2.player.name,
+              data: slot2.stats.radarData.player,
+            }}
           />
 
           {/* 스탯 비교 테이블 */}
           <CompareStatTable
-            player1={player1}
-            player2={player2}
-            stats1={stats1}
-            stats2={stats2}
+            player1={slot1.player}
+            player2={slot2.player}
+            stats1={slot1.stats}
+            stats2={slot2.stats}
           />
 
           {/* Verdict */}
           <CompareVerdict
-            player1={player1}
-            player2={player2}
-            stats1={stats1}
-            stats2={stats2}
+            player1={slot1.player}
+            player2={slot2.player}
+            stats1={slot1.stats}
+            stats2={slot2.stats}
           />
         </>
       )}
