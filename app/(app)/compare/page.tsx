@@ -7,7 +7,6 @@ import {
   getAllPlayers,
   getAllTeams,
   getPlayerById,
-  getPlayerSeasonStats,
   getPlayerSeasonStatsByIds,
 } from "@/lib/repositories";
 import type { PlayerSeasonStats } from "@/types";
@@ -22,7 +21,7 @@ export async function generateMetadata({
   const { p1, p2 } = await searchParams;
 
   const baseMetadata: Metadata = {
-    title: "선수 비교 | pitch-ac",
+    title: "선수 비교",
     description: "프리미어리그 선수 스탯을 비교해보세요",
   };
 
@@ -35,15 +34,17 @@ export async function generateMetadata({
 
   if (!player1 || !player2) return baseMetadata;
 
-  const title = `${player1.name} vs ${player2.name} | pitch-ac`;
+  const title = `${player1.name} vs ${player2.name}`;
   const description = `${player1.name}과(와) ${player2.name}의 프리미어리그 시즌 스탯 비교`;
   const ogImageUrl = `/api/og?p1=${p1}&p2=${p2}`;
+
+  const ogTitle = `${player1.name} vs ${player2.name} | pitch-ac`;
 
   return {
     title,
     description,
     openGraph: {
-      title,
+      title: ogTitle,
       description,
       images: [
         {
@@ -57,7 +58,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: ogTitle,
       description,
       images: [ogImageUrl],
     },
@@ -97,14 +98,13 @@ async function CompareContent({
     player2Id ? getPlayerById(player2Id) : Promise.resolve(null),
   ]);
 
-  const [initialStats1, initialStats2] = await Promise.all([
-    initialPlayer1
-      ? getPlayerSeasonStats(initialPlayer1.id, CURRENT_SEASON_LABEL)
-      : Promise.resolve(null),
-    initialPlayer2
-      ? getPlayerSeasonStats(initialPlayer2.id, CURRENT_SEASON_LABEL)
-      : Promise.resolve(null),
-  ]);
+  // seasonStatsMap에서 직접 조회 (중복 DB 호출 제거)
+  const initialStats1 = initialPlayer1
+    ? (seasonStatsMap.get(initialPlayer1.id) ?? null)
+    : null;
+  const initialStats2 = initialPlayer2
+    ? (seasonStatsMap.get(initialPlayer2.id) ?? null)
+    : null;
 
   return (
     <CompareClient
