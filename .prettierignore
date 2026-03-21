@@ -5,3 +5,4 @@ build/
 coverage/
 *.tsbuildinfo
 package-lock.json
+.claude/

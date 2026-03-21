@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
+
 import { CURRENT_SEASON_LABEL } from "@/lib/api/sportmonks/constants";
+
+export const metadata: Metadata = {
+  title: "선수 검색",
+  description: "프리미어리그 선수 스탯을 검색하고 비교해보세요",
+};
 import {
   getAllPlayers,
   getAllTeams,

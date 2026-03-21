@@ -1,5 +1,7 @@
 // 매치데이 대시보드 페이지 — Supabase DB에서 실제 PL 경기 데이터 조회
 
+import type { Metadata } from "next";
+
 import { CURRENT_SEASON_LABEL } from "@/lib/api/sportmonks/constants";
 import {
   getCurrentGameweek,
@@ -15,6 +17,23 @@ import { buildDateRange } from "./_utils";
 
 interface PageProps {
   searchParams: Promise<{ gw?: string }>;
+}
+
+export async function generateMetadata({
+  searchParams,
+}: PageProps): Promise<Metadata> {
+  const { gw } = await searchParams;
+  const currentGw = await getCurrentGameweek();
+  const gameweek = Number(gw) || currentGw;
+
+  return {
+    title: `GW${gameweek} 매치데이`,
+    description: `프리미어리그 ${gameweek}라운드 경기 일정 및 결과`,
+    openGraph: {
+      title: `GW${gameweek} 매치데이 | pitch-ac`,
+      description: `프리미어리그 ${gameweek}라운드 경기 일정 및 결과`,
+    },
+  };
 }
 
 export default async function MatchdayPage({ searchParams }: PageProps) {
