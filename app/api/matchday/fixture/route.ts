@@ -11,6 +11,8 @@ import {
   getTeamsByIds,
 } from "@/lib/repositories";
 import { fetchH2HResults } from "@/lib/services/h2h";
+import { getLiveFixtureById } from "@/lib/services/live/live-fixture-service";
+import { writebackFinishedFixture } from "@/lib/services/live/live-writeback";
 import type {
   Fixture,
   H2HResult,
@@ -46,9 +48,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const fixture = await getFixtureById(id);
+    const dbFixture = await getFixtureById(id);
 
-    if (!fixture) {
+    if (!dbFixture) {
       return NextResponse.json(
         {
           data: null,
@@ -57,6 +59,21 @@ export async function GET(request: NextRequest) {
         },
         { status: 404 },
       );
+    }
+
+    // 킥오프 시각이 지났고 아직 FT가 아닌 경우 → SportMonks 실시간 데이터로 교체
+    let fixture = dbFixture;
+    const now = new Date();
+    if (dbFixture.status !== "FT" && new Date(dbFixture.date) <= now) {
+      const liveFixture = await getLiveFixtureById(id);
+      if (liveFixture) {
+        // FT 전환 감지 → 비동기 DB writeback (응답 지연 없이)
+        // dbFixture.status는 이미 "FT"가 아님이 보장됨 (외부 if 조건)
+        if (liveFixture.status === "FT") {
+          writebackFinishedFixture(liveFixture).catch(() => {});
+        }
+        fixture = liveFixture;
+      }
     }
 
     const teamIds = [fixture.homeTeamId, fixture.awayTeamId].filter(Boolean);

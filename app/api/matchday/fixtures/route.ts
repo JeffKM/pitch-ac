@@ -9,6 +9,11 @@ import {
   getStandingsByTeamIds,
   getTeamsByIds,
 } from "@/lib/repositories";
+import {
+  getLiveFixtures,
+  mergeFixturesWithLive,
+} from "@/lib/services/live/live-fixture-service";
+import { writebackFinishedFixture } from "@/lib/services/live/live-writeback";
 import type { Fixture, Team, TeamStanding } from "@/types";
 
 export interface MatchdayData {
@@ -35,7 +40,31 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const fixtures = await getFixturesByGameweek(gameweek);
+    const dbFixtures = await getFixturesByGameweek(gameweek);
+
+    // 킥오프 시각이 지났고 아직 FT가 아닌 경기가 있을 때만 라이브 API 호출
+    const now = new Date();
+    const hasKickedOff = dbFixtures.some(
+      (f) => f.status !== "FT" && new Date(f.date) <= now,
+    );
+
+    let fixtures = dbFixtures;
+    if (hasKickedOff) {
+      const liveFixtures = await getLiveFixtures();
+      fixtures = mergeFixturesWithLive(dbFixtures, liveFixtures);
+
+      // FT로 전환된 경기 감지 → 비동기 DB writeback (응답 지연 없이)
+      const finishedFixtures = fixtures.filter(
+        (f) =>
+          f.status === "FT" &&
+          dbFixtures.find((db) => db.id === f.id)?.status !== "FT",
+      );
+      if (finishedFixtures.length > 0) {
+        Promise.all(finishedFixtures.map(writebackFinishedFixture)).catch(
+          () => {},
+        );
+      }
+    }
 
     const teamIds = [
       ...new Set(

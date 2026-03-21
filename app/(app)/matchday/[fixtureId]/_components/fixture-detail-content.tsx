@@ -1,6 +1,8 @@
 "use client";
 
-// 경기 상세 Client Component — TanStack Query 폴링 담당
+// 경기 상세 Client Component — TanStack Query 폴링 + 상태 전환 감지
+
+import { useEffect, useRef, useState } from "react";
 
 import {
   type FixtureDetailData,
@@ -10,9 +12,9 @@ import {
 import { FixtureTabs } from "./fixture-tabs";
 import { MatchHeader } from "./match-header";
 
-function resolveDefaultTab(
-  status: "NS" | "LIVE" | "FT",
-): "prematch" | "live" | "postmatch" {
+type TabValue = "prematch" | "live" | "postmatch";
+
+function resolveDefaultTab(status: "NS" | "LIVE" | "FT"): TabValue {
   if (status === "NS") return "prematch";
   if (status === "LIVE") return "live";
   return "postmatch";
@@ -38,7 +40,25 @@ export function FixtureDetailContent({
     awayInjuries,
   } = data;
 
-  const defaultTab = resolveDefaultTab(fixture.status);
+  const [activeTab, setActiveTab] = useState<TabValue>(
+    resolveDefaultTab(initialData.fixture.status),
+  );
+  const prevStatusRef = useRef(initialData.fixture.status);
+
+  // 경기 상태 전환 감지: NS→LIVE 시 live 탭, LIVE→FT 시 postmatch 탭 자동 전환
+  useEffect(() => {
+    const prevStatus = prevStatusRef.current;
+    const nextStatus = fixture.status;
+
+    if (prevStatus !== nextStatus) {
+      if (prevStatus === "NS" && nextStatus === "LIVE") {
+        setActiveTab("live");
+      } else if (prevStatus === "LIVE" && nextStatus === "FT") {
+        setActiveTab("postmatch");
+      }
+      prevStatusRef.current = nextStatus;
+    }
+  }, [fixture.status]);
 
   return (
     <div className="space-y-4">
@@ -59,7 +79,8 @@ export function FixtureDetailContent({
         h2hResults={h2hResults}
         homeInjuries={homeInjuries}
         awayInjuries={awayInjuries}
-        defaultTab={defaultTab}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
     </div>
   );

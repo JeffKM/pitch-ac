@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import type { Fixture, Team, TeamStanding } from "@/types";
 
 import { FixtureStatusBadge } from "../../_components/fixture-status-badge";
+import { ScoreFlash } from "../../_components/score-flash";
 
 interface MatchHeaderProps {
   fixture: Fixture;
@@ -67,7 +68,13 @@ export function MatchHeader({
           <div className="flex flex-col items-center gap-2">
             {fixture.homeScore !== null && fixture.awayScore !== null ? (
               <p className="text-4xl font-bold tabular-nums">
-                {fixture.homeScore} – {fixture.awayScore}
+                <ScoreFlash score={fixture.homeScore}>
+                  {fixture.homeScore}
+                </ScoreFlash>
+                {" – "}
+                <ScoreFlash score={fixture.awayScore}>
+                  {fixture.awayScore}
+                </ScoreFlash>
               </p>
             ) : (
               <p className="text-2xl font-medium text-muted-foreground">vs</p>

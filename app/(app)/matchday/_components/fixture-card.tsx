@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils";
 import type { Fixture, Team, TeamStanding } from "@/types";
 
 import { FixtureStatusBadge } from "./fixture-status-badge";
+import { LivePulse } from "./live-pulse";
+import { ScoreFlash } from "./score-flash";
 
 interface FixtureCardProps {
   fixture: Fixture;
@@ -37,6 +39,8 @@ export function FixtureCard({
           "transition-colors hover:bg-muted/50",
           isLive && "border-green-500/50 bg-green-500/5",
         )}
+        data-live={isLive || undefined}
+        data-fixture-id={fixture.id}
       >
         <CardContent className="p-4">
           {/* 메인 행: 홈팀 — 스코어/상태 — 어웨이팀 */}
@@ -63,9 +67,18 @@ export function FixtureCard({
             {/* 스코어 / 배지 */}
             <div className="flex flex-col items-center gap-1.5">
               {fixture.homeScore !== null && fixture.awayScore !== null ? (
-                <p className="text-2xl font-bold tabular-nums">
-                  {fixture.homeScore} – {fixture.awayScore}
-                </p>
+                <div className="flex items-center gap-1.5">
+                  {isLive && <LivePulse />}
+                  <p className="text-2xl font-bold tabular-nums">
+                    <ScoreFlash score={fixture.homeScore}>
+                      {fixture.homeScore}
+                    </ScoreFlash>
+                    {" – "}
+                    <ScoreFlash score={fixture.awayScore}>
+                      {fixture.awayScore}
+                    </ScoreFlash>
+                  </p>
+                </div>
               ) : (
                 <p className="text-lg font-medium text-muted-foreground">vs</p>
               )}

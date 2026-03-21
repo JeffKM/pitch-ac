@@ -1,6 +1,7 @@
 "use client";
 
 // 경기 상세 탭 네비게이션 — 프리매치 / 라이브 / 포스트매치
+// activeTab + onTabChange prop으로 외부에서 제어 가능한 컴포넌트
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type {
@@ -16,6 +17,8 @@ import { LiveTab } from "./live-tab";
 import { PostmatchTab } from "./postmatch-tab";
 import { PrematchTab } from "./prematch-tab";
 
+type TabValue = "prematch" | "live" | "postmatch";
+
 interface FixtureTabsProps {
   fixture: Fixture;
   homeTeam: Team;
@@ -25,7 +28,8 @@ interface FixtureTabsProps {
   h2hResults: H2HResult[];
   homeInjuries: InjuredPlayer[];
   awayInjuries: InjuredPlayer[];
-  defaultTab: "prematch" | "live" | "postmatch";
+  activeTab: TabValue;
+  onTabChange: (tab: TabValue) => void;
 }
 
 export function FixtureTabs({
@@ -37,12 +41,13 @@ export function FixtureTabs({
   h2hResults,
   homeInjuries,
   awayInjuries,
-  defaultTab,
+  activeTab,
+  onTabChange,
 }: FixtureTabsProps) {
   const isLive = fixture.status === "LIVE";
 
   return (
-    <Tabs defaultValue={defaultTab}>
+    <Tabs value={activeTab} onValueChange={(v) => onTabChange(v as TabValue)}>
       <TabsList className="w-full">
         <TabsTrigger value="prematch" className="flex-1">
           프리매치

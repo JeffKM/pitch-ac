@@ -24,7 +24,7 @@ export function LiveTab({ fixture, homeTeam, awayTeam }: LiveTabProps) {
 
   return (
     <div className="space-y-4">
-      <AutoRefreshIndicator />
+      <AutoRefreshIndicator status={fixture.status} />
 
       {/* 팀 스탯 비교 */}
       {fixture.liveStats ? (
