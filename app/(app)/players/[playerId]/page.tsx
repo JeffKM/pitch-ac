@@ -20,6 +20,7 @@ export default async function PlayerProfilePage({
 }) {
   const { playerId } = await params;
   const id = Number(playerId);
+  if (isNaN(id) || id <= 0) notFound();
 
   const player = getPlayerById(id);
   if (!player) notFound();

@@ -10,6 +10,7 @@ function readStorage(): string[] {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? (JSON.parse(raw) as string[]) : [];
   } catch {
+    localStorage.removeItem(STORAGE_KEY);
     return [];
   }
 }

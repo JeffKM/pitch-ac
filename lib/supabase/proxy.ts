@@ -32,8 +32,13 @@ export async function updateSession(request: NextRequest) {
 
   // createServerClient와 getClaims() 사이에 다른 코드를 넣지 말 것.
   // 사용자 로그아웃 문제를 유발할 수 있음.
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getClaims();
+    user = data?.claims;
+  } catch {
+    // 인증 서비스 실패 시 비인증 사용자로 처리
+  }
 
   // 보호가 필요한 경로 목록 (향후 추가: /settings, /favorites 등)
   const protectedPaths: string[] = [];

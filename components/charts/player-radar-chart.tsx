@@ -60,7 +60,11 @@ interface CompareModeProps {
 export type PlayerRadarChartProps = ProfileModeProps | CompareModeProps;
 
 function toProfileChartData(radarData: RadarData): ProfileChartDataPoint[] {
-  return radarData.player.map((p, i) => ({
+  const minLen = Math.min(
+    radarData.player.length,
+    radarData.positionAverage.length,
+  );
+  return radarData.player.slice(0, minLen).map((p, i) => ({
     dimension: p.dimension,
     label: p.label,
     player: p.value,
@@ -72,7 +76,8 @@ function toCompareChartData(
   data1: RadarDataPoint[],
   data2: RadarDataPoint[],
 ): CompareChartDataPoint[] {
-  return data1.map((p, i) => ({
+  const minLen = Math.min(data1.length, data2.length);
+  return data1.slice(0, minLen).map((p, i) => ({
     dimension: p.dimension,
     label: p.label,
     player1: p.value,

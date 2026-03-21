@@ -27,13 +27,17 @@ export function PostmatchTab({
   return (
     <div className="space-y-4">
       {/* 최종 스탯 비교 */}
-      {fixture.liveStats && (
+      {fixture.liveStats ? (
         <StatBar
           homeStats={fixture.liveStats.home}
           awayStats={fixture.liveStats.away}
           homeTeamName={homeTeam.shortName}
           awayTeamName={awayTeam.shortName}
         />
+      ) : (
+        <p className="text-center text-sm text-muted-foreground">
+          경기 스탯 데이터가 없습니다.
+        </p>
       )}
 
       {/* 전체 이벤트 요약 */}

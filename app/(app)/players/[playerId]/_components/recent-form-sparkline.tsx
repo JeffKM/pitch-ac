@@ -125,7 +125,10 @@ export function RecentFormSparkline({ matchStats }: RecentFormSparklineProps) {
               tickLine={false}
             />
             <YAxis
-              domain={[5, 10]}
+              domain={[
+                (dataMin: number) => Math.max(0, Math.floor(dataMin) - 1),
+                (dataMax: number) => Math.min(10, Math.ceil(dataMax) + 1),
+              ]}
               tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
               axisLine={false}
               tickLine={false}

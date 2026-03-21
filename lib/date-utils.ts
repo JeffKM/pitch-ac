@@ -44,6 +44,7 @@ export function formatH2HDate(dateStr: string): string {
     year: "2-digit",
     month: "short",
     day: "numeric",
+    timeZone: "Asia/Seoul",
   }).format(new Date(dateStr));
 }
 

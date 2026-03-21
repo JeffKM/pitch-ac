@@ -27,13 +27,17 @@ export function LiveTab({ fixture, homeTeam, awayTeam }: LiveTabProps) {
       <AutoRefreshIndicator />
 
       {/* 팀 스탯 비교 */}
-      {fixture.liveStats && (
+      {fixture.liveStats ? (
         <StatBar
           homeStats={fixture.liveStats.home}
           awayStats={fixture.liveStats.away}
           homeTeamName={homeTeam.shortName}
           awayTeamName={awayTeam.shortName}
         />
+      ) : (
+        <p className="text-center text-sm text-muted-foreground">
+          실시간 스탯이 아직 제공되지 않습니다.
+        </p>
       )}
 
       {/* 이벤트 타임라인 */}

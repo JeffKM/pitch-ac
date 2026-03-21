@@ -1,4 +1,4 @@
-// 비교 결과 Verdict — "X leads in N/6 categories" 텍스트
+// 비교 결과 판정 — 항목별 우위 요약 텍스트
 
 import { cn } from "@/lib/utils";
 import type { Player, PlayerSeasonStats } from "@/types";
@@ -34,17 +34,18 @@ export function CompareVerdict({
     <div className="rounded-lg border bg-muted/40 px-4 py-3 text-center text-sm font-semibold">
       {isDraw ? (
         <span className="text-muted-foreground">
-          Verdict: Draw ({player1Wins}/{COMPARE_STAT_DEFINITIONS.length} each)
+          판정: 무승부 ({player1Wins}/{COMPARE_STAT_DEFINITIONS.length}개 항목
+          동점)
         </span>
       ) : (
         <span>
-          Verdict:{" "}
+          판정:{" "}
           <span
             className={cn(isPlayer1Leading ? "text-chart-1" : "text-chart-2")}
           >
             {leader.name}
-          </span>{" "}
-          leads in {leadCount}/{COMPARE_STAT_DEFINITIONS.length} categories
+          </span>
+          이(가) {leadCount}/{COMPARE_STAT_DEFINITIONS.length}개 항목에서 우위
         </span>
       )}
     </div>

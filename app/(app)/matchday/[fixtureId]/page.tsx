@@ -28,7 +28,10 @@ export default async function FixtureDetailPage({
   params: Promise<{ fixtureId: string }>;
 }) {
   const { fixtureId } = await params;
-  const fixture = getFixtureById(Number(fixtureId));
+  const id = Number(fixtureId);
+  if (isNaN(id) || id <= 0) notFound();
+
+  const fixture = getFixtureById(id);
 
   if (!fixture) notFound();
 

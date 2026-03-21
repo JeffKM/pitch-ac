@@ -37,7 +37,7 @@ function groupByRow(players: LineupPlayer[]): Map<number, LineupPlayer[]> {
     row.sort((a, b) => {
       const aCol = a.grid ? parseGrid(a.grid).col : 0;
       const bCol = b.grid ? parseGrid(b.grid).col : 0;
-      return bCol - aCol; // 왼쪽→오른쪽: col 내림차순
+      return aCol - bCol; // 왼쪽→오른쪽: col 오름차순
     });
   }
   return map;
