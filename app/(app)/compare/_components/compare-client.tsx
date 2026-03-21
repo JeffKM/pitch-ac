@@ -155,7 +155,13 @@ export function CompareClient({
 
       {/* Share as Image 버튼 */}
       <div className="flex justify-center">
-        <ShareButton disabled={!canCompare} />
+        <ShareButton
+          disabled={!canCompare}
+          player1Id={slot1?.player.id}
+          player2Id={slot2?.player.id}
+          player1Name={slot1?.player.name}
+          player2Name={slot2?.player.name}
+        />
       </div>
     </div>
   );
