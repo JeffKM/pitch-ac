@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
         hostname: "media.api-sports.io",
         pathname: "/football/**",
       },
+      {
+        protocol: "https",
+        hostname: "cdn.sportmonks.com",
+        pathname: "/images/**",
+      },
     ],
   },
 };
