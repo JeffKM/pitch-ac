@@ -2,10 +2,22 @@
 
 // 선수 비교 페이지 핵심 조율자 — 선수 선택 상태 + URL 파라미터 동기화
 
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { PlayerRadarChart } from "@/components/charts/player-radar-chart";
+const PlayerRadarChart = dynamic(
+  () =>
+    import("@/components/charts/player-radar-chart").then(
+      (m) => m.PlayerRadarChart,
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[300px] animate-pulse rounded-xl border bg-muted" />
+    ),
+  },
+);
 import type { Player, PlayerSeasonStats, Team } from "@/types";
 
 import { CompareStatTable } from "./compare-stat-table";

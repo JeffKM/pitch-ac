@@ -121,11 +121,15 @@ export async function GET(request: NextRequest) {
       awayInjuries,
     };
 
-    return NextResponse.json({
-      data,
-      error: null,
-      timestamp: new Date().toISOString(),
-    });
+    const isLive = data.fixture.status === "LIVE";
+    const cacheControl = isLive
+      ? "public, s-maxage=10, stale-while-revalidate=30"
+      : "public, s-maxage=60, stale-while-revalidate=120";
+
+    return NextResponse.json(
+      { data, error: null, timestamp: new Date().toISOString() },
+      { headers: { "Cache-Control": cacheControl } },
+    );
   } catch (error) {
     return NextResponse.json(
       {

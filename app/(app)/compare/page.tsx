@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { CURRENT_SEASON_LABEL } from "@/lib/api/sportmonks/constants";
 import {
   getAllPlayers,
@@ -126,7 +127,22 @@ export default function ComparePage({
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">선수 비교</h1>
-      <Suspense fallback={<p className="text-muted-foreground">로딩 중...</p>}>
+      <Suspense
+        fallback={
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {[0, 1].map((i) => (
+              <Card key={i}>
+                <CardHeader className="pb-2">
+                  <div className="h-4 w-16 animate-pulse rounded bg-muted" />
+                </CardHeader>
+                <CardContent>
+                  <div className="h-10 w-full animate-pulse rounded-md bg-muted" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        }
+      >
         <CompareContent searchParams={searchParams} />
       </Suspense>
     </div>

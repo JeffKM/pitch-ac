@@ -141,7 +141,7 @@ export function PlayerSearchCombobox({
                       width={32}
                       height={32}
                       className="size-8 shrink-0 rounded-full object-cover"
-                      unoptimized
+                      sizes="32px"
                     />
                     <div className="ml-2 min-w-0">
                       <p className="truncate font-medium">{player.name}</p>

@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 
-import { PlayerRadarChart } from "@/components/charts/player-radar-chart";
 import { CURRENT_SEASON_LABEL } from "@/lib/api/sportmonks/constants";
 import {
   getMatchStatsByPlayerId,
@@ -10,8 +9,11 @@ import {
 } from "@/lib/repositories";
 
 import { CompareButton } from "./_components/compare-button";
+import {
+  PlayerRadarChart,
+  RecentFormSparkline,
+} from "./_components/player-charts";
 import { PlayerHeaderCard } from "./_components/player-header-card";
-import { RecentFormSparkline } from "./_components/recent-form-sparkline";
 import { StatContextGrid } from "./_components/stat-context-grid";
 
 export default async function PlayerProfilePage({

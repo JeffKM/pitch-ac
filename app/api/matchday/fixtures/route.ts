@@ -85,11 +85,14 @@ export async function GET(request: NextRequest) {
       hasLive: fixtures.some((f) => f.status === "LIVE"),
     };
 
-    return NextResponse.json({
-      data,
-      error: null,
-      timestamp: new Date().toISOString(),
-    });
+    const cacheControl = data.hasLive
+      ? "public, s-maxage=10, stale-while-revalidate=30"
+      : "public, s-maxage=30, stale-while-revalidate=60";
+
+    return NextResponse.json(
+      { data, error: null, timestamp: new Date().toISOString() },
+      { headers: { "Cache-Control": cacheControl } },
+    );
   } catch (error) {
     return NextResponse.json(
       {

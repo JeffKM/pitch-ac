@@ -35,7 +35,7 @@ export function PlayerHeaderCard({
               alt={player.name}
               fill
               className="object-cover"
-              unoptimized
+              sizes="112px"
             />
           </div>
 
@@ -55,7 +55,7 @@ export function PlayerHeaderCard({
                     alt={team.name}
                     fill
                     className="object-contain"
-                    unoptimized
+                    sizes="20px"
                   />
                 </div>
                 <span>{team.name}</span>

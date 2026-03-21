@@ -22,6 +22,7 @@ export function useMatchdayFixtures(
     queryKey: ["matchday", "fixtures", gameweek],
     queryFn: () => fetchMatchdayFixtures(gameweek),
     initialData,
+    staleTime: 30_000, // 30초간 fresh — 탭 전환/재마운트 시 불필요한 요청 차단
     // 현재 데이터의 hasLive에 따라 폴링 간격 동적 전환
     refetchInterval: (query) => {
       const data = query.state.data;

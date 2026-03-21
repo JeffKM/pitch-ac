@@ -22,6 +22,7 @@ export function useFixtureDetail(
     queryKey: ["fixture", "detail", fixtureId],
     queryFn: () => fetchFixtureDetail(fixtureId),
     initialData,
+    staleTime: 30_000, // 30초간 fresh — 탭 전환/재마운트 시 불필요한 요청 차단
     // LIVE 경기만 60초 폴링, 나머지는 폴링 없음
     refetchInterval: (query) => {
       const data = query.state.data;

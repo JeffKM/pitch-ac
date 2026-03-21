@@ -55,7 +55,7 @@ export function PlayerCard({ player, team, seasonStats }: PlayerCardProps) {
             width={80}
             height={80}
             className="size-20 rounded-full object-cover"
-            unoptimized
+            sizes="80px"
           />
           <div className="w-full text-center">
             <p className="truncate font-semibold">{player.name}</p>
