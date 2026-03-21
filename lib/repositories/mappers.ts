@@ -6,6 +6,7 @@ import type {
   Fixture,
   FixtureEvent,
   FixtureLiveStats,
+  InjuredPlayer,
   Lineup,
   Team,
   TeamStanding,
@@ -78,6 +79,26 @@ export function teamRowToTeam(row: TeamRow): Team {
     shortName: row.short_code,
     logoUrl: row.logo_url,
     season: row.season,
+  };
+}
+
+/** injuries 테이블 행 타입 */
+export interface InjuryRow {
+  player_id: number;
+  team_id: number;
+  player_name: string;
+  reason: string;
+  expected_return: string | null;
+}
+
+/** injuries 테이블 행 → InjuredPlayer 앱 타입 */
+export function injuryRowToInjuredPlayer(row: InjuryRow): InjuredPlayer {
+  return {
+    playerId: row.player_id,
+    playerName: row.player_name,
+    teamId: row.team_id,
+    reason: row.reason,
+    expectedReturn: row.expected_return,
   };
 }
 

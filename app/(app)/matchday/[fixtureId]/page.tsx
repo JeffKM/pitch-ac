@@ -1,26 +1,19 @@
-// 경기 상세 페이지 — 헤더 + 상태별 탭 (프리매치/라이브/포스트매치)
+// 경기 상세 페이지 — 서버에서 초기 데이터 조회 후 Client 폴링으로 전달
 
 import { notFound } from "next/navigation";
 
+import type { FixtureDetailData } from "@/app/api/matchday/fixture/route";
+import { CURRENT_SEASON_LABEL } from "@/lib/api/sportmonks/constants";
 import {
   getFixtureById,
-  getH2HResults,
   getInjuriesByTeamId,
-  getStandingByTeamId,
-  getTeamById,
-} from "@/lib/mock";
-import type { FixtureStatus } from "@/types";
+  getStandingsByTeamIds,
+  getTeamsByIds,
+} from "@/lib/repositories";
+import { fetchH2HResults } from "@/lib/services/h2h";
+import type { H2HResult, InjuredPlayer } from "@/types";
 
-import { FixtureTabs } from "./_components/fixture-tabs";
-import { MatchHeader } from "./_components/match-header";
-
-function resolveDefaultTab(
-  status: FixtureStatus,
-): "prematch" | "live" | "postmatch" {
-  if (status === "NS") return "prematch";
-  if (status === "LIVE") return "live";
-  return "postmatch";
-}
+import { FixtureDetailContent } from "./_components/fixture-detail-content";
 
 export default async function FixtureDetailPage({
   params,
@@ -31,43 +24,41 @@ export default async function FixtureDetailPage({
   const id = Number(fixtureId);
   if (isNaN(id) || id <= 0) notFound();
 
-  const fixture = getFixtureById(id);
-
+  const fixture = await getFixtureById(id);
   if (!fixture) notFound();
 
-  const homeTeam = getTeamById(fixture.homeTeamId);
-  const awayTeam = getTeamById(fixture.awayTeamId);
+  const teamIds = [fixture.homeTeamId, fixture.awayTeamId].filter(Boolean);
+
+  const [teamsMap, standingsMap, h2hResults, homeInjuries, awayInjuries] =
+    await Promise.all([
+      getTeamsByIds(teamIds),
+      getStandingsByTeamIds(teamIds, CURRENT_SEASON_LABEL),
+      fetchH2HResults(fixture.homeTeamId, fixture.awayTeamId).catch(
+        () => [] as H2HResult[],
+      ),
+      getInjuriesByTeamId(fixture.homeTeamId).catch(
+        () => [] as InjuredPlayer[],
+      ),
+      getInjuriesByTeamId(fixture.awayTeamId).catch(
+        () => [] as InjuredPlayer[],
+      ),
+    ]);
+
+  const homeTeam = teamsMap.get(fixture.homeTeamId);
+  const awayTeam = teamsMap.get(fixture.awayTeamId);
 
   if (!homeTeam || !awayTeam) notFound();
 
-  const homeStanding = getStandingByTeamId(fixture.homeTeamId);
-  const awayStanding = getStandingByTeamId(fixture.awayTeamId);
-  const h2hResults = getH2HResults(fixture.homeTeamId, fixture.awayTeamId);
-  const homeInjuries = getInjuriesByTeamId(fixture.homeTeamId);
-  const awayInjuries = getInjuriesByTeamId(fixture.awayTeamId);
-  const defaultTab = resolveDefaultTab(fixture.status);
+  const initialData: FixtureDetailData = {
+    fixture,
+    homeTeam,
+    awayTeam,
+    homeStanding: standingsMap.get(fixture.homeTeamId) ?? null,
+    awayStanding: standingsMap.get(fixture.awayTeamId) ?? null,
+    h2hResults,
+    homeInjuries,
+    awayInjuries,
+  };
 
-  return (
-    <div className="space-y-4">
-      <MatchHeader
-        fixture={fixture}
-        homeTeam={homeTeam}
-        awayTeam={awayTeam}
-        homeStanding={homeStanding}
-        awayStanding={awayStanding}
-      />
-
-      <FixtureTabs
-        fixture={fixture}
-        homeTeam={homeTeam}
-        awayTeam={awayTeam}
-        homeStanding={homeStanding}
-        awayStanding={awayStanding}
-        h2hResults={h2hResults}
-        homeInjuries={homeInjuries}
-        awayInjuries={awayInjuries}
-        defaultTab={defaultTab}
-      />
-    </div>
-  );
+  return <FixtureDetailContent initialData={initialData} />;
 }

@@ -2,8 +2,10 @@
 
 export {
   getCurrentGameweek,
+  getFixtureById,
   getFixturesByGameweek,
 } from "./fixture-repository";
-export type { FixtureRow, StandingRow, TeamRow } from "./mappers";
+export { getInjuriesByTeamId } from "./injury-repository";
+export type { FixtureRow, InjuryRow, StandingRow, TeamRow } from "./mappers";
 export { getStandingsByTeamIds } from "./standing-repository";
 export { getTeamsByIds } from "./team-repository";

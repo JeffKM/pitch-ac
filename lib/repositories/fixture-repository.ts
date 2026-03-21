@@ -51,6 +51,22 @@ export async function getCurrentGameweek(): Promise<number> {
   return 1;
 }
 
+/** ID로 경기 상세 조회 */
+export async function getFixtureById(id: number): Promise<Fixture | null> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("fixtures")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) throw new Error(`fixture 조회 실패: ${error.message}`);
+  if (!data) return null;
+
+  return fixtureRowToFixture(data as FixtureRow);
+}
+
 /** 게임위크별 경기 목록 조회 */
 export async function getFixturesByGameweek(
   gameweek: number,
