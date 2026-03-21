@@ -100,11 +100,11 @@ export function EventTimeline({ events, homeTeamId }: EventTimelineProps) {
         <CardTitle className="text-sm font-medium">이벤트</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
-        {sorted.map((event, i) => {
+        {sorted.map((event) => {
           const isHome = event.teamId === homeTeamId;
           return (
             <div
-              key={i}
+              key={`${event.minute}-${event.teamId}-${event.type}-${event.playerId ?? ""}`}
               className="grid grid-cols-[1fr_auto_1fr] items-center gap-2"
             >
               {/* 홈팀 이벤트 */}

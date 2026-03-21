@@ -47,8 +47,8 @@ function StatRow({
       <div className="flex h-1.5 overflow-hidden rounded-full bg-muted">
         <div
           className={cn(
-            "h-full bg-primary transition-all",
-            homePercent >= awayPercent ? "rounded-l-full" : "rounded-l-full",
+            "h-full rounded-l-full bg-primary transition-all",
+            homePercent >= awayPercent && "rounded-r-full",
           )}
           style={{ width: `${homePercent}%` }}
         />

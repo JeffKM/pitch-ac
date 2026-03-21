@@ -4,6 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { TeamFormBadge } from "./team-form-badge";
 
+function isFormResult(v: string): v is "W" | "D" | "L" {
+  return v === "W" || v === "D" || v === "L";
+}
+
 interface TeamFormRowProps {
   homeTeamName: string;
   awayTeamName: string;
@@ -29,9 +33,9 @@ export function TeamFormRow({
             <p className="text-xs text-muted-foreground">{homeTeamName}</p>
             <div className="flex gap-1">
               {homeForm.length > 0 ? (
-                homeForm.map((result, i) => (
-                  <TeamFormBadge key={i} result={result as "W" | "D" | "L"} />
-                ))
+                homeForm
+                  .filter(isFormResult)
+                  .map((result, i) => <TeamFormBadge key={i} result={result} />)
               ) : (
                 <p className="text-xs text-muted-foreground">데이터 없음</p>
               )}
@@ -43,9 +47,9 @@ export function TeamFormRow({
             <p className="text-xs text-muted-foreground">{awayTeamName}</p>
             <div className="flex gap-1">
               {awayForm.length > 0 ? (
-                awayForm.map((result, i) => (
-                  <TeamFormBadge key={i} result={result as "W" | "D" | "L"} />
-                ))
+                awayForm
+                  .filter(isFormResult)
+                  .map((result, i) => <TeamFormBadge key={i} result={result} />)
               ) : (
                 <p className="text-xs text-muted-foreground">데이터 없음</p>
               )}
