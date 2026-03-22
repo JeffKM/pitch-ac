@@ -18,7 +18,7 @@ export function AppHeader({ authSlot }: AppHeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 hidden w-full border-comic-black border-b-[var(--comic-border-width)] bg-comic-white md:block">
-      <div className="container flex h-14 items-center">
+      <div className="mx-auto flex h-14 max-w-5xl items-center px-[var(--comic-panel-padding)]">
         {/* 로고 */}
         <Link
           href="/matchday"

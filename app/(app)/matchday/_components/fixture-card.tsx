@@ -42,7 +42,7 @@ export function FixtureCard({
         data-live={isLive || undefined}
         data-fixture-id={fixture.id}
       >
-        <CardContent className="p-4">
+        <CardContent className="p-[var(--comic-panel-padding)]">
           {/* 메인 행: 홈팀 — 스코어/상태 — 어웨이팀 */}
           <div className="flex items-center justify-between gap-4">
             {/* 홈팀 */}

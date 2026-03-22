@@ -22,7 +22,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* 메인 콘텐츠 */}
         <main className="flex-1">
-          <div className="container py-6">{children}</div>
+          <div className="mx-auto max-w-5xl p-[var(--comic-panel-padding)]">
+            {children}
+          </div>
         </main>
 
         {/* 모바일 하단 탭 바 */}

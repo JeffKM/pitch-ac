@@ -6,8 +6,6 @@ import { Download, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
-
 interface ShareButtonProps {
   disabled?: boolean;
   player1Id?: number;
@@ -57,10 +55,10 @@ export function ShareButton({
   };
 
   return (
-    <Button
-      variant="outline"
+    <button
       disabled={disabled || isLoading}
       onClick={handleDownload}
+      className="inline-flex items-center gap-2 rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-black px-6 py-2.5 font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] tracking-[var(--comic-tracking-normal)] text-comic-white transition-colors hover:bg-comic-black/80 disabled:pointer-events-none disabled:opacity-50"
     >
       {isLoading ? (
         <Loader2 className="size-4 animate-spin" />
@@ -68,6 +66,6 @@ export function ShareButton({
         <Download className="size-4" />
       )}
       Share as Image
-    </Button>
+    </button>
   );
 }

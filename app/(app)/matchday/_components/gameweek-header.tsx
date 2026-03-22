@@ -3,8 +3,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
-
 const MIN_GW = 1;
 const MAX_GW = 38;
 
@@ -20,25 +18,17 @@ export function GameweekHeader({ gameweek, dateRange }: GameweekHeaderProps) {
   return (
     <div className="flex items-center justify-between">
       {hasPrev ? (
-        <Button
-          variant="outline"
-          size="icon"
+        <Link
+          href={`/matchday?gw=${gameweek - 1}`}
+          className="flex size-10 items-center justify-center rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white transition-colors hover:bg-comic-cream"
           aria-label="이전 게임위크"
-          asChild
         >
-          <Link href={`/matchday?gw=${gameweek - 1}`}>
-            <ChevronLeft className="size-5" />
-          </Link>
-        </Button>
+          <ChevronLeft className="size-5 text-comic-black" />
+        </Link>
       ) : (
-        <Button
-          variant="outline"
-          size="icon"
-          disabled
-          aria-label="이전 게임위크"
-        >
-          <ChevronLeft className="size-5" />
-        </Button>
+        <span className="flex size-10 items-center justify-center rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black/30 bg-comic-white/50">
+          <ChevronLeft className="size-5 text-comic-black/30" />
+        </span>
       )}
 
       <div className="text-center">
@@ -51,25 +41,17 @@ export function GameweekHeader({ gameweek, dateRange }: GameweekHeaderProps) {
       </div>
 
       {hasNext ? (
-        <Button
-          variant="outline"
-          size="icon"
+        <Link
+          href={`/matchday?gw=${gameweek + 1}`}
+          className="flex size-10 items-center justify-center rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white transition-colors hover:bg-comic-cream"
           aria-label="다음 게임위크"
-          asChild
         >
-          <Link href={`/matchday?gw=${gameweek + 1}`}>
-            <ChevronRight className="size-5" />
-          </Link>
-        </Button>
+          <ChevronRight className="size-5 text-comic-black" />
+        </Link>
       ) : (
-        <Button
-          variant="outline"
-          size="icon"
-          disabled
-          aria-label="다음 게임위크"
-        >
-          <ChevronRight className="size-5" />
-        </Button>
+        <span className="flex size-10 items-center justify-center rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black/30 bg-comic-white/50">
+          <ChevronRight className="size-5 text-comic-black/30" />
+        </span>
       )}
     </div>
   );

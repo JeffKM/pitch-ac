@@ -110,7 +110,7 @@ export function CompareClient({
           teams={teams}
           onSelect={handleSelectPlayer1}
           onClear={handleClearPlayer1}
-          colorClass="text-chart-1"
+          colorClass="text-comic-skyblue"
         />
         <PlayerSlot
           label="선수 B"
@@ -120,7 +120,7 @@ export function CompareClient({
           teams={teams}
           onSelect={handleSelectPlayer2}
           onClear={handleClearPlayer2}
-          colorClass="text-chart-2"
+          colorClass="text-comic-red"
         />
       </div>
 
@@ -160,7 +160,7 @@ export function CompareClient({
 
       {/* 빈 상태 안내 */}
       {!canCompare && (
-        <p className="py-12 text-center text-muted-foreground">
+        <p className="py-12 text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50">
           두 선수를 선택하면 비교 배틀카드가 표시됩니다.
         </p>
       )}
