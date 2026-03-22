@@ -14,16 +14,16 @@ interface EventTimelineProps {
 
 function EventIcon({ type }: { type: FixtureEvent["type"] }) {
   if (type === "goal") {
-    return <CircleDot className="size-4 text-primary" />;
+    return <CircleDot className="size-4 text-comic-skyblue" />;
   }
   if (type === "substitution") {
-    return <ArrowLeftRight className="size-4 text-blue-500" />;
+    return <ArrowLeftRight className="size-4 text-comic-skyblue" />;
   }
   if (type === "yellow_card") {
-    return <div className="size-3.5 rounded-sm bg-yellow-400" />;
+    return <div className="size-3.5 rounded-sm bg-comic-yellow" />;
   }
   if (type === "red_card") {
-    return <div className="size-3.5 rounded-sm bg-red-500" />;
+    return <div className="size-3.5 rounded-sm bg-comic-red" />;
   }
   return null;
 }
@@ -44,10 +44,10 @@ function EventItem({ event, isHome }: EventItemProps) {
             <PlayerNameLink
               playerId={event.playerId}
               playerName={event.playerName}
-              className="text-sm"
+              className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)]"
             />
             {event.type === "goal" && event.xg !== undefined && (
-              <p className="text-xs text-muted-foreground">
+              <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/40">
                 xG {event.xg.toFixed(2)}
               </p>
             )}
@@ -62,10 +62,10 @@ function EventItem({ event, isHome }: EventItemProps) {
             <PlayerNameLink
               playerId={event.playerId}
               playerName={event.playerName}
-              className="text-sm"
+              className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)]"
             />
             {event.type === "goal" && event.xg !== undefined && (
-              <p className="text-xs text-muted-foreground">
+              <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/40">
                 xG {event.xg.toFixed(2)}
               </p>
             )}
@@ -88,7 +88,9 @@ export function EventTimeline({ events, homeTeamId }: EventTimelineProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">이벤트가 없습니다.</p>
+          <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] text-comic-black/40">
+            이벤트가 없습니다.
+          </p>
         </CardContent>
       </Card>
     );
@@ -115,7 +117,7 @@ export function EventTimeline({ events, homeTeamId }: EventTimelineProps) {
               <div>{isHome && <EventItem event={event} isHome />}</div>
 
               {/* 분 표시 */}
-              <div className="w-10 text-center text-xs font-medium text-muted-foreground">
+              <div className="w-10 text-center font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-xs)] text-comic-black/40">
                 {event.minute}&apos;
               </div>
 

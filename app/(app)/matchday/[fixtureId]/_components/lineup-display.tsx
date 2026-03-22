@@ -55,8 +55,10 @@ function PitchLineup({
 
   return (
     <div className="space-y-2">
-      <p className="text-center text-sm font-medium">{teamName}</p>
-      <p className="text-center text-xs text-muted-foreground">
+      <p className="text-center font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
+        {teamName}
+      </p>
+      <p className="text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/40">
         {lineup.formation}
       </p>
 
@@ -84,15 +86,20 @@ function PitchLineup({
       {/* 교체 선수 */}
       {lineup.substitutes.length > 0 && (
         <div>
-          <p className="mb-1 text-xs text-muted-foreground">교체 선수</p>
+          <p className="mb-1 font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-xs)] text-comic-black/40">
+            교체 선수
+          </p>
           <ul className="space-y-0.5">
             {lineup.substitutes.map((sub) => (
-              <li key={sub.playerId} className="flex gap-2 text-xs">
-                <span className="w-5 text-right text-muted-foreground">
+              <li
+                key={sub.playerId}
+                className="flex gap-2 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)]"
+              >
+                <span className="w-5 text-right text-comic-black/40">
                   {sub.number}
                 </span>
-                <span>{sub.playerName}</span>
-                <span className="text-muted-foreground">{sub.position}</span>
+                <span className="text-comic-black">{sub.playerName}</span>
+                <span className="text-comic-black/40">{sub.position}</span>
               </li>
             ))}
           </ul>

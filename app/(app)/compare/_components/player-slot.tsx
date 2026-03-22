@@ -48,7 +48,7 @@ export function PlayerSlot({
         {player ? (
           // 선수 선택됨 — 미니 프로필 카드
           <div className="flex items-center gap-3">
-            <div className="relative size-12 shrink-0 overflow-hidden rounded-full ring-1 ring-border">
+            <div className="relative size-12 shrink-0 overflow-hidden rounded-full ring-[var(--comic-border-width)] ring-comic-black">
               <Image
                 src={player.photoUrl}
                 alt={player.name}
@@ -58,8 +58,10 @@ export function PlayerSlot({
               />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate font-semibold">{player.name}</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="truncate font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
+                {player.name}
+              </p>
+              <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
                 {team?.shortName ?? String(player.teamId)} · {player.position}
               </p>
             </div>

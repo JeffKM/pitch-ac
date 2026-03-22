@@ -91,16 +91,16 @@ function StatRow({
       <div className="text-right">
         <span
           className={cn(
-            "text-base tabular-nums",
+            "font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] tabular-nums",
             isUnavailable
-              ? "text-muted-foreground"
+              ? "text-comic-black/40"
               : winner === "player1" && "font-bold",
           )}
         >
           {value1 === null ? "N/A" : format(value1)}
         </span>
         {context1 !== null && (
-          <span className="block text-xs text-muted-foreground">
+          <span className="block font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/40">
             리그 {context1.rank}위
           </span>
         )}
@@ -108,7 +108,7 @@ function StatRow({
 
       {/* 중앙: 지표명 + 트로피 */}
       <div className="flex min-w-[84px] flex-col items-center gap-1 px-2">
-        <span className="flex items-center gap-0.5 text-center text-xs text-muted-foreground">
+        <span className="flex items-center gap-0.5 text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/40">
           {label}
           {glossaryId && <GlossaryPopover glossaryId={glossaryId} />}
         </span>
@@ -127,16 +127,16 @@ function StatRow({
       <div className="text-left">
         <span
           className={cn(
-            "text-base tabular-nums",
+            "font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] tabular-nums",
             isUnavailable
-              ? "text-muted-foreground"
+              ? "text-comic-black/40"
               : winner === "player2" && "font-bold",
           )}
         >
           {value2 === null ? "N/A" : format(value2)}
         </span>
         {context2 !== null && (
-          <span className="block text-xs text-muted-foreground">
+          <span className="block font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/40">
             리그 {context2.rank}위
           </span>
         )}
@@ -168,11 +168,11 @@ export function CompareStatTable({
       <CardContent className="px-4">
         {/* 헤더: 선수 이름 */}
         <div className="grid grid-cols-[1fr_auto_1fr] gap-2 border-b pb-2">
-          <p className="truncate text-right text-sm font-semibold text-chart-1">
+          <p className="truncate text-right font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-chart-1">
             {player1.name}
           </p>
           <div className="min-w-[72px] px-2" />
-          <p className="truncate text-left text-sm font-semibold text-chart-2">
+          <p className="truncate text-left font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-chart-2">
             {player2.name}
           </p>
         </div>

@@ -39,7 +39,7 @@ export function ScoreFlash({ score, className, children }: ScoreFlashProps) {
     <span
       className={cn(
         "transition-colors duration-300",
-        isFlashing && "text-green-500",
+        isFlashing && "text-comic-green",
         className,
       )}
     >

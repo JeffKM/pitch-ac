@@ -17,7 +17,10 @@ export function SeasonDeltaIndicator({
 }: SeasonDeltaIndicatorProps) {
   if (prevSeasonValue === null) {
     return (
-      <Badge variant="secondary" className="text-xs">
+      <Badge
+        variant="secondary"
+        className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-xs)]"
+      >
         첫 시즌
       </Badge>
     );
@@ -27,7 +30,7 @@ export function SeasonDeltaIndicator({
 
   if (delta > 0) {
     return (
-      <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+      <div className="flex items-center gap-1 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-green">
         <TrendingUp className="size-3" />
         <span className="tabular-nums">+{format(delta)} vs 전시즌</span>
       </div>
@@ -36,7 +39,7 @@ export function SeasonDeltaIndicator({
 
   if (delta < 0) {
     return (
-      <div className="flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
+      <div className="flex items-center gap-1 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-red">
         <TrendingDown className="size-3" />
         <span className="tabular-nums">{format(delta)} vs 전시즌</span>
       </div>
@@ -44,7 +47,7 @@ export function SeasonDeltaIndicator({
   }
 
   return (
-    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+    <div className="flex items-center gap-1 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/40">
       <Minus className="size-3" />
       <span>전시즌과 동일</span>
     </div>
