@@ -1,7 +1,7 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { Fredoka, Geist } from "next/font/google";
+import { Bangers, Fredoka, Geist, Permanent_Marker } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 
@@ -61,6 +61,20 @@ const fredoka = Fredoka({
   subsets: ["latin"],
 });
 
+const bangers = Bangers({
+  variable: "--font-bangers",
+  weight: "400",
+  display: "swap",
+  subsets: ["latin"],
+});
+
+const permanentMarker = Permanent_Marker({
+  variable: "--font-permanent-marker",
+  weight: "400",
+  display: "swap",
+  subsets: ["latin"],
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -69,7 +83,7 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body
-        className={`${geistSans.className} ${fredoka.variable} antialiased`}
+        className={`${geistSans.className} ${fredoka.variable} ${bangers.variable} ${permanentMarker.variable} antialiased`}
       >
         <ThemeProvider
           attribute="class"

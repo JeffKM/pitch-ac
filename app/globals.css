@@ -36,6 +36,57 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --font-cartoon: var(--font-fredoka);
+  --font-comic-heading: var(--font-bangers);
+  --font-comic-body: var(--font-permanent-marker);
+
+  /* 코믹 컬러 토큰 */
+  --color-comic-skyblue: var(--comic-skyblue);
+  --color-comic-green: var(--comic-green);
+  --color-comic-yellow: var(--comic-yellow);
+  --color-comic-red: var(--comic-red);
+  --color-comic-pink: var(--comic-pink);
+  --color-comic-black: var(--comic-black);
+  --color-comic-cream: var(--comic-cream);
+  --color-comic-white: var(--comic-white);
+
+  /* 코믹 넘버 토큰 — 보더/스페이싱 */
+  --comic-border-width: var(--comic-border);
+  --comic-border-thin: var(--comic-border-t);
+  --comic-panel-gap: var(--comic-gap);
+  --comic-panel-padding: var(--comic-pad);
+  --comic-panel-radius: var(--comic-radius);
+
+  /* 타이포그라피 넘버 토큰 — Bangers */
+  --comic-text-xs: 12px;
+  --comic-text-sm: 14px;
+  --comic-text-base: 18px;
+  --comic-text-lg: 20px;
+  --comic-text-xl: 24px;
+  --comic-text-2xl: 30px;
+  --comic-text-3xl: 48px;
+  --comic-text-4xl: 60px;
+  --comic-text-5xl: 72px;
+  --comic-text-6xl: 96px;
+  /* 타이포그라피 넘버 토큰 — Permanent Marker */
+  --comic-body-xs: 10px;
+  --comic-body-sm: 12px;
+  --comic-body-base: 14px;
+  --comic-body-lg: 16px;
+  /* 줄간격 비율 토큰 */
+  --comic-leading-tight: 1;
+  --comic-leading-snug: 1.2;
+  --comic-leading-normal: 1.333;
+  --comic-leading-relaxed: 1.4;
+  --comic-leading-loose: 1.5;
+  /* 자간 토큰 */
+  --comic-tracking-none: 0px;
+  --comic-tracking-tight: 0.25px;
+  --comic-tracking-normal: 0.45px;
+  --comic-tracking-wide: 1px;
+  --comic-tracking-wider: 1.2px;
+  --comic-tracking-widest: 3px;
+  --comic-tracking-ultra: 4.8px;
+  --comic-tracking-mega: 6px;
 }
 
 :root {
@@ -69,6 +120,21 @@
   --chart-3: oklch(0.82 0.12 85);
   --chart-4: oklch(0.75 0.08 230);
   --chart-5: oklch(0.55 0.1 260);
+  /* 코믹 팬사이트 컬러 팔레트 (피그마 추출) */
+  --comic-skyblue: oklch(0.78 0.08 220);
+  --comic-green: oklch(0.72 0.17 155);
+  --comic-yellow: oklch(0.88 0.15 90);
+  --comic-red: oklch(0.58 0.22 25);
+  --comic-pink: oklch(0.68 0.16 10);
+  --comic-black: oklch(0.15 0 0);
+  --comic-cream: oklch(0.95 0.03 90);
+  --comic-white: oklch(1 0 0);
+  /* 코믹 넘버 토큰 */
+  --comic-border: 3px;
+  --comic-border-t: 2px;
+  --comic-gap: 16px;
+  --comic-pad: 24px;
+  --comic-radius: 4px;
 }
 
 .dark {
@@ -100,6 +166,20 @@
   --chart-3: oklch(0.75 0.1 85);
   --chart-4: oklch(0.6 0.1 230);
   --chart-5: oklch(0.45 0.08 260);
+  /* 코믹 컬러 (다크모드 — 채도/명도 조정) */
+  --comic-skyblue: oklch(0.55 0.1 220);
+  --comic-green: oklch(0.52 0.14 155);
+  --comic-yellow: oklch(0.75 0.13 90);
+  --comic-red: oklch(0.55 0.2 25);
+  --comic-pink: oklch(0.6 0.14 10);
+  --comic-black: oklch(0.95 0 0);
+  --comic-cream: oklch(0.25 0.02 90);
+  --comic-white: oklch(0.18 0.03 260);
+  --comic-border: 3px;
+  --comic-border-t: 2px;
+  --comic-gap: 16px;
+  --comic-pad: 24px;
+  --comic-radius: 4px;
 }
 
 @layer base {
