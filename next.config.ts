@@ -6,7 +6,7 @@ const cspHeader = `
   default-src 'self';
   script-src 'self' 'unsafe-inline' 'unsafe-eval';
   style-src 'self' 'unsafe-inline';
-  img-src 'self' blob: data: https://cdn.sportmonks.com;
+  img-src 'self' blob: data: https://cdn.sportmonks.com https://*.supabase.co;
   font-src 'self';
   connect-src 'self' https://*.supabase.co wss://*.supabase.co;
   frame-ancestors 'none';
@@ -25,6 +25,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "cdn.sportmonks.com",
         pathname: "/images/**",
+      },
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/object/public/cartoon-assets/**",
       },
     ],
   },
