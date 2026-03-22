@@ -1,7 +1,8 @@
-// 선수 프로필 헤더 카드 — 사진, 이름, 클럽, 포지션, 등번호, 국적
+// 선수 프로필 헤더 카드 — 사진, 이름, 클럽, 포지션, 등번호, 국적, 카툰 캐릭터
 
 import Image from "next/image";
 
+import { CartoonAvatar } from "@/components/cartoon/cartoon-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Player, PlayerSeasonStats, Team } from "@/types";
@@ -10,6 +11,8 @@ interface PlayerHeaderCardProps {
   player: Player;
   team: Team;
   seasonStats?: PlayerSeasonStats;
+  /** 카툰 에셋 등록 여부 */
+  hasCartoonAsset?: boolean;
 }
 
 const POSITION_LABELS: Record<string, string> = {
@@ -23,21 +26,33 @@ export function PlayerHeaderCard({
   player,
   team,
   seasonStats,
+  hasCartoonAsset = false,
 }: PlayerHeaderCardProps) {
   return (
     <Card>
       <CardContent className="p-6">
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-          {/* 선수 사진 */}
-          <div className="relative size-28 shrink-0 overflow-hidden rounded-full ring-2 ring-border">
-            <Image
-              src={player.photoUrl}
-              alt={player.name}
-              fill
-              className="object-cover"
-              sizes="112px"
+          {/* 선수 사진 / 카툰 아바타 */}
+          {hasCartoonAsset ? (
+            <CartoonAvatar
+              playerId={player.id}
+              mood="neutral"
+              hasAsset
+              variant="full"
+              playerName={player.name}
+              className="h-36 w-auto shrink-0"
             />
-          </div>
+          ) : (
+            <div className="relative size-28 shrink-0 overflow-hidden rounded-full ring-2 ring-border">
+              <Image
+                src={player.photoUrl}
+                alt={player.name}
+                fill
+                className="object-cover"
+                sizes="112px"
+              />
+            </div>
+          )}
 
           {/* 선수 정보 */}
           <div className="flex flex-1 flex-col items-center gap-3 sm:items-start">

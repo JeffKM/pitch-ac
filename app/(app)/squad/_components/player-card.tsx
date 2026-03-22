@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { CartoonAvatar } from "@/components/cartoon/cartoon-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import type { PlayerSeasonStats } from "@/types/player";
@@ -11,6 +12,8 @@ interface PlayerCardProps {
   player: Player;
   team: Team | undefined;
   seasonStats: PlayerSeasonStats | undefined;
+  /** 카툰 에셋 등록 여부 */
+  hasCartoonAsset?: boolean;
 }
 
 /** 포지션별 대표 스탯 선택 */
@@ -42,21 +45,37 @@ function getPrimaryStat(
   }
 }
 
-export function PlayerCard({ player, team, seasonStats }: PlayerCardProps) {
+export function PlayerCard({
+  player,
+  team,
+  seasonStats,
+  hasCartoonAsset = false,
+}: PlayerCardProps) {
   const primaryStat = getPrimaryStat(player.position, seasonStats);
 
   return (
-    <Link href={`/players/${player.id}`} className="block">
+    <Link href={`/squad/${player.id}`} className="block">
       <Card className="transition-colors hover:bg-muted/50">
         <CardContent className="flex flex-col items-center gap-3 p-4">
-          <Image
-            src={player.photoUrl}
-            alt={player.name}
-            width={80}
-            height={80}
-            className="size-20 rounded-full object-cover"
-            sizes="80px"
-          />
+          {hasCartoonAsset ? (
+            <CartoonAvatar
+              playerId={player.id}
+              mood="neutral"
+              hasAsset
+              variant="thumb"
+              playerName={player.name}
+              className="size-20"
+            />
+          ) : (
+            <Image
+              src={player.photoUrl}
+              alt={player.name}
+              width={80}
+              height={80}
+              className="size-20 rounded-full object-cover"
+              sizes="80px"
+            />
+          )}
           <div className="w-full text-center">
             <p className="truncate font-semibold">{player.name}</p>
             <p className="text-sm text-muted-foreground">

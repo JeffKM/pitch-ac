@@ -17,7 +17,7 @@ export function PlayerNameLink({
 }: PlayerNameLinkProps) {
   return (
     <Link
-      href={`/players/${playerId}`}
+      href={`/squad/${playerId}`}
       className={cn("hover:text-primary hover:underline", className)}
     >
       {playerName}

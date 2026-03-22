@@ -1,8 +1,9 @@
-// 선수 관련 테이블 쿼리 함수
+// 선수 관련 테이블 쿼리 함수 (맨시티 선수 필터링)
 import "server-only";
 
 import { cache } from "react";
 
+import { MCITY_TEAM_ID } from "@/lib/api/sportmonks/constants";
 import { createClient } from "@/lib/supabase/server";
 import type { Player, PlayerMatchStats, PlayerSeasonStats } from "@/types";
 
@@ -15,13 +16,14 @@ import {
   playerSeasonStatsRowToStats,
 } from "./mappers";
 
-/** 전체 선수 목록 조회 (이름순 정렬) */
+/** 맨시티 선수 목록 조회 (이름순 정렬) */
 export async function getAllPlayers(): Promise<Player[]> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("players")
     .select("*")
+    .eq("team_id", MCITY_TEAM_ID)
     .order("name", { ascending: true });
 
   if (error) throw new Error(`players 조회 실패: ${error.message}`);

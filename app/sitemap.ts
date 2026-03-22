@@ -18,7 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1.0,
     },
     {
-      url: `${baseUrl}/players`,
+      url: `${baseUrl}/squad`,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.8,
@@ -36,7 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const players = await getAllPlayers();
     playerRoutes = players.map((player) => ({
-      url: `${baseUrl}/players/${player.id}`,
+      url: `${baseUrl}/squad/${player.id}`,
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.7,

@@ -1,4 +1,4 @@
-// 매치데이 대시보드 페이지 — Supabase DB에서 실제 PL 경기 데이터 조회
+// 매치데이 대시보드 — 맨시티 경기 포커스 뷰
 
 import type { Metadata } from "next";
 
@@ -28,10 +28,10 @@ export async function generateMetadata({
 
   return {
     title: `GW${gameweek} 매치데이`,
-    description: `프리미어리그 ${gameweek}라운드 경기 일정 및 결과`,
+    description: `맨시티 GW${gameweek} 경기 일정 및 결과`,
     openGraph: {
       title: `GW${gameweek} 매치데이 | pitch-ac`,
-      description: `프리미어리그 ${gameweek}라운드 경기 일정 및 결과`,
+      description: `맨시티 GW${gameweek} 경기 일정 및 결과`,
     },
   };
 }

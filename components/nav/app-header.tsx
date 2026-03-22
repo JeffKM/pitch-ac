@@ -22,7 +22,7 @@ export function AppHeader({ authSlot }: AppHeaderProps) {
         {/* 로고 */}
         <Link
           href="/matchday"
-          className="text-lg font-bold tracking-tight hover:opacity-80"
+          className="font-[family-name:var(--font-fredoka)] text-xl font-bold tracking-tight text-primary hover:opacity-80"
         >
           pitch-ac
         </Link>

@@ -12,6 +12,9 @@ export const CURRENT_SEASON_ID = 25583;
 /** 현재 시즌 레이블 — DB standings/teams 테이블의 season 컬럼 값과 일치 */
 export const CURRENT_SEASON_LABEL = "2025/2026";
 
+/** 맨체스터 시티 팀 ID (SportMonks v3) — DB teams 테이블 PK와 동일 */
+export const MCITY_TEAM_ID = 14;
+
 /** 시간당 요청 제한 */
 export const RATE_LIMIT_PER_HOUR = 2000;
 

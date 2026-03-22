@@ -1,8 +1,9 @@
-// fixtures 테이블 쿼리 함수 및 현재 게임위크 감지
+// fixtures 테이블 쿼리 함수 및 현재 게임위크 감지 (맨시티 경기 필터링)
 import "server-only";
 
 import { cache } from "react";
 
+import { MCITY_TEAM_ID } from "@/lib/api/sportmonks/constants";
 import { createClient } from "@/lib/supabase/server";
 import type { Fixture } from "@/types";
 
@@ -18,13 +19,15 @@ import { type FixtureRow, fixtureRowToFixture } from "./mappers";
 export const getCurrentGameweek = cache(async (): Promise<number> => {
   const supabase = await createClient();
 
-  // 3개 쿼리를 병렬 실행 후 우선순위 판정
+  // 맨시티 경기만 대상으로 3개 쿼리 병렬 실행
+  const mcityFilter = `home_team_id.eq.${MCITY_TEAM_ID},away_team_id.eq.${MCITY_TEAM_ID}`;
   const [liveResult, nextResult, lastResult] = await Promise.all([
     // 1) LIVE 경기
     supabase
       .from("fixtures")
       .select("gameweek")
       .eq("status", "LIVE")
+      .or(mcityFilter)
       .limit(1)
       .maybeSingle(),
     // 2) 가장 가까운 미래 NS 경기
@@ -32,6 +35,7 @@ export const getCurrentGameweek = cache(async (): Promise<number> => {
       .from("fixtures")
       .select("gameweek")
       .eq("status", "NS")
+      .or(mcityFilter)
       .gte("date", new Date().toISOString())
       .order("date", { ascending: true })
       .limit(1)
@@ -41,6 +45,7 @@ export const getCurrentGameweek = cache(async (): Promise<number> => {
       .from("fixtures")
       .select("gameweek")
       .eq("status", "FT")
+      .or(mcityFilter)
       .order("date", { ascending: false })
       .limit(1)
       .maybeSingle(),
@@ -72,7 +77,7 @@ export const getFixtureById = cache(
   },
 );
 
-/** 게임위크별 경기 목록 조회 */
+/** 게임위크별 맨시티 경기 조회 */
 export async function getFixturesByGameweek(
   gameweek: number,
 ): Promise<Fixture[]> {
@@ -82,6 +87,7 @@ export async function getFixturesByGameweek(
     .from("fixtures")
     .select("*")
     .eq("gameweek", gameweek)
+    .or(`home_team_id.eq.${MCITY_TEAM_ID},away_team_id.eq.${MCITY_TEAM_ID}`)
     .order("date", { ascending: true });
 
   if (error) throw new Error(`fixtures 조회 실패: ${error.message}`);

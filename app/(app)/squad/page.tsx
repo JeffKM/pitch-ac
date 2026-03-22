@@ -1,11 +1,8 @@
+// 맨시티 스쿼드 페이지 — 맨시티 선수만 표시
+
 import type { Metadata } from "next";
 
 import { CURRENT_SEASON_LABEL } from "@/lib/api/sportmonks/constants";
-
-export const metadata: Metadata = {
-  title: "선수 검색",
-  description: "프리미어리그 선수 스탯을 검색하고 비교해보세요",
-};
 import {
   getAllPlayers,
   getAllTeams,
@@ -15,7 +12,12 @@ import type { PlayerSeasonStats } from "@/types";
 
 import { PlayerSearchPage } from "./_components/player-search-page";
 
-export default async function PlayersPage() {
+export const metadata: Metadata = {
+  title: "스쿼드",
+  description: "맨체스터 시티 스쿼드 — 선수 프로필과 시즌 스탯",
+};
+
+export default async function SquadPage() {
   const [allPlayers, allTeams] = await Promise.all([
     getAllPlayers(),
     getAllTeams(),
@@ -27,13 +29,19 @@ export default async function PlayersPage() {
     CURRENT_SEASON_LABEL,
   );
 
-  // Map은 Client Component로 직렬화 불가 → plain object로 변환
   const seasonStatsRecord: Record<number, PlayerSeasonStats> =
     Object.fromEntries(seasonStatsMap);
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">선수 검색</h1>
+      <div>
+        <h1 className="font-[family-name:var(--font-fredoka)] text-3xl font-bold text-primary">
+          스쿼드
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          맨체스터 시티 {allPlayers.length}명의 선수
+        </p>
+      </div>
       <PlayerSearchPage
         allPlayers={allPlayers}
         teams={allTeams}
