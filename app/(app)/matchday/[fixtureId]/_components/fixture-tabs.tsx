@@ -48,15 +48,24 @@ export function FixtureTabs({
 
   return (
     <Tabs value={activeTab} onValueChange={(v) => onTabChange(v as TabValue)}>
-      <TabsList className="w-full">
-        <TabsTrigger value="prematch" className="flex-1">
+      <TabsList className="w-full rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-cream">
+        <TabsTrigger
+          value="prematch"
+          className="flex-1 rounded-[var(--comic-panel-radius)] font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] tracking-[var(--comic-tracking-normal)] data-[state=active]:bg-comic-yellow data-[state=active]:text-comic-black"
+        >
           프리매치
         </TabsTrigger>
-        <TabsTrigger value="live" className="flex-1 gap-1.5">
+        <TabsTrigger
+          value="live"
+          className="flex-1 gap-1.5 rounded-[var(--comic-panel-radius)] font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] tracking-[var(--comic-tracking-normal)] data-[state=active]:bg-comic-yellow data-[state=active]:text-comic-black"
+        >
           {isLive && <LivePulse />}
           라이브
         </TabsTrigger>
-        <TabsTrigger value="postmatch" className="flex-1">
+        <TabsTrigger
+          value="postmatch"
+          className="flex-1 rounded-[var(--comic-panel-radius)] font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] tracking-[var(--comic-tracking-normal)] data-[state=active]:bg-comic-yellow data-[state=active]:text-comic-black"
+        >
           포스트매치
         </TabsTrigger>
       </TabsList>

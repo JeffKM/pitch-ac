@@ -8,7 +8,7 @@ import { QueryProvider } from "@/components/providers/query-provider";
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <QueryProvider>
-      <div className="flex min-h-screen flex-col">
+      <div className="flex min-h-screen flex-col bg-comic-white">
         {/* 데스크탑 상단 고정 헤더 */}
         <Suspense>
           <AppHeader

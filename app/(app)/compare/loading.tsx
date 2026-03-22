@@ -11,7 +11,10 @@ export default function CompareLoading() {
       {/* 선수 선택 슬롯 2개 */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {[0, 1].map((i) => (
-          <Card key={i}>
+          <Card
+            key={i}
+            className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white"
+          >
             <CardHeader className="pb-2">
               <div className="h-4 w-16 animate-pulse rounded bg-muted" />
             </CardHeader>

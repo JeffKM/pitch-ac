@@ -17,12 +17,12 @@ export function AppHeader({ authSlot }: AppHeaderProps) {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 hidden w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:block">
+    <header className="sticky top-0 z-50 hidden w-full border-comic-black border-b-[var(--comic-border-width)] bg-comic-white md:block">
       <div className="container flex h-14 items-center">
         {/* 로고 */}
         <Link
           href="/matchday"
-          className="font-[family-name:var(--font-fredoka)] text-xl font-bold tracking-tight text-primary hover:opacity-80"
+          className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-2xl)] tracking-[var(--comic-tracking-wide)] text-comic-black hover:opacity-80"
         >
           pitch-ac
         </Link>
@@ -39,10 +39,10 @@ export function AppHeader({ authSlot }: AppHeaderProps) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                  "flex items-center gap-1.5 rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black px-3 py-1.5 font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] tracking-[var(--comic-tracking-normal)] transition-colors",
                   isActive
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                    ? "bg-comic-yellow text-comic-black"
+                    : "bg-comic-black text-comic-white hover:bg-comic-black/80",
                 )}
               >
                 <Icon size={16} />

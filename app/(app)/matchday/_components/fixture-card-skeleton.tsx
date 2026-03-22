@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export function FixtureCardSkeleton() {
   return (
-    <Card className="animate-pulse">
+    <Card className="animate-pulse rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
       <CardContent className="p-4">
         <div className="flex items-center justify-between gap-4">
           {/* 홈팀 */}

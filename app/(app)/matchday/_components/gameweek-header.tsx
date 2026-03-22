@@ -20,30 +20,54 @@ export function GameweekHeader({ gameweek, dateRange }: GameweekHeaderProps) {
   return (
     <div className="flex items-center justify-between">
       {hasPrev ? (
-        <Button variant="ghost" size="icon" aria-label="이전 게임위크" asChild>
+        <Button
+          variant="outline"
+          size="icon"
+          aria-label="이전 게임위크"
+          asChild
+        >
           <Link href={`/matchday?gw=${gameweek - 1}`}>
             <ChevronLeft className="size-5" />
           </Link>
         </Button>
       ) : (
-        <Button variant="ghost" size="icon" disabled aria-label="이전 게임위크">
+        <Button
+          variant="outline"
+          size="icon"
+          disabled
+          aria-label="이전 게임위크"
+        >
           <ChevronLeft className="size-5" />
         </Button>
       )}
 
       <div className="text-center">
-        <h1 className="text-2xl font-bold">Gameweek {gameweek}</h1>
-        <p className="text-sm text-muted-foreground">{dateRange}</p>
+        <h1 className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-2xl)] leading-[var(--comic-leading-snug)] tracking-[var(--comic-tracking-wide)] text-comic-black">
+          Gameweek {gameweek}
+        </h1>
+        <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] tracking-[var(--comic-tracking-wide)] text-comic-black/60">
+          {dateRange}
+        </p>
       </div>
 
       {hasNext ? (
-        <Button variant="ghost" size="icon" aria-label="다음 게임위크" asChild>
+        <Button
+          variant="outline"
+          size="icon"
+          aria-label="다음 게임위크"
+          asChild
+        >
           <Link href={`/matchday?gw=${gameweek + 1}`}>
             <ChevronRight className="size-5" />
           </Link>
         </Button>
       ) : (
-        <Button variant="ghost" size="icon" disabled aria-label="다음 게임위크">
+        <Button
+          variant="outline"
+          size="icon"
+          disabled
+          aria-label="다음 게임위크"
+        >
           <ChevronRight className="size-5" />
         </Button>
       )}

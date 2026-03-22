@@ -159,9 +159,9 @@ export function CompareStatTable({
   stats2,
 }: CompareStatTableProps) {
   return (
-    <Card>
+    <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium">
+        <CardTitle className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
           스탯 비교 ({stats1.season})
         </CardTitle>
       </CardHeader>

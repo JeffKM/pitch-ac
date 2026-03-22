@@ -42,9 +42,11 @@ export function StandingSimulator({
   const delta = getPointsDelta(scenario);
 
   return (
-    <Card>
+    <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium">순위 시뮬레이터</CardTitle>
+        <CardTitle className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
+          순위 시뮬레이터
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* 시나리오 선택 버튼 */}

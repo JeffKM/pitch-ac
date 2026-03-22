@@ -55,7 +55,7 @@ export function PlayerCard({
 
   return (
     <Link href={`/squad/${player.id}`} className="block">
-      <Card className="transition-colors hover:bg-muted/50">
+      <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white transition-colors hover:bg-comic-cream">
         <CardContent className="flex flex-col items-center gap-3 p-4">
           {hasCartoonAsset ? (
             <CartoonAvatar
@@ -77,13 +77,18 @@ export function PlayerCard({
             />
           )}
           <div className="w-full text-center">
-            <p className="truncate font-semibold">{player.name}</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="truncate font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
+              {player.name}
+            </p>
+            <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
               {team?.shortName ?? player.teamId} · {player.position}
             </p>
           </div>
           {primaryStat && (
-            <Badge variant="secondary" className="shrink-0">
+            <Badge
+              variant="outline"
+              className="shrink-0 rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-yellow font-[family-name:var(--font-bangers)] text-comic-black"
+            >
               {primaryStat.label} {primaryStat.value}
               {primaryStat.rank > 0 && ` · 리그 ${primaryStat.rank}위`}
             </Badge>

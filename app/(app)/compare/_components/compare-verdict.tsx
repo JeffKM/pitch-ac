@@ -35,7 +35,7 @@ export function CompareVerdict({
   const isPlayer1Leading = player1Wins > player2Wins;
 
   return (
-    <div className="rounded-lg border bg-muted/40 px-4 py-3 text-center text-sm font-semibold">
+    <div className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-yellow px-4 py-3 text-center font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
       {isDraw ? (
         <span className="text-muted-foreground">
           판정: 무승부 ({player1Wins}/{COMPARE_STAT_DEFINITIONS.length}개 항목

@@ -36,8 +36,8 @@ export function FixtureCard({
     <Link href={`/matchday/${fixture.id}`} className="block">
       <Card
         className={cn(
-          "transition-colors hover:bg-muted/50",
-          isLive && "border-green-500/50 bg-green-500/5",
+          "rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white transition-colors hover:bg-comic-cream",
+          isLive && "border-comic-green bg-comic-green/10",
         )}
         data-live={isLive || undefined}
         data-fixture-id={fixture.id}
@@ -55,9 +55,11 @@ export function FixtureCard({
                 className="size-10 object-contain"
               />
               <div>
-                <p className="font-semibold">{homeTeam.shortName}</p>
+                <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
+                  {homeTeam.shortName}
+                </p>
                 {homeStanding && (
-                  <p className="text-xs text-muted-foreground">
+                  <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
                     {homeStanding.position}위
                   </p>
                 )}
@@ -69,7 +71,7 @@ export function FixtureCard({
               {fixture.homeScore !== null && fixture.awayScore !== null ? (
                 <div className="flex items-center gap-1.5">
                   {isLive && <LivePulse />}
-                  <p className="text-2xl font-bold tabular-nums">
+                  <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-2xl)] text-comic-black tabular-nums">
                     <ScoreFlash score={fixture.homeScore}>
                       {fixture.homeScore}
                     </ScoreFlash>
@@ -80,7 +82,9 @@ export function FixtureCard({
                   </p>
                 </div>
               ) : (
-                <p className="text-lg font-medium text-muted-foreground">vs</p>
+                <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-lg)] text-comic-black/40">
+                  vs
+                </p>
               )}
               <FixtureStatusBadge
                 status={fixture.status}
@@ -99,9 +103,11 @@ export function FixtureCard({
                 className="size-10 object-contain"
               />
               <div className="text-right">
-                <p className="font-semibold">{awayTeam.shortName}</p>
+                <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
+                  {awayTeam.shortName}
+                </p>
                 {awayStanding && (
-                  <p className="text-xs text-muted-foreground">
+                  <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
                     {awayStanding.position}위
                   </p>
                 )}
@@ -111,14 +117,18 @@ export function FixtureCard({
 
           {/* FT 전용: xG + 점유율 미리보기 */}
           {isFt && fixture.liveStats && (
-            <div className="mt-3 border-t pt-3">
-              <div className="grid grid-cols-3 gap-2 text-center text-xs text-muted-foreground">
+            <div className="mt-3 border-comic-black/20 border-t-[var(--comic-border-thin)] pt-3">
+              <div className="grid grid-cols-3 gap-2 text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
                 <span>{fixture.liveStats.home.xg?.toFixed(2) ?? "N/A"}</span>
-                <span className="font-medium text-foreground">xG</span>
+                <span className="font-[family-name:var(--font-bangers)] text-comic-black">
+                  xG
+                </span>
                 <span>{fixture.liveStats.away.xg?.toFixed(2) ?? "N/A"}</span>
 
                 <span>{fixture.liveStats.home.possession}%</span>
-                <span className="font-medium text-foreground">점유율</span>
+                <span className="font-[family-name:var(--font-bangers)] text-comic-black">
+                  점유율
+                </span>
                 <span>{fixture.liveStats.away.possession}%</span>
               </div>
             </div>

@@ -35,10 +35,10 @@ export default async function SquadPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-[family-name:var(--font-fredoka)] text-3xl font-bold text-primary">
+        <h1 className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-3xl)] leading-[var(--comic-leading-snug)] tracking-[var(--comic-tracking-wide)] text-comic-black">
           스쿼드
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] tracking-[var(--comic-tracking-wide)] text-comic-black/60">
           맨체스터 시티 {allPlayers.length}명의 선수
         </p>
       </div>

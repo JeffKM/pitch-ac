@@ -81,9 +81,11 @@ function EventItem({ event, isHome }: EventItemProps) {
 export function EventTimeline({ events, homeTeamId }: EventTimelineProps) {
   if (events.length === 0) {
     return (
-      <Card>
+      <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">이벤트</CardTitle>
+          <CardTitle className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
+            이벤트
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">이벤트가 없습니다.</p>
@@ -95,9 +97,11 @@ export function EventTimeline({ events, homeTeamId }: EventTimelineProps) {
   const sorted = [...events].sort((a, b) => a.minute - b.minute);
 
   return (
-    <Card>
+    <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium">이벤트</CardTitle>
+        <CardTitle className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
+          이벤트
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
         {sorted.map((event) => {

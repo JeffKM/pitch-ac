@@ -34,9 +34,11 @@ export function H2HResults({
 }: H2HResultsProps) {
   if (results.length === 0) {
     return (
-      <Card>
+      <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">H2H 전적</CardTitle>
+          <CardTitle className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
+            H2H 전적
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
@@ -59,9 +61,11 @@ export function H2HResults({
   }
 
   return (
-    <Card>
+    <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium">H2H 전적</CardTitle>
+        <CardTitle className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
+          H2H 전적
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
         {results.map((result) => {

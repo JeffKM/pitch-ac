@@ -22,9 +22,11 @@ export function TeamFormRow({
   awayForm,
 }: TeamFormRowProps) {
   return (
-    <Card>
+    <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium">최근 5경기 폼</CardTitle>
+        <CardTitle className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
+          최근 5경기 폼
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">

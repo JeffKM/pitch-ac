@@ -88,9 +88,11 @@ export function StatBar({
   awayTeamName,
 }: StatBarProps) {
   return (
-    <Card>
+    <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium">팀 스탯 비교</CardTitle>
+        <CardTitle className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
+          팀 스탯 비교
+        </CardTitle>
         <div className="flex justify-between text-xs text-muted-foreground">
           <span>{homeTeamName}</span>
           <span>{awayTeamName}</span>

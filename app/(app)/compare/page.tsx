@@ -126,12 +126,17 @@ export default function ComparePage({
 }) {
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">선수 비교</h1>
+      <h1 className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-3xl)] leading-[var(--comic-leading-snug)] tracking-[var(--comic-tracking-wide)] text-comic-black">
+        선수 비교
+      </h1>
       <Suspense
         fallback={
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {[0, 1].map((i) => (
-              <Card key={i}>
+              <Card
+                key={i}
+                className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white"
+              >
                 <CardHeader className="pb-2">
                   <div className="h-4 w-16 animate-pulse rounded bg-muted" />
                 </CardHeader>

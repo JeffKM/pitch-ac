@@ -58,7 +58,7 @@ const STAT_DEFINITIONS = [
 export function StatContextGrid({ seasonStats }: StatContextGridProps) {
   return (
     <div>
-      <h2 className="mb-3 text-sm font-semibold text-muted-foreground">
+      <h2 className="mb-3 font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-base)] tracking-[var(--comic-tracking-wide)] text-comic-black">
         시즌 스탯 ({seasonStats.season})
       </h2>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">

@@ -24,11 +24,11 @@ export function StatContextCard({
   glossaryId,
 }: StatContextCardProps) {
   return (
-    <Card>
+    <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-cream">
       <CardContent className="space-y-2 p-4">
         {/* 레이블 + 용어 설명 */}
         <div className="flex items-center gap-1">
-          <span className="text-xs font-medium text-muted-foreground">
+          <span className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
             {label}
           </span>
           {glossaryId && <GlossaryPopover glossaryId={glossaryId} />}
@@ -40,11 +40,13 @@ export function StatContextCard({
         ) : (
           <>
             {/* 수치 */}
-            <p className="text-2xl font-bold tabular-nums">{format(value)}</p>
+            <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-2xl)] text-comic-black tabular-nums">
+              {format(value)}
+            </p>
 
             {/* 리그 순위 (context 미계산 시 숨김) */}
             {context.rank > 0 && (
-              <p className="text-xs font-medium text-foreground">
+              <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black">
                 리그 {context.rank}위
               </p>
             )}

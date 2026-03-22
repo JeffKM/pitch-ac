@@ -33,9 +33,14 @@ export function PlayerSlot({
   colorClass,
 }: PlayerSlotProps) {
   return (
-    <Card>
+    <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
       <CardHeader className="pb-2">
-        <CardTitle className={cn("text-sm font-medium", colorClass)}>
+        <CardTitle
+          className={cn(
+            "font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)]",
+            colorClass,
+          )}
+        >
           {label}
         </CardTitle>
       </CardHeader>

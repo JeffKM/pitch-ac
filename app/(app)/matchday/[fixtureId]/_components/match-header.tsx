@@ -33,14 +33,14 @@ export function MatchHeader({
   return (
     <Card
       className={cn(
-        "overflow-hidden",
-        isLive && "border-green-500/50 bg-green-500/5",
+        "overflow-hidden rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white",
+        isLive && "border-comic-green bg-comic-green/10",
       )}
     >
       <CardContent className="p-6">
         {/* GW + 날짜 */}
         <div className="mb-4 text-center">
-          <p className="text-sm text-muted-foreground">
+          <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/60">
             GW{fixture.gameweek} · {kickoffDate}
           </p>
         </div>
@@ -56,9 +56,11 @@ export function MatchHeader({
               height={64}
               className="size-16 object-contain"
             />
-            <p className="font-semibold">{homeTeam.name}</p>
+            <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-base)] text-comic-black">
+              {homeTeam.name}
+            </p>
             {homeStanding && (
-              <p className="text-xs text-muted-foreground">
+              <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
                 {homeStanding.position}위 · {homeStanding.points}pts
               </p>
             )}
@@ -67,7 +69,7 @@ export function MatchHeader({
           {/* 스코어 / 상태 */}
           <div className="flex flex-col items-center gap-2">
             {fixture.homeScore !== null && fixture.awayScore !== null ? (
-              <p className="text-4xl font-bold tabular-nums">
+              <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-4xl)] text-comic-black tabular-nums">
                 <ScoreFlash score={fixture.homeScore}>
                   {fixture.homeScore}
                 </ScoreFlash>
@@ -77,7 +79,9 @@ export function MatchHeader({
                 </ScoreFlash>
               </p>
             ) : (
-              <p className="text-2xl font-medium text-muted-foreground">vs</p>
+              <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-2xl)] text-comic-black/40">
+                vs
+              </p>
             )}
             <FixtureStatusBadge
               status={fixture.status}
@@ -95,9 +99,11 @@ export function MatchHeader({
               height={64}
               className="size-16 object-contain"
             />
-            <p className="font-semibold">{awayTeam.name}</p>
+            <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-base)] text-comic-black">
+              {awayTeam.name}
+            </p>
             {awayStanding && (
-              <p className="text-xs text-muted-foreground">
+              <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
                 {awayStanding.position}위 · {awayStanding.points}pts
               </p>
             )}
