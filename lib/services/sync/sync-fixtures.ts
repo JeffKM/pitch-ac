@@ -1,9 +1,9 @@
 import "server-only";
 
 import {
-  getCupFixturesByTeam,
   getFixturesByRound,
   getSeasonRounds,
+  getTeamScheduleFixtures,
 } from "@/lib/api/sportmonks";
 import { MCITY_TEAM_ID } from "@/lib/api/sportmonks/constants";
 import {
@@ -31,6 +31,13 @@ export async function syncFixtures(): Promise<SyncResult> {
   const seenTeamIds = new Set<number>();
 
   try {
+    // DB에서 POSTP 상태인 fixture ID 조회 (수동 설정 보존용)
+    const { data: postpRows } = await supabase
+      .from("fixtures")
+      .select("id")
+      .eq("status", "POSTP");
+    const postpIds = new Set((postpRows ?? []).map((r) => r.id));
+
     const rounds = await getSeasonRounds();
 
     for (const round of rounds) {
@@ -58,11 +65,18 @@ export async function syncFixtures(): Promise<SyncResult> {
       }
 
       // 경기 upsert (PL 동기화이므로 gameweek null인 경기 제외)
+      // DB에서 POSTP인 경기는 API가 NS를 반환해도 POSTP 유지
       const fixtureRows = fixtures
         .map((raw) => {
           const fixture = mapSmFixtureToFixture(raw);
           if (fixture.gameweek === null || fixture.gameweek === 0) return null;
-          return fixtureToDbRow(fixture);
+          const row = fixtureToDbRow(fixture);
+          if (postpIds.has(fixture.id) && fixture.status === "NS") {
+            row.status = "POSTP";
+            row.home_score = null;
+            row.away_score = null;
+          }
+          return row;
         })
         .filter(Boolean);
 
@@ -96,8 +110,10 @@ export async function syncFixtures(): Promise<SyncResult> {
 
 /**
  * 맨시티 컵 대회 경기 동기화
- * 시즌 날짜 범위 내 비-PL 경기를 조회하여 가장 가까운 PL GW에 할당
- * getCupFixturesByTeam → assignGameweek → DB upsert
+ * /football/schedules/teams/{teamId} 엔드포인트 사용
+ * - between 엔드포인트와 달리 EFL Cup(Carabao Cup) 포함 전 대회 반환
+ * - 날짜 범위 제한 없음 (시즌 전체 스케줄 한 번에 조회)
+ * getTeamScheduleFixtures → assignGameweek → DB upsert
  */
 export async function syncCupFixtures(): Promise<SyncResult> {
   const supabase = createAdminClient();
@@ -108,7 +124,6 @@ export async function syncCupFixtures(): Promise<SyncResult> {
     const rounds = await getSeasonRounds();
     const gwRanges = buildGameweekRanges(rounds);
 
-    // 시즌 범위 계산 (첫 GW 시작 ~ 마지막 GW 종료)
     if (gwRanges.length === 0) {
       return {
         entity: "cup-fixtures",
@@ -117,22 +132,18 @@ export async function syncCupFixtures(): Promise<SyncResult> {
       };
     }
 
-    const seasonStart = gwRanges[0].start.toISOString().split("T")[0];
-    const seasonEnd = gwRanges[gwRanges.length - 1].end
-      .toISOString()
-      .split("T")[0];
+    // schedules 엔드포인트로 전 대회 컵 경기 조회 (EFL Cup 포함)
+    const rawFixtures = await getTeamScheduleFixtures(MCITY_TEAM_ID);
 
-    // 컵 경기 조회
-    const rawFixtures = await getCupFixturesByTeam(
-      MCITY_TEAM_ID,
-      seasonStart,
-      seasonEnd,
+    // 맨시티 참가 경기만 필터 (스케줄에 타팀 경기가 포함될 수 있음)
+    const mcityFixtures = rawFixtures.filter((f) =>
+      f.participants?.some((p) => p.id === MCITY_TEAM_ID),
     );
 
     // 팀 정보 upsert
     const seenTeamIds = new Set<number>();
     const newParticipants: SmFixtureParticipant[] = [];
-    for (const raw of rawFixtures) {
+    for (const raw of mcityFixtures) {
       for (const p of raw.participants ?? []) {
         if (!seenTeamIds.has(p.id)) {
           seenTeamIds.add(p.id);
@@ -152,7 +163,7 @@ export async function syncCupFixtures(): Promise<SyncResult> {
     }
 
     // 경기 매핑 + GW 할당 + DB upsert
-    const fixtureRows = rawFixtures
+    const fixtureRows = mcityFixtures
       .map((raw) => {
         const fixture = mapSmFixtureToFixture(raw);
         // 컵 경기에 가장 가까운 PL GW 할당

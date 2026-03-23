@@ -248,6 +248,39 @@ export interface SmRound {
   games_in_current_week: boolean;
 }
 
+/** 스케줄 집합 (2-leg 합산) */
+export interface SmAggregate {
+  id: number;
+  league_id: number;
+  season_id: number;
+  stage_id: number;
+  round_id: number;
+  sport_id: number;
+  name: string | null;
+  fixtures?: SmFixture[];
+}
+
+/** 스케줄 라운드 (fixtures 포함) */
+export interface SmScheduleRound extends SmRound {
+  fixtures?: SmFixture[];
+  aggregates?: SmAggregate[];
+}
+
+/** 스케줄 항목 (리그/시즌/스테이지별 그룹) */
+export interface SmScheduleEntry {
+  id: number;
+  sport_id: number;
+  league_id: number;
+  season_id: number;
+  stage_id: number;
+  name?: string;
+  /** stage 직속 경기 (컵 결승, 단일전 라운드 등) */
+  fixtures?: SmFixture[];
+  rounds?: SmScheduleRound[];
+  /** stage 레벨 aggregate (2-leg 타이) */
+  aggregates?: SmAggregate[];
+}
+
 /** 경기 상태 */
 export interface SmState {
   id: number;

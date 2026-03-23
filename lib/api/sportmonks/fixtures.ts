@@ -2,10 +2,12 @@
 import { sportMonksFetch } from "./client";
 import { CURRENT_SEASON_ID, MCITY_TEAM_ID, PL_LEAGUE_ID } from "./constants";
 import type {
+  SmAggregate,
   SmApiResponse,
   SmFixture,
   SmPaginatedResponse,
   SmRound,
+  SmScheduleEntry,
 } from "./types";
 
 /** 라운드(게임위크) ID로 경기 목록 조회
@@ -142,6 +144,78 @@ export async function getH2HFixtures(
     },
   );
   return response.data;
+}
+
+/**
+ * 팀 스케줄에서 비-PL 컵 경기 추출
+ * /football/schedules/teams/{teamId} 엔드포인트 사용
+ * - between 엔드포인트와 달리 EFL Cup(Carabao Cup) 포함 전 대회 반환
+ * - Starter 플랜: includes 미지원, participants/scores는 기본 포함
+ * - 경기 위치: stage.fixtures / rounds.fixtures / aggregates.fixtures (3곳)
+ * - 컵 시즌 ID는 PL 시즌 ID와 다름 (EFL Cup: 25654, FA Cup: 25919)
+ */
+export async function getTeamScheduleFixtures(
+  teamId: number,
+): Promise<SmFixture[]> {
+  // Starter 플랜: 중첩 include 미지원 → includes 없이 호출
+  // participants, scores는 기본 포함됨 (state 객체는 미포함, state_id만)
+  const response = await sportMonksFetch<{ data: SmScheduleEntry[] }>(
+    `/football/schedules/teams/${teamId}`,
+    {
+      revalidate: 3600,
+      tags: [`schedule-${teamId}`],
+      timeout: 30_000,
+    },
+  );
+
+  const fixtures: SmFixture[] = [];
+
+  for (const entry of response.data) {
+    // PL 경기는 별도 동기화 → 제외
+    if (entry.league_id === PL_LEAGUE_ID) continue;
+
+    // 1) stage 직속 경기 (컵 결승, 단일전 라운드 등)
+    for (const fixture of entry.fixtures ?? []) {
+      fixtures.push({
+        ...fixture,
+        league_id: fixture.league_id ?? entry.league_id,
+      });
+    }
+
+    // 2) rounds 내부 경기
+    for (const round of entry.rounds ?? []) {
+      for (const fixture of round.fixtures ?? []) {
+        fixtures.push({
+          ...fixture,
+          league_id: fixture.league_id ?? entry.league_id,
+          round: round,
+        });
+      }
+      // 라운드 내 aggregate (있을 수 있음)
+      for (const agg of (round as unknown as { aggregates?: SmAggregate[] })
+        .aggregates ?? []) {
+        for (const fixture of agg.fixtures ?? []) {
+          fixtures.push({
+            ...fixture,
+            league_id: fixture.league_id ?? entry.league_id,
+            round: round,
+          });
+        }
+      }
+    }
+
+    // 3) stage 레벨 aggregate (2-leg 타이: EFL Cup 준결승, UCL 녹아웃 등)
+    for (const agg of entry.aggregates ?? []) {
+      for (const fixture of agg.fixtures ?? []) {
+        fixtures.push({
+          ...fixture,
+          league_id: fixture.league_id ?? entry.league_id,
+        });
+      }
+    }
+  }
+
+  return fixtures;
 }
 
 /** 시즌 경기 목록 (페이지네이션) */

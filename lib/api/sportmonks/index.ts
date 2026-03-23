@@ -7,4 +7,4 @@ export * from "./mappers";
 export * from "./players";
 export * from "./rounds";
 export * from "./teams";
-export type { SmPaginatedResponse } from "./types";
+export type { SmPaginatedResponse, SmScheduleEntry } from "./types";

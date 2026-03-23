@@ -134,6 +134,32 @@ export const FIXTURE_STATE_MAP: Record<string, "NS" | "LIVE" | "FT" | "POSTP"> =
     abandoned: "NS",
   };
 
+/** SportMonks state_id → 앱 FixtureStatus (schedules 엔드포인트용 fallback) */
+export const FIXTURE_STATE_ID_MAP: Record<
+  number,
+  "NS" | "LIVE" | "FT" | "POSTP"
+> = {
+  1: "NS", // Not Started
+  2: "LIVE", // 1st Half / In Play
+  3: "LIVE", // Half Time
+  4: "LIVE", // 2nd Half
+  5: "FT", // Full Time
+  6: "LIVE", // Extra Time
+  7: "LIVE", // Penalties
+  8: "FT", // After Extra Time
+  9: "LIVE", // Break
+  10: "POSTP", // Postponed
+  11: "NS", // Suspended
+  12: "NS", // Cancelled
+  13: "NS", // TBA
+  14: "NS", // Abandoned
+  15: "FT", // Awarded
+  16: "NS", // Delayed
+  17: "FT", // Walkover
+  22: "LIVE", // 1st Extra Time Half
+  23: "LIVE", // 2nd Extra Time Half
+};
+
 /** 주요 컵 대회 league_id (SportMonks v3) */
 export const CUP_LEAGUE_IDS = {
   FA_CUP: 24,

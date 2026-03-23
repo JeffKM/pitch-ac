@@ -16,11 +16,19 @@ export interface GameweekRange {
 export function buildGameweekRanges(rounds: SmRound[]): GameweekRange[] {
   // 라운드 이름 → 숫자로 정렬
   const sorted = [...rounds]
-    .map((r) => ({
-      gameweek: parseInt(r.name, 10),
-      start: new Date(r.starting_at),
-      end: new Date(r.ending_at),
-    }))
+    .map((r) => {
+      // ending_at이 날짜만 포함(시간 없음) → 하루 끝(23:59:59)으로 확장
+      // 예: "2026-03-22" → 3/22 23:59:59 UTC (당일 경기가 범위 내 포함되도록)
+      const end = new Date(r.ending_at);
+      if (r.ending_at.length <= 10) {
+        end.setUTCHours(23, 59, 59, 999);
+      }
+      return {
+        gameweek: parseInt(r.name, 10),
+        start: new Date(r.starting_at),
+        end,
+      };
+    })
     .filter((r) => !isNaN(r.gameweek))
     .sort((a, b) => a.gameweek - b.gameweek);
 
@@ -35,8 +43,9 @@ const MAX_DISTANCE_MS = 30 * 24 * 60 * 60 * 1000;
 
 /**
  * 컵 경기 날짜 → 가장 가까운 PL GW 할당
- * - 경기 날짜가 특정 GW 범위 내이면 해당 GW
- * - 범위 사이에 있으면 가장 가까운 GW의 midpoint 기준
+ * - 항상 midpoint(범위 중앙값) 기준으로 가장 가까운 GW 선택
+ * - PL 라운드의 start~end 범위는 일정 변경으로 매우 넓어질 수 있어
+ *   범위 기반 판정 대신 midpoint 거리만 사용
  * - 30일 초과 거리 → null (시즌 외)
  */
 export function assignGameweek(
@@ -48,14 +57,7 @@ export function assignGameweek(
   const date = new Date(fixtureDate);
   const time = date.getTime();
 
-  // 1) 범위 안에 들어가는 GW 확인
-  for (const range of ranges) {
-    if (time >= range.start.getTime() && time <= range.end.getTime()) {
-      return range.gameweek;
-    }
-  }
-
-  // 2) 가장 가까운 midpoint 기준
+  // midpoint 기준 가장 가까운 GW 선택
   let closest: GameweekRange | null = null;
   let minDistance = Infinity;
 

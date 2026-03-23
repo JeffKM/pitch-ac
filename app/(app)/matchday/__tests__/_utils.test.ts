@@ -92,4 +92,48 @@ describe("buildDateRange", () => {
     const result = buildDateRange(fixtures);
     expect(result).toContain("–");
   });
+
+  it("컵 경기 날짜는 범위에서 제외", () => {
+    const fixtures = [
+      // PL 경기: 3/22
+      makeFixture({ id: 1, date: "2026-03-22T20:00:00Z", leagueId: 8 }),
+      // FA Cup 경기: 3/8 (범위에 포함되면 안 됨)
+      makeFixture({
+        id: 2,
+        date: "2026-03-08T15:00:00Z",
+        leagueId: 24,
+        competitionName: "FA Cup",
+      }),
+      // EFL Cup 경기: 3/25 (범위에 포함되면 안 됨)
+      makeFixture({
+        id: 3,
+        date: "2026-03-25T20:00:00Z",
+        leagueId: 27,
+        competitionName: "EFL Cup",
+      }),
+    ];
+    const result = buildDateRange(fixtures);
+    // PL 경기만으로 범위 계산 → 단일 날짜 (3/23 KST)
+    expect(result).not.toContain("–");
+  });
+
+  it("PL 경기 없으면 전체 경기로 fallback", () => {
+    const fixtures = [
+      makeFixture({
+        id: 1,
+        date: "2026-03-08T15:00:00Z",
+        leagueId: 24,
+        competitionName: "FA Cup",
+      }),
+      makeFixture({
+        id: 2,
+        date: "2026-03-25T20:00:00Z",
+        leagueId: 27,
+        competitionName: "EFL Cup",
+      }),
+    ];
+    const result = buildDateRange(fixtures);
+    // 컵 경기만 있으면 fallback → 범위 표시
+    expect(result).toContain("–");
+  });
 });

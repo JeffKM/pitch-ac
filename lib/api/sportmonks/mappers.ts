@@ -20,6 +20,7 @@ import type {
 
 import {
   EVENT_TYPE_ID,
+  FIXTURE_STATE_ID_MAP,
   FIXTURE_STATE_MAP,
   LEAGUE_NAME_MAP,
   LINEUP_TYPE_ID,
@@ -428,9 +429,12 @@ export function mapSmFixtureToFixture(raw: SmFixture): Fixture {
   const homeId = homePart?.id ?? 0;
   const awayId = awayPart?.id ?? 0;
 
-  // 상태 매핑
+  // 상태 매핑 (state 객체 우선, state_id fallback — schedules 엔드포인트)
   const developerName = raw.state?.developer_name?.toLowerCase() ?? "";
-  const status: FixtureStatus = FIXTURE_STATE_MAP[developerName] ?? "NS";
+  const status: FixtureStatus =
+    FIXTURE_STATE_MAP[developerName] ??
+    FIXTURE_STATE_ID_MAP[raw.state_id] ??
+    "NS";
 
   // LIVE 진행 분: 이벤트 최대값 또는 상태에서 추론
   const minute =
