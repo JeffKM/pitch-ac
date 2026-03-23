@@ -3,6 +3,12 @@ import "server-only";
 
 import type { SmRound } from "@/lib/api/sportmonks/types";
 
+/** 맨시티 PL 실제 경기 날짜 기반 GW 앵커 */
+export interface McityPlAnchor {
+  gameweek: number;
+  date: Date;
+}
+
 /** GW 날짜 범위 */
 export interface GameweekRange {
   gameweek: number;
@@ -70,6 +76,37 @@ export function assignGameweek(
   }
 
   // 30일 초과 → null
+  if (!closest || minDistance > MAX_DISTANCE_MS) return null;
+
+  return closest.gameweek;
+}
+
+/**
+ * 앵커 기반 GW 할당 — 맨시티 PL 실제 경기 날짜 사용
+ * midpoint 방식의 왜곡 문제 해결:
+ * - 라운드 범위가 일정 변경/연기로 넓어져도 실제 경기 날짜는 정확
+ * - 컵 경기 날짜와 가장 가까운 PL 경기 날짜의 GW를 할당
+ * - 30일 초과 거리 → null (시즌 외)
+ */
+export function assignGameweekByAnchors(
+  fixtureDate: string,
+  anchors: McityPlAnchor[],
+): number | null {
+  if (anchors.length === 0) return null;
+
+  const time = new Date(fixtureDate).getTime();
+
+  let closest: McityPlAnchor | null = null;
+  let minDistance = Infinity;
+
+  for (const anchor of anchors) {
+    const distance = Math.abs(time - anchor.date.getTime());
+    if (distance < minDistance) {
+      minDistance = distance;
+      closest = anchor;
+    }
+  }
+
   if (!closest || minDistance > MAX_DISTANCE_MS) return null;
 
   return closest.gameweek;

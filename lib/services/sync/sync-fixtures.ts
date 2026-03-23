@@ -5,7 +5,7 @@ import {
   getSeasonRounds,
   getTeamScheduleFixtures,
 } from "@/lib/api/sportmonks";
-import { MCITY_TEAM_ID } from "@/lib/api/sportmonks/constants";
+import { MCITY_TEAM_ID, PL_LEAGUE_ID } from "@/lib/api/sportmonks/constants";
 import {
   mapSmFixtureToFixture,
   mapSmTeamToTeam,
@@ -14,7 +14,12 @@ import type { SmFixtureParticipant } from "@/lib/api/sportmonks/types";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 import { fixtureToDbRow, teamToDbRow } from "./db-mappers";
-import { assignGameweek, buildGameweekRanges } from "./gameweek-assigner";
+import {
+  assignGameweek,
+  assignGameweekByAnchors,
+  buildGameweekRanges,
+  type McityPlAnchor,
+} from "./gameweek-assigner";
 import { extractErrorMessage, type SyncResult, writeSyncLog } from "./log";
 
 const SEASON_LABEL = "2025/2026";
@@ -120,16 +125,32 @@ export async function syncCupFixtures(): Promise<SyncResult> {
   let totalSynced = 0;
 
   try {
-    // PL 라운드 목록 → GW 날짜 범위 생성
-    const rounds = await getSeasonRounds();
-    const gwRanges = buildGameweekRanges(rounds);
+    // 1) DB에서 맨시티 PL 경기 조회 → 앵커 빌드
+    const { data: plRows } = await supabase
+      .from("fixtures")
+      .select("gameweek, date")
+      .eq("league_id", PL_LEAGUE_ID)
+      .or(`home_team_id.eq.${MCITY_TEAM_ID},away_team_id.eq.${MCITY_TEAM_ID}`)
+      .not("gameweek", "is", null)
+      .order("gameweek");
 
-    if (gwRanges.length === 0) {
-      return {
-        entity: "cup-fixtures",
-        status: "success",
-        recordsSynced: 0,
-      };
+    const anchors: McityPlAnchor[] = (plRows ?? []).map((r) => ({
+      gameweek: r.gameweek as number,
+      date: new Date(r.date),
+    }));
+
+    // 2) 앵커가 없으면 기존 라운드 기반 fallback
+    let fallbackRanges: ReturnType<typeof buildGameweekRanges> = [];
+    if (anchors.length === 0) {
+      const rounds = await getSeasonRounds();
+      fallbackRanges = buildGameweekRanges(rounds);
+      if (fallbackRanges.length === 0) {
+        return {
+          entity: "cup-fixtures",
+          status: "success",
+          recordsSynced: 0,
+        };
+      }
     }
 
     // schedules 엔드포인트로 전 대회 컵 경기 조회 (EFL Cup 포함)
@@ -166,8 +187,11 @@ export async function syncCupFixtures(): Promise<SyncResult> {
     const fixtureRows = mcityFixtures
       .map((raw) => {
         const fixture = mapSmFixtureToFixture(raw);
-        // 컵 경기에 가장 가까운 PL GW 할당
-        const gw = assignGameweek(fixture.date, gwRanges);
+        // 앵커 기반 우선, fallback으로 라운드 midpoint 기반
+        const gw =
+          anchors.length > 0
+            ? assignGameweekByAnchors(fixture.date, anchors)
+            : assignGameweek(fixture.date, fallbackRanges);
         return fixtureToDbRow({ ...fixture, gameweek: gw });
       })
       .filter(Boolean);
