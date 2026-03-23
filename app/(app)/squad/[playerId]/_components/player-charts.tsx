@@ -12,7 +12,7 @@ export const PlayerRadarChart = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-[300px] animate-pulse rounded-xl border bg-muted" />
+      <div className="h-[300px] animate-pulse rounded-xl bg-comic-cream" />
     ),
   },
 );
@@ -22,9 +22,9 @@ export const RecentFormSparkline = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="rounded-xl border bg-card p-6">
-        <div className="mb-4 h-4 w-24 animate-pulse rounded bg-muted" />
-        <div className="h-[120px] animate-pulse rounded bg-muted" />
+      <div className="rounded-xl bg-comic-white p-6">
+        <div className="mb-4 h-4 w-24 animate-pulse rounded bg-comic-cream" />
+        <div className="h-[120px] animate-pulse rounded bg-comic-cream" />
       </div>
     ),
   },

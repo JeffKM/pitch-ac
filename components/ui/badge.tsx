@@ -4,17 +4,17 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-[var(--comic-panel-radius)] border-[var(--comic-border-thin)] border-comic-black px-2.5 py-0.5 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] transition-colors",
   {
     variants: {
       variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
-        outline: "text-foreground",
+        default: "bg-comic-skyblue text-comic-black shadow-sm",
+        secondary: "bg-comic-cream text-comic-black",
+        destructive: "bg-comic-red text-comic-white shadow-sm",
+        outline: "bg-transparent text-comic-black",
+        green: "border-comic-green/30 bg-comic-green/15 text-comic-green",
+        yellow: "border-comic-yellow/30 bg-comic-yellow/15 text-comic-yellow",
+        red: "border-comic-red/30 bg-comic-red/15 text-comic-red",
       },
     },
     defaultVariants: {

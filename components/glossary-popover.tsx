@@ -26,17 +26,23 @@ export function GlossaryPopover({ glossaryId }: GlossaryPopoverProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="size-5 shrink-0 text-muted-foreground hover:text-foreground"
+          className="size-5 shrink-0 text-comic-black/50 hover:text-comic-black"
           aria-label={`${term.term} 용어 설명`}
         >
           <CircleHelp className="size-3.5" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 space-y-2.5">
-        <p className="font-semibold">{term.term}</p>
-        <p className="text-sm text-foreground">{term.definition}</p>
-        <p className="text-sm text-muted-foreground">{term.analogy}</p>
-        <p className="text-xs text-muted-foreground italic">
+        <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)]">
+          {term.term}
+        </p>
+        <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black">
+          {term.definition}
+        </p>
+        <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50">
+          {term.analogy}
+        </p>
+        <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50 italic">
           예: {term.example}
         </p>
       </PopoverContent>

@@ -71,7 +71,7 @@ export function PlayerSearchCombobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="h-10 w-full justify-start gap-2 text-muted-foreground"
+          className="h-10 w-full justify-start gap-2 text-comic-black/50"
           onClick={() => setOpen(true)}
         >
           <Search className="size-4 shrink-0" />
@@ -96,9 +96,11 @@ export function PlayerSearchCombobox({
           />
           <CommandList>
             <CommandEmpty>
-              <div className="flex flex-col items-center gap-2 py-6 text-muted-foreground">
+              <div className="flex flex-col items-center gap-2 py-6 text-comic-black/50">
                 <UserSearch className="size-6" />
-                <p className="text-sm">결과 없음</p>
+                <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)]">
+                  결과 없음
+                </p>
               </div>
             </CommandEmpty>
 
@@ -115,7 +117,7 @@ export function PlayerSearchCombobox({
                         setOpen(false);
                       }}
                     >
-                      <Clock className="mr-2 size-3.5 text-muted-foreground" />
+                      <Clock className="mr-2 size-3.5 text-comic-black/50" />
                       {term}
                     </CommandItem>
                   ))}
@@ -144,8 +146,10 @@ export function PlayerSearchCombobox({
                       sizes="32px"
                     />
                     <div className="ml-2 min-w-0">
-                      <p className="truncate font-medium">{player.name}</p>
-                      <p className="truncate text-xs text-muted-foreground">
+                      <p className="truncate font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)]">
+                        {player.name}
+                      </p>
+                      <p className="truncate font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
                         {team?.shortName ?? player.teamId} · {player.position}
                       </p>
                     </div>

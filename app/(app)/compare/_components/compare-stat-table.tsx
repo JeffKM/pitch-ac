@@ -84,7 +84,7 @@ function StatRow({
     <div
       className={cn(
         "grid grid-cols-[1fr_auto_1fr] items-center gap-2 py-3",
-        !isLast && "border-b",
+        !isLast && "border-comic-black/20 border-b-[var(--comic-border-thin)]",
       )}
     >
       {/* 선수 A 수치 */}
@@ -116,7 +116,7 @@ function StatRow({
           <Trophy
             className={cn(
               "size-4",
-              winner === "player1" ? "text-chart-1" : "text-chart-2",
+              winner === "player1" ? "text-comic-skyblue" : "text-comic-red",
             )}
             data-testid="trophy-icon"
           />
@@ -167,12 +167,12 @@ export function CompareStatTable({
       </CardHeader>
       <CardContent className="px-4">
         {/* 헤더: 선수 이름 */}
-        <div className="grid grid-cols-[1fr_auto_1fr] gap-2 border-b pb-2">
-          <p className="truncate text-right font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-chart-1">
+        <div className="grid grid-cols-[1fr_auto_1fr] gap-2 border-comic-black/20 border-b-[var(--comic-border-thin)] pb-2">
+          <p className="truncate text-right font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-skyblue">
             {player1.name}
           </p>
           <div className="min-w-[72px] px-2" />
-          <p className="truncate text-left font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-chart-2">
+          <p className="truncate text-left font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-red">
             {player2.name}
           </p>
         </div>

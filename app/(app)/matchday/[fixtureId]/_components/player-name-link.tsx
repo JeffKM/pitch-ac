@@ -18,7 +18,7 @@ export function PlayerNameLink({
   return (
     <Link
       href={`/squad/${playerId}`}
-      className={cn("hover:text-primary hover:underline", className)}
+      className={cn("hover:text-comic-skyblue hover:underline", className)}
     >
       {playerName}
     </Link>

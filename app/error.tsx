@@ -20,10 +20,14 @@ export default function Error({
 
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 text-center">
-      <p className="text-4xl font-bold text-muted-foreground">오류 발생</p>
-      <p className="text-lg font-semibold">예상치 못한 오류가 발생했습니다</p>
+      <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-3xl)] text-comic-black/50">
+        오류 발생
+      </p>
+      <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-lg)]">
+        예상치 못한 오류가 발생했습니다
+      </p>
       {error.digest && (
-        <p className="text-xs text-muted-foreground">
+        <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
           오류 코드: {error.digest}
         </p>
       )}

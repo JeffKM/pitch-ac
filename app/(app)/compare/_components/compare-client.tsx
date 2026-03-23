@@ -14,7 +14,7 @@ const PlayerRadarChart = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-[300px] animate-pulse rounded-xl border bg-muted" />
+      <div className="h-[300px] animate-pulse rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-cream" />
     ),
   },
 );

@@ -138,10 +138,10 @@ export default function ComparePage({
                 className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white"
               >
                 <CardHeader className="pb-2">
-                  <div className="h-4 w-16 animate-pulse rounded bg-muted" />
+                  <div className="h-4 w-16 animate-pulse rounded bg-comic-cream" />
                 </CardHeader>
                 <CardContent>
-                  <div className="h-10 w-full animate-pulse rounded-md bg-muted" />
+                  <div className="h-10 w-full animate-pulse rounded-md bg-comic-cream" />
                 </CardContent>
               </Card>
             ))}

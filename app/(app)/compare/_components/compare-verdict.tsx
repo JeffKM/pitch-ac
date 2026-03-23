@@ -37,7 +37,7 @@ export function CompareVerdict({
   return (
     <div className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-yellow px-4 py-3 text-center font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
       {isDraw ? (
-        <span className="text-muted-foreground">
+        <span className="text-comic-black/50">
           판정: 무승부 ({player1Wins}/{COMPARE_STAT_DEFINITIONS.length}개 항목
           동점)
         </span>
@@ -45,7 +45,9 @@ export function CompareVerdict({
         <span>
           판정:{" "}
           <span
-            className={cn(isPlayer1Leading ? "text-chart-1" : "text-chart-2")}
+            className={cn(
+              isPlayer1Leading ? "text-comic-skyblue" : "text-comic-red",
+            )}
           >
             {leader.name}
           </span>

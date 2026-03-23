@@ -27,21 +27,16 @@ function StatRow({
   format,
   glossaryId,
 }: StatRowProps) {
-  // null 값은 "N/A" 표시 후 바 숨김
   if (homeValue === null || awayValue === null) {
     return (
       <div className="space-y-1">
-        <div className="flex items-center justify-between text-sm">
-          <span className="font-medium text-muted-foreground tabular-nums">
-            N/A
-          </span>
-          <span className="flex items-center gap-0.5 text-xs text-muted-foreground">
+        <div className="flex items-center justify-between font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)]">
+          <span className="text-comic-black/50 tabular-nums">N/A</span>
+          <span className="flex items-center gap-0.5 text-[length:var(--comic-body-xs)] text-comic-black/50">
             {label}
             {glossaryId && <GlossaryPopover glossaryId={glossaryId} />}
           </span>
-          <span className="font-medium text-muted-foreground tabular-nums">
-            N/A
-          </span>
+          <span className="text-comic-black/50 tabular-nums">N/A</span>
         </div>
       </div>
     );
@@ -54,26 +49,24 @@ function StatRow({
 
   return (
     <div className="space-y-1">
-      {/* 수치 + 라벨 */}
-      <div className="flex items-center justify-between text-sm">
-        <span className="font-medium tabular-nums">{fmt(homeValue)}</span>
-        <span className="flex items-center gap-0.5 text-xs text-muted-foreground">
+      <div className="flex items-center justify-between font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)]">
+        <span className="tabular-nums">{fmt(homeValue)}</span>
+        <span className="flex items-center gap-0.5 text-[length:var(--comic-body-xs)] text-comic-black/50">
           {label}
           {glossaryId && <GlossaryPopover glossaryId={glossaryId} />}
         </span>
-        <span className="font-medium tabular-nums">{fmt(awayValue)}</span>
+        <span className="tabular-nums">{fmt(awayValue)}</span>
       </div>
-      {/* 비율 바 */}
-      <div className="flex h-1.5 overflow-hidden rounded-full bg-muted">
+      <div className="flex h-1.5 overflow-hidden rounded-full bg-comic-cream">
         <div
           className={cn(
-            "h-full rounded-l-full bg-primary transition-all",
+            "h-full rounded-l-full bg-comic-skyblue transition-all",
             homePercent >= awayPercent && "rounded-r-full",
           )}
           style={{ width: `${homePercent}%` }}
         />
         <div
-          className="h-full flex-1 bg-muted-foreground/30"
+          className="h-full flex-1 bg-comic-black/30"
           style={{ width: `${awayPercent}%` }}
         />
       </div>
@@ -88,12 +81,10 @@ export function StatBar({
   awayTeamName,
 }: StatBarProps) {
   return (
-    <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
+    <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
-          팀 스탯 비교
-        </CardTitle>
-        <div className="flex justify-between text-xs text-muted-foreground">
+        <CardTitle>팀 스탯 비교</CardTitle>
+        <div className="flex justify-between font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
           <span>{homeTeamName}</span>
           <span>{awayTeamName}</span>
         </div>

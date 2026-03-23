@@ -42,14 +42,11 @@ export function StandingSimulator({
   const delta = getPointsDelta(scenario);
 
   return (
-    <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
+    <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
-          순위 시뮬레이터
-        </CardTitle>
+        <CardTitle>순위 시뮬레이터</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* 시나리오 선택 버튼 */}
         <div className="flex gap-2">
           {(["home_win", "draw", "away_win"] as const).map((s) => (
             <Button
@@ -64,47 +61,56 @@ export function StandingSimulator({
           ))}
         </div>
 
-        {/* 결과 표시 */}
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-2 gap-4 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)]">
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">{homeTeamName}</p>
-            <p className="font-medium">
-              현재 <span className="font-bold">{homeStanding.points}pts</span>
+            <p className="text-[length:var(--comic-body-xs)] text-comic-black/50">
+              {homeTeamName}
+            </p>
+            <p>
+              현재{" "}
+              <span className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)]">
+                {homeStanding.points}pts
+              </span>
             </p>
             {delta && (
-              <p className="text-green-600 dark:text-green-400">
+              <p className="text-comic-green">
                 +{delta.home}pts →{" "}
-                <span className="font-bold">
+                <span className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)]">
                   {homeStanding.points + delta.home}pts
                 </span>
               </p>
             )}
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[length:var(--comic-body-xs)] text-comic-black/50">
               현재 {homeStanding.position}위
             </p>
           </div>
 
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">{awayTeamName}</p>
-            <p className="font-medium">
-              현재 <span className="font-bold">{awayStanding.points}pts</span>
+            <p className="text-[length:var(--comic-body-xs)] text-comic-black/50">
+              {awayTeamName}
+            </p>
+            <p>
+              현재{" "}
+              <span className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)]">
+                {awayStanding.points}pts
+              </span>
             </p>
             {delta && (
-              <p className="text-green-600 dark:text-green-400">
+              <p className="text-comic-green">
                 +{delta.away}pts →{" "}
-                <span className="font-bold">
+                <span className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)]">
                   {awayStanding.points + delta.away}pts
                 </span>
               </p>
             )}
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[length:var(--comic-body-xs)] text-comic-black/50">
               현재 {awayStanding.position}위
             </p>
           </div>
         </div>
 
         {!delta && (
-          <p className="text-center text-xs text-muted-foreground">
+          <p className="text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
             시나리오를 선택하면 예상 포인트를 확인할 수 있습니다.
           </p>
         )}

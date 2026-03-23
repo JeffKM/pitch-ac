@@ -18,7 +18,7 @@ export function PostmatchTab({
 }: PostmatchTabProps) {
   if (fixture.status !== "FT") {
     return (
-      <div className="py-12 text-center text-muted-foreground">
+      <div className="py-12 text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50">
         경기가 아직 종료되지 않았습니다.
       </div>
     );
@@ -35,7 +35,7 @@ export function PostmatchTab({
           awayTeamName={awayTeam.shortName}
         />
       ) : (
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50">
           경기 스탯 데이터가 없습니다.
         </p>
       )}

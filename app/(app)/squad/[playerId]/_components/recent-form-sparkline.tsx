@@ -70,16 +70,17 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 
   const data = payload[0].payload;
   return (
-    <div className="rounded-md border bg-popover p-2 text-xs shadow-md">
-      <p className="font-medium">{label}</p>
+    <div className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-thin)] border-comic-black bg-comic-white p-2 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] shadow-md">
+      <p>{label}</p>
       <p className="tabular-nums">
-        평점: <span className="font-semibold">{data.rating.toFixed(1)}</span>
+        평점:{" "}
+        <span className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)]">
+          {data.rating.toFixed(1)}
+        </span>
       </p>
-      {data.goals > 0 && (
-        <p className="text-muted-foreground">골 {data.goals}</p>
-      )}
+      {data.goals > 0 && <p className="text-comic-black/50">골 {data.goals}</p>}
       {data.assists > 0 && (
-        <p className="text-muted-foreground">어시스트 {data.assists}</p>
+        <p className="text-comic-black/50">어시스트 {data.assists}</p>
       )}
     </div>
   );
@@ -90,12 +91,10 @@ export function RecentFormSparkline({ matchStats }: RecentFormSparklineProps) {
   const trend = calculateTrend(chartData);
 
   return (
-    <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
+    <Card>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
-            최근 폼 ({chartData.length}경기)
-          </CardTitle>
+          <CardTitle>최근 폼 ({chartData.length}경기)</CardTitle>
           <Badge
             variant={
               trend.direction === "up"
@@ -120,7 +119,7 @@ export function RecentFormSparkline({ matchStats }: RecentFormSparklineProps) {
           >
             <XAxis
               dataKey="match"
-              tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+              tick={{ fontSize: 10, fill: "var(--comic-black)" }}
               axisLine={false}
               tickLine={false}
             />
@@ -129,24 +128,24 @@ export function RecentFormSparkline({ matchStats }: RecentFormSparklineProps) {
                 (dataMin: number) => Math.max(0, Math.floor(dataMin) - 1),
                 (dataMax: number) => Math.min(10, Math.ceil(dataMax) + 1),
               ]}
-              tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+              tick={{ fontSize: 10, fill: "var(--comic-black)" }}
               axisLine={false}
               tickLine={false}
               tickCount={3}
             />
             <ReferenceLine
               y={7}
-              stroke="var(--muted-foreground)"
+              stroke="var(--comic-black)"
               strokeDasharray="3 3"
-              strokeOpacity={0.5}
+              strokeOpacity={0.3}
             />
             <Tooltip content={<CustomTooltip />} />
             <Line
               type="monotone"
               dataKey="rating"
-              stroke="var(--primary)"
+              stroke="var(--comic-skyblue)"
               strokeWidth={2}
-              dot={{ r: 3, fill: "var(--primary)", strokeWidth: 0 }}
+              dot={{ r: 3, fill: "var(--comic-skyblue)", strokeWidth: 0 }}
               activeDot={{ r: 5, strokeWidth: 0 }}
             />
           </LineChart>

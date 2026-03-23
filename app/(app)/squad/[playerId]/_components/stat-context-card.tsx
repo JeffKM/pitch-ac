@@ -36,7 +36,9 @@ export function StatContextCard({
 
         {/* 데이터 없음 처리 */}
         {value === null || context === null ? (
-          <p className="text-sm text-muted-foreground">N/A</p>
+          <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50">
+            N/A
+          </p>
         ) : (
           <>
             {/* 수치 */}

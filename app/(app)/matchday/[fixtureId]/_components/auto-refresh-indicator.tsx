@@ -33,7 +33,7 @@ export function AutoRefreshIndicator({ status }: AutoRefreshIndicatorProps) {
   if (intervalSeconds === 0) return null;
 
   return (
-    <div className="flex items-center justify-end gap-1.5 text-xs text-muted-foreground">
+    <div className="flex items-center justify-end gap-1.5 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
       <RefreshCw className="size-3" />
       <span>{remaining}초 후 갱신</span>
     </div>

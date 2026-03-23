@@ -22,38 +22,42 @@ export function TeamFormRow({
   awayForm,
 }: TeamFormRowProps) {
   return (
-    <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
+    <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
-          최근 5경기 폼
-        </CardTitle>
+        <CardTitle>최근 5경기 폼</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">
-          {/* 홈팀 */}
           <div className="space-y-2">
-            <p className="text-xs text-muted-foreground">{homeTeamName}</p>
+            <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+              {homeTeamName}
+            </p>
             <div className="flex gap-1">
               {homeForm.length > 0 ? (
                 homeForm
                   .filter(isFormResult)
                   .map((result, i) => <TeamFormBadge key={i} result={result} />)
               ) : (
-                <p className="text-xs text-muted-foreground">데이터 없음</p>
+                <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+                  데이터 없음
+                </p>
               )}
             </div>
           </div>
 
-          {/* 어웨이팀 */}
           <div className="space-y-2">
-            <p className="text-xs text-muted-foreground">{awayTeamName}</p>
+            <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+              {awayTeamName}
+            </p>
             <div className="flex gap-1">
               {awayForm.length > 0 ? (
                 awayForm
                   .filter(isFormResult)
                   .map((result, i) => <TeamFormBadge key={i} result={result} />)
               ) : (
-                <p className="text-xs text-muted-foreground">데이터 없음</p>
+                <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+                  데이터 없음
+                </p>
               )}
             </div>
           </div>
