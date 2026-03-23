@@ -27,11 +27,11 @@ export async function generateMetadata({
   const gameweek = Number(gw) || currentGw;
 
   return {
-    title: `GW${gameweek} 매치데이`,
-    description: `맨시티 GW${gameweek} 경기 일정 및 결과`,
+    title: `GW${gameweek} Matchday`,
+    description: `Man City GW${gameweek} fixtures and results`,
     openGraph: {
-      title: `GW${gameweek} 매치데이 | pitch-ac`,
-      description: `맨시티 GW${gameweek} 경기 일정 및 결과`,
+      title: `GW${gameweek} Matchday | pitch-ac`,
+      description: `Man City GW${gameweek} fixtures and results`,
     },
   };
 }

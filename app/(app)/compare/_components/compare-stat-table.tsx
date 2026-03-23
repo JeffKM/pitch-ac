@@ -14,7 +14,7 @@ export const COMPARE_STAT_DEFINITIONS = [
   {
     key: "goals" as const,
     contextKey: "goalsContext" as const,
-    label: "골",
+    label: "Goals",
     glossaryId: "goal",
   },
   {
@@ -27,24 +27,24 @@ export const COMPARE_STAT_DEFINITIONS = [
   {
     key: "assists" as const,
     contextKey: "assistsContext" as const,
-    label: "어시스트",
+    label: "Assists",
   },
   {
     key: "keyPasses" as const,
     contextKey: "keyPassesContext" as const,
-    label: "키패스",
+    label: "Key Passes",
     glossaryId: "key-pass",
   },
   {
     key: "dribbles" as const,
     contextKey: "dribblesContext" as const,
-    label: "드리블",
+    label: "Dribbles",
     glossaryId: "dribble",
   },
   {
     key: "averageRating" as const,
     contextKey: "averageRatingContext" as const,
-    label: "평균 평점",
+    label: "Avg. Rating",
     glossaryId: "average-rating",
     format: (v: number) => v.toFixed(1),
   },
@@ -101,7 +101,7 @@ function StatRow({
         </span>
         {context1 !== null && (
           <span className="block font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/40">
-            리그 {context1.rank}위
+            League #{context1.rank}
           </span>
         )}
       </div>
@@ -137,7 +137,7 @@ function StatRow({
         </span>
         {context2 !== null && (
           <span className="block font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/40">
-            리그 {context2.rank}위
+            League #{context2.rank}
           </span>
         )}
       </div>
@@ -162,7 +162,7 @@ export function CompareStatTable({
     <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
       <CardHeader className="pb-2">
         <CardTitle className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
-          스탯 비교 ({stats1.season})
+          Stats Comparison ({stats1.season})
         </CardTitle>
       </CardHeader>
       <CardContent className="px-4">

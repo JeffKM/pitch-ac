@@ -21,7 +21,7 @@ export function GameweekHeader({ gameweek, dateRange }: GameweekHeaderProps) {
         <Link
           href={`/matchday?gw=${gameweek - 1}`}
           className="flex size-10 items-center justify-center rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white transition-colors hover:bg-comic-cream"
-          aria-label="이전 게임위크"
+          aria-label="Previous gameweek"
         >
           <ChevronLeft className="size-5 text-comic-black" />
         </Link>
@@ -44,7 +44,7 @@ export function GameweekHeader({ gameweek, dateRange }: GameweekHeaderProps) {
         <Link
           href={`/matchday?gw=${gameweek + 1}`}
           className="flex size-10 items-center justify-center rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white transition-colors hover:bg-comic-cream"
-          aria-label="다음 게임위크"
+          aria-label="Next gameweek"
         >
           <ChevronRight className="size-5 text-comic-black" />
         </Link>

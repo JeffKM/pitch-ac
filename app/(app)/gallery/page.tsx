@@ -6,8 +6,8 @@ import type { Metadata } from "next";
 import { Card, CardContent } from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "갤러리",
-  description: "맨시티 카툰 갤러리 — 경기 하이라이트 카툰 카드",
+  title: "Gallery",
+  description: "Man City cartoon gallery — match highlight cartoon cards",
 };
 
 export default function GalleryPage() {
@@ -15,10 +15,10 @@ export default function GalleryPage() {
     <div className="space-y-6">
       <div>
         <h1 className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-3xl)] leading-[var(--comic-leading-snug)] tracking-[var(--comic-tracking-wide)] text-comic-black">
-          갤러리
+          Gallery
         </h1>
         <p className="mt-1 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] tracking-[var(--comic-tracking-wide)] text-comic-black/60">
-          경기 하이라이트 카툰 카드 — 곧 공개됩니다
+          Match highlight cartoon cards — Coming soon
         </p>
       </div>
 
@@ -29,10 +29,11 @@ export default function GalleryPage() {
           </div>
           <div className="space-y-1">
             <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-lg)] text-comic-black">
-              카툰 갤러리 준비 중
+              Cartoon Gallery Coming Soon
             </p>
             <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] text-comic-black/60">
-              매치데이 카툰 카드, MVP 카드, 베스트 모먼트 카드가 곧 추가됩니다.
+              Matchday cartoon cards, MVP cards, and best moment cards coming
+              soon.
             </p>
           </div>
         </CardContent>

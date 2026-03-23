@@ -11,13 +11,13 @@ interface StatContextGridProps {
 const STAT_DEFINITIONS = [
   {
     key: "goals" as const,
-    label: "골",
+    label: "Goals",
     contextKey: "goalsContext" as const,
     glossaryId: "goal",
   },
   {
     key: "assists" as const,
-    label: "어시스트",
+    label: "Assists",
     contextKey: "assistsContext" as const,
   },
   {
@@ -36,19 +36,19 @@ const STAT_DEFINITIONS = [
   },
   {
     key: "keyPasses" as const,
-    label: "키패스",
+    label: "Key Passes",
     contextKey: "keyPassesContext" as const,
     glossaryId: "key-pass",
   },
   {
     key: "dribbles" as const,
-    label: "드리블",
+    label: "Dribbles",
     contextKey: "dribblesContext" as const,
     glossaryId: "dribble",
   },
   {
     key: "averageRating" as const,
-    label: "평균 평점",
+    label: "Avg. Rating",
     contextKey: "averageRatingContext" as const,
     glossaryId: "average-rating",
     format: (v: number) => v.toFixed(1),
@@ -59,7 +59,7 @@ export function StatContextGrid({ seasonStats }: StatContextGridProps) {
   return (
     <div>
       <h2 className="mb-3 font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-base)] tracking-[var(--comic-tracking-wide)] text-comic-black">
-        시즌 스탯 ({seasonStats.season})
+        Season Stats ({seasonStats.season})
       </h2>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {STAT_DEFINITIONS.map((def) => (

@@ -49,7 +49,7 @@ export function StatContextCard({
             {/* 리그 순위 (context 미계산 시 숨김) */}
             {context.rank > 0 && (
               <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black">
-                리그 {context.rank}위
+                League #{context.rank}
               </p>
             )}
 

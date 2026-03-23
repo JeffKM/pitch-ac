@@ -103,11 +103,11 @@ export function PlayerHeaderCard({
                 </span>
                 <div className="space-y-0.5">
                   <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black">
-                    평균 평점
+                    Avg. Rating
                   </p>
                   {seasonStats.averageRatingContext.rank > 0 && (
                     <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
-                      리그 {seasonStats.averageRatingContext.rank}위 · 상위{" "}
+                      League #{seasonStats.averageRatingContext.rank} · Top{" "}
                       {100 - seasonStats.averageRatingContext.percentile + 1}%
                     </p>
                   )}

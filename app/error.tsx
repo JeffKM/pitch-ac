@@ -21,17 +21,17 @@ export default function Error({
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 text-center">
       <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-3xl)] text-comic-black/50">
-        오류 발생
+        Error
       </p>
       <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-lg)]">
-        예상치 못한 오류가 발생했습니다
+        An unexpected error occurred
       </p>
       {error.digest && (
         <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
-          오류 코드: {error.digest}
+          Error code: {error.digest}
         </p>
       )}
-      <Button onClick={reset}>다시 시도</Button>
+      <Button onClick={reset}>Try Again</Button>
     </div>
   );
 }

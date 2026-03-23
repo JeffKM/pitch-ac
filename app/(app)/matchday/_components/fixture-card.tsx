@@ -60,7 +60,7 @@ export function FixtureCard({
                 </p>
                 {homeStanding && (
                   <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
-                    {homeStanding.position}위
+                    #{homeStanding.position}
                   </p>
                 )}
               </div>
@@ -108,7 +108,7 @@ export function FixtureCard({
                 </p>
                 {awayStanding && (
                   <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
-                    {awayStanding.position}위
+                    #{awayStanding.position}
                   </p>
                 )}
               </div>
@@ -127,7 +127,7 @@ export function FixtureCard({
 
                 <span>{fixture.liveStats.home.possession}%</span>
                 <span className="font-[family-name:var(--font-bangers)] text-comic-black">
-                  점유율
+                  Possession
                 </span>
                 <span>{fixture.liveStats.away.possession}%</span>
               </div>

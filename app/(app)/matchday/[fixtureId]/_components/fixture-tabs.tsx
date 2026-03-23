@@ -53,20 +53,20 @@ export function FixtureTabs({
           value="prematch"
           className="flex-1 rounded-[var(--comic-panel-radius)] font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] tracking-[var(--comic-tracking-normal)] data-[state=active]:bg-comic-yellow data-[state=active]:text-comic-black"
         >
-          프리매치
+          Pre-match
         </TabsTrigger>
         <TabsTrigger
           value="live"
           className="flex-1 gap-1.5 rounded-[var(--comic-panel-radius)] font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] tracking-[var(--comic-tracking-normal)] data-[state=active]:bg-comic-yellow data-[state=active]:text-comic-black"
         >
           {isLive && <LivePulse />}
-          라이브
+          Live
         </TabsTrigger>
         <TabsTrigger
           value="postmatch"
           className="flex-1 rounded-[var(--comic-panel-radius)] font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] tracking-[var(--comic-tracking-normal)] data-[state=active]:bg-comic-yellow data-[state=active]:text-comic-black"
         >
-          포스트매치
+          Post-match
         </TabsTrigger>
       </TabsList>
 

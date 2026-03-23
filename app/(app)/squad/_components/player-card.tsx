@@ -2,57 +2,22 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { CartoonAvatar } from "@/components/cartoon/cartoon-avatar";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import type { PlayerSeasonStats } from "@/types/player";
 import type { Player } from "@/types/player";
 import type { Team } from "@/types/team";
 
 interface PlayerCardProps {
   player: Player;
   team: Team | undefined;
-  seasonStats: PlayerSeasonStats | undefined;
   /** 카툰 에셋 등록 여부 */
   hasCartoonAsset?: boolean;
-}
-
-/** 포지션별 대표 스탯 선택 */
-function getPrimaryStat(
-  position: Player["position"],
-  stats: PlayerSeasonStats | undefined,
-): { label: string; value: number | string; rank: number } | null {
-  if (!stats) return null;
-  switch (position) {
-    case "FWD":
-      return {
-        label: "골",
-        value: stats.goals,
-        rank: stats.goalsContext.rank,
-      };
-    case "MID":
-      return {
-        label: "어시스트",
-        value: stats.assists,
-        rank: stats.assistsContext.rank,
-      };
-    case "DEF":
-    case "GK":
-      return {
-        label: "평점",
-        value: stats.averageRating.toFixed(1),
-        rank: stats.averageRatingContext.rank,
-      };
-  }
 }
 
 export function PlayerCard({
   player,
   team,
-  seasonStats,
   hasCartoonAsset = false,
 }: PlayerCardProps) {
-  const primaryStat = getPrimaryStat(player.position, seasonStats);
-
   return (
     <Link href={`/squad/${player.id}`} className="block">
       <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white transition-colors hover:bg-comic-cream">
@@ -84,15 +49,6 @@ export function PlayerCard({
               {team?.shortName ?? player.teamId} · {player.position}
             </p>
           </div>
-          {primaryStat && (
-            <Badge
-              variant="outline"
-              className="shrink-0 rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-yellow font-[family-name:var(--font-bangers)] text-comic-black"
-            >
-              {primaryStat.label} {primaryStat.value}
-              {primaryStat.rank > 0 && ` · 리그 ${primaryStat.rank}위`}
-            </Badge>
-          )}
         </CardContent>
       </Card>
     </Link>

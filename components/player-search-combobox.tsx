@@ -41,7 +41,7 @@ export function PlayerSearchCombobox({
   teams,
   onSelect,
   onSearch,
-  placeholder = "선수 이름, 팀, 포지션으로 검색...",
+  placeholder = "Search by name, team, or position...",
   recentSearches = [],
   onRecentClick,
 }: PlayerSearchComboboxProps) {
@@ -99,7 +99,7 @@ export function PlayerSearchCombobox({
               <div className="flex flex-col items-center gap-2 py-6 text-comic-black/50">
                 <UserSearch className="size-6" />
                 <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)]">
-                  결과 없음
+                  No results
                 </p>
               </div>
             </CommandEmpty>
@@ -107,7 +107,7 @@ export function PlayerSearchCombobox({
             {/* 최근 검색어 — 입력 없을 때만 표시 */}
             {recentSearches.length > 0 && !inputValue && (
               <>
-                <CommandGroup heading="최근 검색어">
+                <CommandGroup heading="Recent searches">
                   {recentSearches.map((term) => (
                     <CommandItem
                       key={term}
@@ -127,7 +127,7 @@ export function PlayerSearchCombobox({
             )}
 
             {/* 선수 목록 */}
-            <CommandGroup heading="선수">
+            <CommandGroup heading="Players">
               {players.map((player) => {
                 const team = getTeam(player.teamId);
                 return (

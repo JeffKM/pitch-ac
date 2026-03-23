@@ -83,7 +83,7 @@ export function StatBar({
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle>팀 스탯 비교</CardTitle>
+        <CardTitle>Team Stats</CardTitle>
         <div className="flex justify-between font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
           <span>{homeTeamName}</span>
           <span>{awayTeamName}</span>
@@ -91,20 +91,20 @@ export function StatBar({
       </CardHeader>
       <CardContent className="space-y-3">
         <StatRow
-          label="점유율"
+          label="Possession"
           homeValue={homeStats.possession}
           awayValue={awayStats.possession}
           format={(v) => `${v}%`}
           glossaryId="possession"
         />
         <StatRow
-          label="슈팅"
+          label="Shots"
           homeValue={homeStats.shots}
           awayValue={awayStats.shots}
           glossaryId="shot"
         />
         <StatRow
-          label="유효 슈팅"
+          label="Shots on Target"
           homeValue={homeStats.shotsOnTarget}
           awayValue={awayStats.shotsOnTarget}
           glossaryId="shot-on-target"
@@ -117,13 +117,13 @@ export function StatBar({
           glossaryId="xg"
         />
         <StatRow
-          label="코너킥"
+          label="Corners"
           homeValue={homeStats.corners}
           awayValue={awayStats.corners}
           glossaryId="corner-kick"
         />
         <StatRow
-          label="파울"
+          label="Fouls"
           homeValue={homeStats.fouls}
           awayValue={awayStats.fouls}
           glossaryId="foul"

@@ -20,7 +20,7 @@ export function showGoalNotification(
   const scoringTeamName =
     change.scoringTeam === "home" ? homeTeam.shortName : awayTeam.shortName;
 
-  toast(`⚽ ${scoringTeamName} 골!`, {
+  toast(`⚽ ${scoringTeamName} Goal!`, {
     description: `${homeTeam.shortName} ${change.newHomeScore} – ${change.newAwayScore} ${awayTeam.shortName}`,
     duration: 5000,
   });

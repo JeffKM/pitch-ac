@@ -17,7 +17,7 @@ export function LiveTab({ fixture, homeTeam, awayTeam }: LiveTabProps) {
   if (fixture.status === "NS") {
     return (
       <div className="py-12 text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50">
-        경기 시작 전입니다.
+        Match hasn&apos;t started yet.
       </div>
     );
   }
@@ -36,7 +36,7 @@ export function LiveTab({ fixture, homeTeam, awayTeam }: LiveTabProps) {
         />
       ) : (
         <p className="text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50">
-          실시간 스탯이 아직 제공되지 않습니다.
+          Live stats not yet available.
         </p>
       )}
 

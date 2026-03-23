@@ -84,12 +84,12 @@ export function EventTimeline({ events, homeTeamId }: EventTimelineProps) {
       <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
         <CardHeader className="pb-2">
           <CardTitle className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
-            이벤트
+            Events
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] text-comic-black/40">
-            이벤트가 없습니다.
+            No events.
           </p>
         </CardContent>
       </Card>

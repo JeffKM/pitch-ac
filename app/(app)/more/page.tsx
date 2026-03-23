@@ -8,18 +8,18 @@ export default function MorePage() {
   return (
     <div className="space-y-6">
       <h1 className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-2xl)] leading-[var(--comic-leading-snug)] tracking-[var(--comic-tracking-wide)] text-comic-black">
-        설정
+        Settings
       </h1>
       <div className="space-y-3">
         <div className="flex items-center justify-between rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white p-4">
           <span className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black">
-            테마
+            Theme
           </span>
           <ThemeSwitcher />
         </div>
         <div className="flex items-center justify-between rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white p-4">
           <span className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black">
-            계정
+            Account
           </span>
           <Suspense>
             <AuthButton />

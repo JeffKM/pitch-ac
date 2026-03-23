@@ -24,7 +24,7 @@ export function TeamFormRow({
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle>최근 5경기 폼</CardTitle>
+        <CardTitle>Last 5 Matches</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">
@@ -39,7 +39,7 @@ export function TeamFormRow({
                   .map((result, i) => <TeamFormBadge key={i} result={result} />)
               ) : (
                 <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
-                  데이터 없음
+                  No data
                 </p>
               )}
             </div>
@@ -56,7 +56,7 @@ export function TeamFormRow({
                   .map((result, i) => <TeamFormBadge key={i} result={result} />)
               ) : (
                 <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
-                  데이터 없음
+                  No data
                 </p>
               )}
             </div>

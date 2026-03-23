@@ -12,15 +12,15 @@ export default function FixtureDetailNotFound() {
         404
       </p>
       <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-lg)]">
-        경기를 찾을 수 없습니다
+        Match Not Found
       </p>
       <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50">
-        요청한 경기 정보가 존재하지 않거나 아직 준비 중입니다.
+        The requested match doesn&apos;t exist or isn&apos;t available yet.
       </p>
       <Button variant="outline" asChild>
         <Link href="/matchday">
           <ChevronLeft className="size-4" />
-          매치데이로 돌아가기
+          Back to Matchday
         </Link>
       </Button>
     </div>

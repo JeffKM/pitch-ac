@@ -87,7 +87,7 @@ function PitchLineup({
       {lineup.substitutes.length > 0 && (
         <div>
           <p className="mb-1 font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-xs)] text-comic-black/40">
-            교체 선수
+            Substitutes
           </p>
           <ul className="space-y-0.5">
             {lineup.substitutes.map((sub) => (
@@ -119,7 +119,7 @@ export function LineupDisplay({
     <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
       <CardHeader className="pb-2">
         <CardTitle className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
-          라인업
+          Lineups
         </CardTitle>
       </CardHeader>
       <CardContent>

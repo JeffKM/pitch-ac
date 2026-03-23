@@ -36,11 +36,11 @@ export function H2HResults({
     return (
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle>H2H 전적</CardTitle>
+          <CardTitle>H2H Records</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50">
-            H2H 데이터가 없습니다.
+            No H2H data available.
           </p>
         </CardContent>
       </Card>
@@ -60,7 +60,7 @@ export function H2HResults({
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle>H2H 전적</CardTitle>
+        <CardTitle>H2H Records</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
         {results.map((result) => {
@@ -91,11 +91,11 @@ export function H2HResults({
 
         <div className="flex justify-center gap-4 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
           <span>
-            <span className="text-comic-green">{wins}승</span> ({homeTeamName})
+            <span className="text-comic-green">{wins}W</span> ({homeTeamName})
           </span>
-          <span className="text-comic-yellow">{draws}무</span>
+          <span className="text-comic-yellow">{draws}D</span>
           <span>
-            <span className="text-comic-red">{losses}패</span> ({homeTeamName})
+            <span className="text-comic-red">{losses}L</span> ({homeTeamName})
           </span>
         </div>
       </CardContent>

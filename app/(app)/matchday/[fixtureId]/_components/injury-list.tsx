@@ -28,7 +28,7 @@ function TeamInjuries({
       </p>
       {injuries.length === 0 ? (
         <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50">
-          부상자 없음
+          No injuries
         </p>
       ) : (
         <ul className="space-y-1.5">
@@ -62,7 +62,7 @@ export function InjuryList({
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle>부상/결장</CardTitle>
+        <CardTitle>Injuries</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">

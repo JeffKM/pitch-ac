@@ -18,9 +18,9 @@ interface StandingSimulatorProps {
 }
 
 const SCENARIO_LABELS = {
-  home_win: "홈팀 승",
-  draw: "무승부",
-  away_win: "원정팀 승",
+  home_win: "Home Win",
+  draw: "Draw",
+  away_win: "Away Win",
 } as const;
 
 function getPointsDelta(
@@ -44,7 +44,7 @@ export function StandingSimulator({
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle>순위 시뮬레이터</CardTitle>
+        <CardTitle>Standing Simulator</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex gap-2">
@@ -67,7 +67,7 @@ export function StandingSimulator({
               {homeTeamName}
             </p>
             <p>
-              현재{" "}
+              Current{" "}
               <span className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)]">
                 {homeStanding.points}pts
               </span>
@@ -81,7 +81,7 @@ export function StandingSimulator({
               </p>
             )}
             <p className="text-[length:var(--comic-body-xs)] text-comic-black/50">
-              현재 {homeStanding.position}위
+              Currently #{homeStanding.position}
             </p>
           </div>
 
@@ -90,7 +90,7 @@ export function StandingSimulator({
               {awayTeamName}
             </p>
             <p>
-              현재{" "}
+              Current{" "}
               <span className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)]">
                 {awayStanding.points}pts
               </span>
@@ -104,14 +104,14 @@ export function StandingSimulator({
               </p>
             )}
             <p className="text-[length:var(--comic-body-xs)] text-comic-black/50">
-              현재 {awayStanding.position}위
+              Currently #{awayStanding.position}
             </p>
           </div>
         </div>
 
         {!delta && (
           <p className="text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
-            시나리오를 선택하면 예상 포인트를 확인할 수 있습니다.
+            Select a scenario to see projected points.
           </p>
         )}
       </CardContent>

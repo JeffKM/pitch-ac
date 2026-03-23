@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { PlayerSearchCombobox } from "@/components/player-search-combobox";
 import { useRecentSearches } from "@/hooks/use-recent-searches";
-import type { Player, PlayerSeasonStats } from "@/types/player";
+import type { Player } from "@/types/player";
 import type { Team } from "@/types/team";
 
 import { PlayerCardGrid } from "./player-card-grid";
@@ -13,7 +13,6 @@ import { PlayerSearchEmpty } from "./player-search-empty";
 interface PlayerSearchPageProps {
   allPlayers: Player[];
   teams: Team[];
-  seasonStatsMap: Record<number, PlayerSeasonStats>;
 }
 
 /** 이름/팀/포지션/국적 기반 클라이언트 필터 */
@@ -35,11 +34,7 @@ function filterPlayers(
   });
 }
 
-export function PlayerSearchPage({
-  allPlayers,
-  teams,
-  seasonStatsMap,
-}: PlayerSearchPageProps) {
+export function PlayerSearchPage({ allPlayers, teams }: PlayerSearchPageProps) {
   const [displayedPlayers, setDisplayedPlayers] =
     useState<Player[]>(allPlayers);
   const [activeQuery, setActiveQuery] = useState("");
@@ -83,11 +78,7 @@ export function PlayerSearchPage({
       {isEmpty ? (
         <PlayerSearchEmpty query={activeQuery} />
       ) : (
-        <PlayerCardGrid
-          players={displayedPlayers}
-          teams={teams}
-          seasonStatsMap={seasonStatsMap}
-        />
+        <PlayerCardGrid players={displayedPlayers} teams={teams} />
       )}
     </div>
   );

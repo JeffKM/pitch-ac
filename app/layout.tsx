@@ -12,39 +12,38 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: {
-    default: "pitch-ac | 맨시티 카툰 팬사이트",
+    default: "pitch-ac | Man City Fan Site",
     template: "%s | pitch-ac",
   },
-  description: "맨체스터 시티 선수들이 카툰 캐릭터로 살아 움직이는 팬사이트",
+  description: "A cartoon fan site where Manchester City players come alive",
   keywords: [
-    "맨체스터 시티",
-    "맨시티",
     "Manchester City",
-    "카툰",
-    "팬사이트",
-    "프리미어리그",
-    "축구",
+    "Man City",
+    "cartoon",
+    "fan site",
+    "Premier League",
+    "football",
   ],
   openGraph: {
     type: "website",
-    locale: "ko_KR",
+    locale: "en_US",
     url: defaultUrl,
     siteName: "pitch-ac",
-    title: "pitch-ac | 맨시티 카툰 팬사이트",
-    description: "맨체스터 시티 선수들이 카툰 캐릭터로 살아 움직이는 팬사이트",
+    title: "pitch-ac | Man City Fan Site",
+    description: "A cartoon fan site where Manchester City players come alive",
     images: [
       {
         url: "/opengraph-image.png",
         width: 1200,
         height: 630,
-        alt: "pitch-ac 맨시티 카툰 팬사이트",
+        alt: "pitch-ac Man City cartoon fan site",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "pitch-ac | 맨시티 카툰 팬사이트",
-    description: "맨체스터 시티 선수들이 카툰 캐릭터로 살아 움직이는 팬사이트",
+    title: "pitch-ac | Man City Fan Site",
+    description: "A cartoon fan site where Manchester City players come alive",
     images: ["/twitter-image.png"],
   },
 };
@@ -81,7 +80,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.className} ${fredoka.variable} ${bangers.variable} ${permanentMarker.variable} antialiased`}
       >

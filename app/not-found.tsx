@@ -12,15 +12,15 @@ export default function NotFound() {
         404
       </p>
       <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-xl)]">
-        페이지를 찾을 수 없습니다
+        Page Not Found
       </p>
       <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50">
-        요청한 페이지가 존재하지 않거나 이동되었습니다.
+        The requested page doesn&apos;t exist or has been moved.
       </p>
       <Button variant="outline" asChild>
         <Link href="/matchday">
           <ChevronLeft className="size-4" />
-          매치데이로 돌아가기
+          Back to Matchday
         </Link>
       </Button>
     </div>
