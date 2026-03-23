@@ -278,6 +278,8 @@ export const mockFixtures: Fixture[] = [
         ],
       },
     },
+    leagueId: 8,
+    competitionName: null,
   },
 
   // 5002: Liverpool vs Man City — FT, 3-2
@@ -552,6 +554,8 @@ export const mockFixtures: Fixture[] = [
         ],
       },
     },
+    leagueId: 8,
+    competitionName: null,
   },
 
   // 5003: Man United vs Tottenham — LIVE, 1-1
@@ -807,6 +811,8 @@ export const mockFixtures: Fixture[] = [
         ],
       },
     },
+    leagueId: 8,
+    competitionName: null,
   },
 
   // 5004: Chelsea vs Liverpool — LIVE, 0-0
@@ -1053,6 +1059,8 @@ export const mockFixtures: Fixture[] = [
         ],
       },
     },
+    leagueId: 8,
+    competitionName: null,
   },
 
   // 5005: Man City vs Arsenal — NS
@@ -1069,6 +1077,8 @@ export const mockFixtures: Fixture[] = [
     events: [],
     liveStats: null,
     lineups: null,
+    leagueId: 8,
+    competitionName: null,
   },
 
   // 5006: Tottenham vs Man United — NS
@@ -1085,6 +1095,8 @@ export const mockFixtures: Fixture[] = [
     events: [],
     liveStats: null,
     lineups: null,
+    leagueId: 8,
+    competitionName: null,
   },
 ];
 

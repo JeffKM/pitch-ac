@@ -423,7 +423,7 @@ font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-ba
 | `text-primary` / `bg-primary`                 | `text-comic-skyblue` / `bg-comic-skyblue`           |
 | `bg-card` / `bg-popover`                      | `bg-comic-white`                                    |
 | `text-chart-1` / `text-chart-2`               | `text-comic-skyblue` / `text-comic-red`             |
-| `text-sm`, `text-xs` (폰트 사이즈)            | `text-[length:var(--comic-*)]`                      |
+| `text-sm`, `text-xs` (폰트 사이즈)            | `text-[length:var(--comic-body-base)]` 등           |
 | `font-medium` / `font-semibold` / `font-bold` | 코믹 폰트 적용 시 제거 (weight 1개)                 |
 | `ring-1 ring-border`                          | `ring-[var(--comic-border-width)] ring-comic-black` |
 

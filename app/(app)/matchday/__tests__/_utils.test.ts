@@ -21,6 +21,8 @@ function makeFixture(overrides: Partial<Fixture> = {}): Fixture {
     events: [],
     liveStats: null,
     lineups: null,
+    leagueId: 8,
+    competitionName: null,
     ...overrides,
   };
 }

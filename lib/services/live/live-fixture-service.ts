@@ -3,7 +3,7 @@ import "server-only";
 
 import {
   getFixtureById as getSmFixtureById,
-  getLivePLFixtures,
+  getLiveMCityFixtures,
 } from "@/lib/api/sportmonks/fixtures";
 import { mapSmFixtureToFixture } from "@/lib/api/sportmonks/mappers";
 import type { Fixture } from "@/types";
@@ -22,7 +22,7 @@ export async function getLiveFixtures(): Promise<Fixture[]> {
   }
 
   try {
-    const smFixtures = await getLivePLFixtures();
+    const smFixtures = await getLiveMCityFixtures();
     cachedLiveFixtures = smFixtures.map(mapSmFixtureToFixture);
     cacheTimestamp = now;
     return cachedLiveFixtures;

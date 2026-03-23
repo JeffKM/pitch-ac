@@ -16,6 +16,17 @@ export function FixtureStatusBadge({
   minute,
   kickoffTime,
 }: FixtureStatusBadgeProps) {
+  if (status === "POSTP") {
+    return (
+      <Badge
+        variant="outline"
+        className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-red bg-comic-red/10 font-[family-name:var(--font-bangers)] text-comic-red"
+      >
+        POSTPONED
+      </Badge>
+    );
+  }
+
   if (status === "NS") {
     return (
       <Badge

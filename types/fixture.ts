@@ -3,7 +3,7 @@
 import type { Team, TeamStanding } from "./team";
 
 /** 경기 상태 */
-export type FixtureStatus = "NS" | "LIVE" | "FT";
+export type FixtureStatus = "NS" | "LIVE" | "FT" | "POSTP";
 
 /** 경기 이벤트 타입 */
 export type FixtureEventType =
@@ -94,7 +94,8 @@ export interface FixtureDetailData {
 /** 경기 정보 */
 export interface Fixture {
   id: number;
-  gameweek: number;
+  /** PL 게임위크 (컵 경기는 가장 가까운 GW 할당, 시즌 외이면 null) */
+  gameweek: number | null;
   date: string;
   homeTeamId: number;
   awayTeamId: number;
@@ -111,4 +112,8 @@ export interface Fixture {
   liveStats: FixtureLiveStats | null;
   /** 라인업 (NS일 때 null) */
   lineups: { home: Lineup; away: Lineup } | null;
+  /** SportMonks league_id (PL=8) */
+  leagueId: number;
+  /** 대회 표시명 (PL이면 null, 컵 경기만 표시) */
+  competitionName: string | null;
 }

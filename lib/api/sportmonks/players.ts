@@ -49,7 +49,7 @@ export async function getSquadByTeamAndSeason(
   const response = await sportMonksFetch<SmPaginatedResponse<SmPlayer>>(
     `/football/squads/teams/${teamId}/seasons/${seasonId}`,
     {
-      includes: ["position", "nationality", "statistics.details"],
+      includes: ["teams", "position", "nationality", "statistics.details"],
       filters: { playerStatisticSeasonIds: seasonId },
       perPage: 50,
       revalidate: 86400,

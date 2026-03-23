@@ -14,8 +14,8 @@ import { MatchHeader } from "./match-header";
 
 type TabValue = "prematch" | "live" | "postmatch";
 
-function resolveDefaultTab(status: "NS" | "LIVE" | "FT"): TabValue {
-  if (status === "NS") return "prematch";
+function resolveDefaultTab(status: "NS" | "LIVE" | "FT" | "POSTP"): TabValue {
+  if (status === "NS" || status === "POSTP") return "prematch";
   if (status === "LIVE") return "live";
   return "postmatch";
 }

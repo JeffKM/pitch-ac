@@ -46,6 +46,8 @@ describe("fixtureRowToFixture", () => {
     ],
     live_stats: null,
     lineups: null,
+    league_id: 8,
+    competition_name: null,
   };
 
   it("snake_case → camelCase 변환", () => {

@@ -42,10 +42,11 @@ export async function GET(request: NextRequest) {
   try {
     const dbFixtures = await getFixturesByGameweek(gameweek);
 
-    // 킥오프 시각이 지났고 아직 FT가 아닌 경기가 있을 때만 라이브 API 호출
+    // 킥오프 시각이 지났고 아직 FT/POSTP가 아닌 경기가 있을 때만 라이브 API 호출
     const now = new Date();
     const hasKickedOff = dbFixtures.some(
-      (f) => f.status !== "FT" && new Date(f.date) <= now,
+      (f) =>
+        f.status !== "FT" && f.status !== "POSTP" && new Date(f.date) <= now,
     );
 
     let fixtures = dbFixtures;

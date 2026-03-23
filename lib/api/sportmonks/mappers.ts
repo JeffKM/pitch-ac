@@ -21,7 +21,9 @@ import type {
 import {
   EVENT_TYPE_ID,
   FIXTURE_STATE_MAP,
+  LEAGUE_NAME_MAP,
   LINEUP_TYPE_ID,
+  PL_LEAGUE_ID,
   POSITION_MAP,
   SCORE_TYPE_ID,
   STAT_TYPE_ID,
@@ -469,9 +471,21 @@ export function mapSmFixtureToFixture(raw: SmFixture): Fixture {
       ? mapSmLineups(raw.lineups, homeId, awayId)
       : null;
 
+  // 게임위크: PL 경기는 round.name, 컵 경기는 null (나중에 assignGameweek로 할당)
+  const gameweekRaw = raw.round?.name ? parseInt(raw.round.name, 10) : null;
+  const gameweek =
+    gameweekRaw !== null && !isNaN(gameweekRaw) ? gameweekRaw : null;
+
+  // 대회 구분
+  const leagueId = raw.league_id ?? PL_LEAGUE_ID;
+  const competitionName =
+    leagueId !== PL_LEAGUE_ID
+      ? (LEAGUE_NAME_MAP[leagueId] ?? `League ${leagueId}`)
+      : null;
+
   return {
     id: raw.id,
-    gameweek: raw.round?.name ? parseInt(raw.round.name, 10) : 0,
+    gameweek,
     date: raw.starting_at,
     homeTeamId: homeId,
     awayTeamId: awayId,
@@ -482,6 +496,8 @@ export function mapSmFixtureToFixture(raw: SmFixture): Fixture {
     events,
     liveStats,
     lineups,
+    leagueId,
+    competitionName,
   };
 }
 

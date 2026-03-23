@@ -19,7 +19,7 @@ import { type FixtureRow, fixtureRowToFixture } from "./mappers";
 export const getCurrentGameweek = cache(async (): Promise<number> => {
   const supabase = await createClient();
 
-  // 맨시티 경기만 대상으로 3개 쿼리 병렬 실행
+  // 맨시티 PL 경기만 대상 (POSTP 제외, gameweek NOT NULL)
   const mcityFilter = `home_team_id.eq.${MCITY_TEAM_ID},away_team_id.eq.${MCITY_TEAM_ID}`;
   const [liveResult, nextResult, lastResult] = await Promise.all([
     // 1) LIVE 경기
@@ -27,14 +27,16 @@ export const getCurrentGameweek = cache(async (): Promise<number> => {
       .from("fixtures")
       .select("gameweek")
       .eq("status", "LIVE")
+      .not("gameweek", "is", null)
       .or(mcityFilter)
       .limit(1)
       .maybeSingle(),
-    // 2) 가장 가까운 미래 NS 경기
+    // 2) 가장 가까운 미래 NS 경기 (POSTP 제외)
     supabase
       .from("fixtures")
       .select("gameweek")
       .eq("status", "NS")
+      .not("gameweek", "is", null)
       .or(mcityFilter)
       .gte("date", new Date().toISOString())
       .order("date", { ascending: true })
@@ -45,6 +47,7 @@ export const getCurrentGameweek = cache(async (): Promise<number> => {
       .from("fixtures")
       .select("gameweek")
       .eq("status", "FT")
+      .not("gameweek", "is", null)
       .or(mcityFilter)
       .order("date", { ascending: false })
       .limit(1)
@@ -52,9 +55,9 @@ export const getCurrentGameweek = cache(async (): Promise<number> => {
   ]);
 
   // 우선순위: LIVE > NS(미래) > FT(과거) > fallback(1)
-  if (liveResult.data) return liveResult.data.gameweek;
-  if (nextResult.data) return nextResult.data.gameweek;
-  if (lastResult.data) return lastResult.data.gameweek;
+  if (liveResult.data?.gameweek) return liveResult.data.gameweek;
+  if (nextResult.data?.gameweek) return nextResult.data.gameweek;
+  if (lastResult.data?.gameweek) return lastResult.data.gameweek;
 
   return 1;
 });

@@ -35,7 +35,10 @@ export async function generateMetadata({
     ? ` ${fixture.homeScore}-${fixture.awayScore}`
     : "";
   const title = `${homeTeam.name} vs ${awayTeam.name}${scoreStr}`;
-  const description = `GW${fixture.gameweek} — ${homeTeam.name} vs ${awayTeam.name} 경기 상세`;
+  const gwLabel = fixture.gameweek
+    ? `GW${fixture.gameweek}`
+    : (fixture.competitionName ?? "Cup");
+  const description = `${gwLabel} — ${homeTeam.name} vs ${awayTeam.name} 경기 상세`;
 
   return {
     title,

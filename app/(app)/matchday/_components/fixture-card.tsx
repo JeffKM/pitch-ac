@@ -8,6 +8,7 @@ import { formatKickoffTime } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import type { Fixture, Team, TeamStanding } from "@/types";
 
+import { CompetitionBadge } from "./competition-badge";
 import { FixtureStatusBadge } from "./fixture-status-badge";
 import { LivePulse } from "./live-pulse";
 import { ScoreFlash } from "./score-flash";
@@ -29,112 +30,132 @@ export function FixtureCard({
 }: FixtureCardProps) {
   const isLive = fixture.status === "LIVE";
   const isFt = fixture.status === "FT";
+  const isPostp = fixture.status === "POSTP";
 
   const kickoffTime = formatKickoffTime(fixture.date);
 
-  return (
-    <Link href={`/matchday/${fixture.id}`} className="block">
-      <Card
-        className={cn(
-          "rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white transition-colors hover:bg-comic-cream",
-          isLive && "border-comic-green bg-comic-green/10",
+  const cardContent = (
+    <Card
+      className={cn(
+        "rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white transition-colors hover:bg-comic-cream",
+        isLive && "border-comic-green bg-comic-green/10",
+        isPostp && "border-comic-red/50 opacity-60",
+      )}
+      data-live={isLive || undefined}
+      data-fixture-id={fixture.id}
+    >
+      <CardContent className="p-[var(--comic-panel-padding)]">
+        {/* 대회 배지 (컵 경기만) */}
+        {fixture.competitionName && (
+          <div className="mb-2">
+            <CompetitionBadge
+              competitionName={fixture.competitionName}
+              leagueId={fixture.leagueId}
+            />
+          </div>
         )}
-        data-live={isLive || undefined}
-        data-fixture-id={fixture.id}
-      >
-        <CardContent className="p-[var(--comic-panel-padding)]">
-          {/* 메인 행: 홈팀 — 스코어/상태 — 어웨이팀 */}
-          <div className="flex items-center justify-between gap-4">
-            {/* 홈팀 */}
-            <div className="flex flex-1 items-center gap-3">
-              <Image
-                src={homeTeam.logoUrl}
-                alt={homeTeam.name}
-                width={40}
-                height={40}
-                className="size-10 object-contain"
-              />
-              <div>
-                <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
-                  {homeTeam.shortName}
-                </p>
-                {homeStanding && (
-                  <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
-                    #{homeStanding.position}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* 스코어 / 배지 */}
-            <div className="flex flex-col items-center gap-1.5">
-              {fixture.homeScore !== null && fixture.awayScore !== null ? (
-                <div className="flex items-center gap-1.5">
-                  {isLive && <LivePulse />}
-                  <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-2xl)] text-comic-black tabular-nums">
-                    <ScoreFlash score={fixture.homeScore}>
-                      {fixture.homeScore}
-                    </ScoreFlash>
-                    {" – "}
-                    <ScoreFlash score={fixture.awayScore}>
-                      {fixture.awayScore}
-                    </ScoreFlash>
-                  </p>
-                </div>
-              ) : (
-                <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-lg)] text-comic-black/40">
-                  vs
+        {/* 메인 행: 홈팀 — 스코어/상태 — 어웨이팀 */}
+        <div className="flex items-center justify-between gap-4">
+          {/* 홈팀 */}
+          <div className="flex flex-1 items-center gap-3">
+            <Image
+              src={homeTeam.logoUrl}
+              alt={homeTeam.name}
+              width={40}
+              height={40}
+              className="size-10 object-contain"
+            />
+            <div>
+              <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
+                {homeTeam.shortName}
+              </p>
+              {homeStanding && (
+                <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+                  #{homeStanding.position}
                 </p>
               )}
-              <FixtureStatusBadge
-                status={fixture.status}
-                minute={fixture.minute}
-                kickoffTime={kickoffTime}
-              />
-            </div>
-
-            {/* 어웨이팀 */}
-            <div className="flex flex-1 flex-row-reverse items-center gap-3">
-              <Image
-                src={awayTeam.logoUrl}
-                alt={awayTeam.name}
-                width={40}
-                height={40}
-                className="size-10 object-contain"
-              />
-              <div className="text-right">
-                <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
-                  {awayTeam.shortName}
-                </p>
-                {awayStanding && (
-                  <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
-                    #{awayStanding.position}
-                  </p>
-                )}
-              </div>
             </div>
           </div>
 
-          {/* FT 전용: xG + 점유율 미리보기 */}
-          {isFt && fixture.liveStats && (
-            <div className="mt-3 border-comic-black/20 border-t-[var(--comic-border-thin)] pt-3">
-              <div className="grid grid-cols-3 gap-2 text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
-                <span>{fixture.liveStats.home.xg?.toFixed(2) ?? "N/A"}</span>
-                <span className="font-[family-name:var(--font-bangers)] text-comic-black">
-                  xG
-                </span>
-                <span>{fixture.liveStats.away.xg?.toFixed(2) ?? "N/A"}</span>
-
-                <span>{fixture.liveStats.home.possession}%</span>
-                <span className="font-[family-name:var(--font-bangers)] text-comic-black">
-                  Possession
-                </span>
-                <span>{fixture.liveStats.away.possession}%</span>
+          {/* 스코어 / 배지 */}
+          <div className="flex flex-col items-center gap-1.5">
+            {fixture.homeScore !== null && fixture.awayScore !== null ? (
+              <div className="flex items-center gap-1.5">
+                {isLive && <LivePulse />}
+                <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-2xl)] text-comic-black tabular-nums">
+                  <ScoreFlash score={fixture.homeScore}>
+                    {fixture.homeScore}
+                  </ScoreFlash>
+                  {" – "}
+                  <ScoreFlash score={fixture.awayScore}>
+                    {fixture.awayScore}
+                  </ScoreFlash>
+                </p>
               </div>
+            ) : (
+              <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-lg)] text-comic-black/40">
+                vs
+              </p>
+            )}
+            <FixtureStatusBadge
+              status={fixture.status}
+              minute={fixture.minute}
+              kickoffTime={kickoffTime}
+            />
+          </div>
+
+          {/* 어웨이팀 */}
+          <div className="flex flex-1 flex-row-reverse items-center gap-3">
+            <Image
+              src={awayTeam.logoUrl}
+              alt={awayTeam.name}
+              width={40}
+              height={40}
+              className="size-10 object-contain"
+            />
+            <div className="text-right">
+              <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
+                {awayTeam.shortName}
+              </p>
+              {awayStanding && (
+                <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+                  #{awayStanding.position}
+                </p>
+              )}
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+
+        {/* FT 전용: xG + 점유율 미리보기 */}
+        {isFt && fixture.liveStats && (
+          <div className="mt-3 border-comic-black/20 border-t-[var(--comic-border-thin)] pt-3">
+            <div className="grid grid-cols-3 gap-2 text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+              <span>{fixture.liveStats.home.xg?.toFixed(2) ?? "N/A"}</span>
+              <span className="font-[family-name:var(--font-bangers)] text-comic-black">
+                xG
+              </span>
+              <span>{fixture.liveStats.away.xg?.toFixed(2) ?? "N/A"}</span>
+
+              <span>{fixture.liveStats.home.possession}%</span>
+              <span className="font-[family-name:var(--font-bangers)] text-comic-black">
+                Possession
+              </span>
+              <span>{fixture.liveStats.away.possession}%</span>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  // POSTP 경기는 클릭 비활성화
+  if (isPostp) {
+    return <div className="cursor-not-allowed">{cardContent}</div>;
+  }
+
+  return (
+    <Link href={`/matchday/${fixture.id}`} className="block">
+      {cardContent}
     </Link>
   );
 }

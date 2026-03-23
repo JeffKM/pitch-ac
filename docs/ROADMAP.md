@@ -182,6 +182,38 @@ i18n 도입 전까지 모든 UI 텍스트를 영어로 통일. 선수 카드 스
 
 ---
 
+## Phase 7E: 컵 대회 지원 + 연기 경기(POSTP) 상태 ✅
+
+PL 경기만 표시하던 매치데이를 확장하여 맨시티의 모든 대회(FA Cup, Carabao Cup, UCL 등)를 GW 뷰에 통합 표시. 연기 경기(POSTP) 상태를 정확히 반영.
+
+- **Task 7E1: DB 마이그레이션** ✅
+  - `supabase/migrations/0004_cup_and_postp.sql`
+  - `fixtures` 테이블: `status` CHECK에 `POSTP` 추가, `league_id`(INT NOT NULL DEFAULT 8), `competition_name`(TEXT), `gameweek` nullable 전환
+  - `idx_fixtures_league_id` 인덱스 추가
+
+- **Task 7E2: POSTP 상태 + 컵 대회 필드 타입/매퍼** ✅
+  - `types/fixture.ts`: `FixtureStatus`에 `"POSTP"`, `Fixture`에 `leagueId`, `competitionName`, `gameweek: number | null`
+  - `lib/api/sportmonks/constants.ts`: `postp: "POSTP"` 매핑, `CUP_LEAGUE_IDS`, `LEAGUE_NAME_MAP`
+  - SportMonks 매퍼, Repository 매퍼, DB 매퍼 3곳 모두 새 필드 반영
+  - `fixture-repository.ts`: `getCurrentGameweek`에서 POSTP/null gameweek 제외
+  - `app/api/matchday/fixtures/route.ts`: `hasKickedOff`에서 POSTP 제외
+
+- **Task 7E3: POSTP 배지 + 대회 배지 UI** ✅
+  - `fixture-status-badge.tsx`: 빨간 `POSTPONED` 배지
+  - `fixture-card.tsx`: POSTP 시 반투명 + 빨간 보더 + 클릭 비활성화
+  - `competition-badge.tsx` 신규: 대회별 색상 배지 (UCL=스카이블루, FA=빨강, EFL=초록, Community Shield=앰버)
+
+- **Task 7E4: 컵 대회 API + 동기화** ✅
+  - `lib/api/sportmonks/fixtures.ts`: `getLiveMCityFixtures()`, `getCupFixturesByTeam()` 추가
+  - `lib/services/sync/gameweek-assigner.ts` 신규: PL GW 날짜 범위 빌드 + 컵 경기 GW 할당 알고리즘 (30일 초과 → null)
+  - `lib/services/sync/sync-fixtures.ts`: `syncCupFixtures()` 추가 — 컵 경기 조회 → GW 할당 → DB upsert
+  - `live-fixture-service.ts`: PL 전용 → 맨시티 전 대회 라이브로 확장
+
+- **Task 7E5: 디버그 엔드포인트** ✅
+  - `app/api/debug/sportmonks/cup-fixtures/route.ts`: Starter 플랜 컵 대회 데이터 접근 테스트용
+
+---
+
 ## Phase 8: 카툰 매치데이 (핵심) — 예정
 
 - **Task 801: 카툰 포메이션 피치 뷰**
@@ -262,8 +294,10 @@ i18n 도입 전까지 모든 UI 텍스트를 영어로 통일. 선수 카드 스
 | F114    | 디자인 시스템 문서화   | Task 7C1~7C3  |
 | F115    | UI 영어 전환           | Task 7D2      |
 | F116    | 카드 간소화            | Task 7D1      |
+| F117    | 컵 대회 통합           | Task 7E1~7E5  |
+| F118    | 연기 경기(POSTP) 표시  | Task 7E2~7E3  |
 
 ---
 
 **최종 업데이트**: 2026-03-23
-**진행 상황**: Phase 1~5A 레거시 완료 ✅ | Phase 6 완료 ✅ | Phase 7+7B+7C+7D 완료 ✅ | Phase 8~10 예정
+**진행 상황**: Phase 1~5A 레거시 완료 ✅ | Phase 6 완료 ✅ | Phase 7+7B+7C+7D+7E 완료 ✅ | Phase 8~10 예정

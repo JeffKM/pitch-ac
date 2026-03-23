@@ -1,6 +1,6 @@
 // SportMonks 경기(Fixture) API 서비스
 import { sportMonksFetch } from "./client";
-import { CURRENT_SEASON_ID, PL_LEAGUE_ID } from "./constants";
+import { CURRENT_SEASON_ID, MCITY_TEAM_ID, PL_LEAGUE_ID } from "./constants";
 import type {
   SmApiResponse,
   SmFixture,
@@ -76,6 +76,55 @@ export async function getLivePLFixtures(): Promise<SmFixture[]> {
     },
   );
   return response.data.filter((f) => f.league_id === PL_LEAGUE_ID);
+}
+
+/** 맨시티 참가 라이브 경기 (전 대회) */
+export async function getLiveMCityFixtures(): Promise<SmFixture[]> {
+  const response = await sportMonksFetch<SmPaginatedResponse<SmFixture>>(
+    `/football/livescores/inplay`,
+    {
+      includes: [
+        "participants",
+        "scores",
+        "events.player",
+        "statistics",
+        "state",
+      ],
+      revalidate: false,
+    },
+  );
+  return response.data.filter((f) =>
+    f.participants?.some((p) => p.id === MCITY_TEAM_ID),
+  );
+}
+
+/** 날짜 범위 내 팀의 비-PL 경기 조회 (컵 대회) */
+export async function getCupFixturesByTeam(
+  teamId: number,
+  startDate: string,
+  endDate: string,
+): Promise<SmFixture[]> {
+  const response = await sportMonksFetch<SmPaginatedResponse<SmFixture>>(
+    `/football/fixtures/between/${startDate}/${endDate}`,
+    {
+      filters: {
+        fixtureTeamIds: teamId,
+      },
+      includes: [
+        "participants",
+        "scores",
+        "events",
+        "state",
+        "round",
+        "league",
+      ],
+      perPage: 50,
+      revalidate: 3600, // 1시간 캐시
+      tags: [`cup-fixtures-${teamId}`],
+    },
+  );
+  // PL 경기는 제외 (PL은 별도 동기화)
+  return response.data.filter((f) => f.league_id !== PL_LEAGUE_ID);
 }
 
 /** H2H 경기 이력 조회 (최근 5경기) */

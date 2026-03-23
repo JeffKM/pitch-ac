@@ -41,7 +41,10 @@ export function MatchHeader({
         {/* GW + 날짜 */}
         <div className="mb-4 text-center">
           <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/60">
-            GW{fixture.gameweek} · {kickoffDate}
+            {fixture.gameweek
+              ? `GW${fixture.gameweek}`
+              : (fixture.competitionName ?? "Cup")}{" "}
+            · {kickoffDate}
           </p>
         </div>
 

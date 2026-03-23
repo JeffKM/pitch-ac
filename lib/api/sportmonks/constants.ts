@@ -13,7 +13,7 @@ export const CURRENT_SEASON_ID = 25583;
 export const CURRENT_SEASON_LABEL = "2025/2026";
 
 /** 맨체스터 시티 팀 ID (SportMonks v3) — DB teams 테이블 PK와 동일 */
-export const MCITY_TEAM_ID = 14;
+export const MCITY_TEAM_ID = 9;
 
 /** 시간당 요청 제한 */
 export const RATE_LIMIT_PER_HOUR = 2000;
@@ -105,29 +105,48 @@ export const POSITION_MAP: Record<number, string> = {
 };
 
 /** SportMonks state developer_name → 앱 FixtureStatus */
-export const FIXTURE_STATE_MAP: Record<string, "NS" | "LIVE" | "FT"> = {
-  // 라이브 상태
-  inplay: "LIVE",
-  "1st-half": "LIVE",
-  "2nd-half": "LIVE",
-  ht: "LIVE",
-  et: "LIVE",
-  "et-half": "LIVE",
-  "1st-et-half": "LIVE",
-  "2nd-et-half": "LIVE",
-  pen: "LIVE",
-  break: "LIVE",
-  // 종료 상태
-  ft: "FT",
-  aet: "FT",
-  "pen-ft": "FT",
-  awarded: "FT",
-  // 예정 상태
-  ns: "NS",
-  tba: "NS",
-  postp: "NS",
-  delayed: "NS",
-  susp: "NS",
-  cancelled: "NS",
-  abandoned: "NS",
+export const FIXTURE_STATE_MAP: Record<string, "NS" | "LIVE" | "FT" | "POSTP"> =
+  {
+    // 라이브 상태
+    inplay: "LIVE",
+    "1st-half": "LIVE",
+    "2nd-half": "LIVE",
+    ht: "LIVE",
+    et: "LIVE",
+    "et-half": "LIVE",
+    "1st-et-half": "LIVE",
+    "2nd-et-half": "LIVE",
+    pen: "LIVE",
+    break: "LIVE",
+    // 종료 상태
+    ft: "FT",
+    aet: "FT",
+    "pen-ft": "FT",
+    awarded: "FT",
+    // 연기 상태
+    postp: "POSTP",
+    // 예정 상태
+    ns: "NS",
+    tba: "NS",
+    delayed: "NS",
+    susp: "NS",
+    cancelled: "NS",
+    abandoned: "NS",
+  };
+
+/** 주요 컵 대회 league_id (SportMonks v3) */
+export const CUP_LEAGUE_IDS = {
+  FA_CUP: 24,
+  EFL_CUP: 27, // Carabao Cup
+  UCL: 2, // UEFA Champions League
+  COMMUNITY_SHIELD: 14,
+} as const;
+
+/** league_id → 대회 표시명 매핑 */
+export const LEAGUE_NAME_MAP: Record<number, string> = {
+  [PL_LEAGUE_ID]: "Premier League",
+  [CUP_LEAGUE_IDS.FA_CUP]: "FA Cup",
+  [CUP_LEAGUE_IDS.EFL_CUP]: "EFL Cup",
+  [CUP_LEAGUE_IDS.UCL]: "Champions League",
+  [CUP_LEAGUE_IDS.COMMUNITY_SHIELD]: "Community Shield",
 };

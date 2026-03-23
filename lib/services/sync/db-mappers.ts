@@ -90,6 +90,8 @@ export function fixtureToDbRow(fixture: Fixture) {
     events: fixture.events,
     live_stats: fixture.liveStats,
     lineups: fixture.lineups,
+    league_id: fixture.leagueId,
+    competition_name: fixture.competitionName,
   };
 }
 

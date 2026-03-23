@@ -22,17 +22,19 @@ import type { RadarData } from "@/types/radar";
 /** fixtures 테이블 행 타입 (Supabase 반환값) */
 export interface FixtureRow {
   id: number;
-  gameweek: number;
+  gameweek: number | null;
   date: string;
   home_team_id: number | null;
   away_team_id: number | null;
-  status: "NS" | "LIVE" | "FT";
+  status: "NS" | "LIVE" | "FT" | "POSTP";
   home_score: number | null;
   away_score: number | null;
   minute: number | null;
   events: FixtureEvent[] | null;
   live_stats: FixtureLiveStats | null;
   lineups: { home: Lineup; away: Lineup } | null;
+  league_id: number;
+  competition_name: string | null;
 }
 
 /** teams 테이블 행 타입 */
@@ -75,6 +77,8 @@ export function fixtureRowToFixture(row: FixtureRow): Fixture {
     events: row.events ?? [],
     liveStats: row.live_stats,
     lineups: row.lineups,
+    leagueId: row.league_id ?? 8,
+    competitionName: row.competition_name ?? null,
   };
 }
 
