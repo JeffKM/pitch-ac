@@ -21,7 +21,7 @@ export function AppHeader({ authSlot }: AppHeaderProps) {
       <div className="mx-auto flex h-14 max-w-5xl items-center px-[var(--comic-panel-padding)]">
         {/* 로고 */}
         <Link
-          href="/matchday"
+          href="/"
           className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-2xl)] tracking-[var(--comic-tracking-wide)] text-comic-black hover:opacity-80"
         >
           pitch-ac
