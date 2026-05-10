@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
+import { CURRENT_SEASON_LABEL } from "@/lib/api/sportmonks/constants";
 import { getAllStandings, getAllTeams } from "@/lib/repositories";
 
 import { RankingContent } from "./_components/ranking-content";
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 
 async function RankingData() {
   const [standings, teams] = await Promise.all([
-    getAllStandings("2024-25"),
+    getAllStandings(CURRENT_SEASON_LABEL),
     getAllTeams(),
   ]);
 
