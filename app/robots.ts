@@ -11,8 +11,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/matchday", "/players", "/compare"],
-        disallow: ["/api/", "/auth/", "/more"],
+        allow: ["/matchday", "/ranking", "/scouting", "/news"],
+        disallow: ["/api/", "/auth/"],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

@@ -6,9 +6,9 @@ import { usePathname } from "next/navigation";
 /* ── 네비게이션 항목 (피그마 SpeechBubbleNav) ── */
 const navItems = [
   { href: "/", label: "HOME", sub: null },
-  { href: "/squad", label: "PLAYERS", sub: "PROFILES" },
   { href: "/matchday", label: "MATCHDAY", sub: "LIVE!" },
-  { href: "/gallery", label: "SHARE", sub: "VIRAL!" },
+  { href: "/ranking", label: "RANKING", sub: "TABLE" },
+  { href: "/scouting", label: "SCOUTING", sub: "LAB" },
 ] as const;
 
 /* ── 다이아몬드 장식 ── */

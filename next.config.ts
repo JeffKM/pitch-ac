@@ -33,6 +33,30 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/squad",
+        destination: "/scouting",
+        permanent: true,
+      },
+      {
+        source: "/squad/:playerId",
+        destination: "/scouting?playerId=:playerId",
+        permanent: true,
+      },
+      {
+        source: "/compare",
+        destination: "/scouting/compare",
+        permanent: true,
+      },
+      {
+        source: "/gallery",
+        destination: "/",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

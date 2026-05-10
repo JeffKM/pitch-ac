@@ -15,7 +15,9 @@ export function MobileTabBar() {
       <div className="flex h-14 items-center justify-around">
         {mobileNavItems.map((item) => {
           const isActive =
-            pathname === item.href || pathname.startsWith(`${item.href}/`);
+            item.href === "/"
+              ? pathname === "/"
+              : pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = item.icon;
 
           return (

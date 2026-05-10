@@ -31,7 +31,10 @@ export function AppHeader({ authSlot }: AppHeaderProps) {
         <nav className="ml-6 flex items-center gap-1">
           {mainNavItems.map((item) => {
             const isActive =
-              pathname === item.href || pathname.startsWith(`${item.href}/`);
+              item.href === "/"
+                ? pathname === "/"
+                : pathname === item.href ||
+                  pathname.startsWith(`${item.href}/`);
             const Icon = item.icon;
 
             return (

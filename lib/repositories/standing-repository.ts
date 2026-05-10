@@ -8,6 +8,23 @@ import type { TeamStanding } from "@/types";
 
 import { type StandingRow, standingRowToStanding } from "./mappers";
 
+/** 시즌 전체 순위 조회 (position 오름차순) */
+export const getAllStandings = cache(
+  async (season: string): Promise<TeamStanding[]> => {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from("standings")
+      .select("*")
+      .eq("season", season)
+      .order("position", { ascending: true });
+
+    if (error) throw new Error(`standings 전체 조회 실패: ${error.message}`);
+
+    return (data as StandingRow[]).map(standingRowToStanding);
+  },
+);
+
 /** 여러 팀 ID의 순위를 한 번에 조회 → Map<teamId, TeamStanding> */
 export const getStandingsByTeamIds = cache(
   async (
