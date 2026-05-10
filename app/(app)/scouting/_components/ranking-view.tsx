@@ -86,7 +86,7 @@ export function RankingView({
     startTransition(async () => {
       try {
         const response = await fetch(
-          `/api/scoutlab/ranking?category=${category}&metric=${metric}`,
+          `/api/scoutlab/ranking?category=${encodeURIComponent(category)}&metric=${encodeURIComponent(metric)}`,
         );
         if (response.ok) {
           const data = await response.json();

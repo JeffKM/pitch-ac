@@ -315,6 +315,30 @@ export async function getRankingData(
   return results.slice(0, limit);
 }
 
+/** 메트릭 키 목록 추출용 — 아무 선수 1명의 메트릭 조회 */
+export const getSampleMetrics = cache(
+  async (
+    season: string,
+    mode: ScoutlabMode = "per90",
+    adjustment: ScoutlabAdjustment = "padj",
+  ): Promise<ScoutlabMetrics | null> => {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from("scoutlab_metrics")
+      .select("*")
+      .eq("season", season)
+      .eq("mode", mode)
+      .eq("adjustment", adjustment)
+      .limit(1);
+
+    if (error) throw new Error(`sample metrics 조회 실패: ${error.message}`);
+    if (!data || data.length === 0) return null;
+
+    return scoutlabMetricsRowToMetrics(data[0] as ScoutlabMetricsRow);
+  },
+);
+
 /** 필터 옵션 조회 (드롭다운용) */
 export const getScoutlabFilterOptions = cache(
   async (season?: string): Promise<ScoutlabFilterOptions> => {

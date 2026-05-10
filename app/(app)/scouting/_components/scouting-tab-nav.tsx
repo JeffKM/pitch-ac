@@ -13,9 +13,11 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import { cn } from "@/lib/utils";
+
+import { buildContextQuery } from "../_lib/build-context-query";
 
 const scoutingTabs = [
   { href: "/scouting", label: "Player Card", icon: Search },
@@ -32,6 +34,8 @@ const scoutingTabs = [
 
 export function ScoutingTabNav() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const contextQuery = buildContextQuery(searchParams);
 
   return (
     <nav className="mb-6 overflow-x-auto border-b border-comic-black/10">
@@ -45,7 +49,7 @@ export function ScoutingTabNav() {
           return (
             <Link
               key={href}
-              href={href}
+              href={`${href}${contextQuery}`}
               className={cn(
                 "flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors",
                 isActive

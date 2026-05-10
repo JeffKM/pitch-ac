@@ -1,7 +1,7 @@
 // ScoutLab Ranking — 메트릭별 선수 랭킹 테이블
 import {
   getRankingData,
-  getScoutlabMetrics,
+  getSampleMetrics,
 } from "@/lib/repositories/scoutlab-repository";
 import type { ScoutlabCategoryMetrics } from "@/types";
 
@@ -18,8 +18,7 @@ export default async function RankingPage({ searchParams }: PageProps) {
   const initialCategory = "final_product" as const;
 
   // sampleMetrics에서 실제 첫 번째 메트릭 키를 추출
-  const sampleMetrics = await getScoutlabMetrics(
-    1,
+  const sampleMetrics = await getSampleMetrics(
     params.season,
     params.mode,
     params.adjustment,
