@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Calendar, Image, Swords, Users } from "lucide-react";
+import { Calendar, Image, Radar, Swords, Users } from "lucide-react";
 
 export type NavItem = {
   href: string;
@@ -13,6 +13,7 @@ export const mainNavItems: NavItem[] = [
   { href: "/squad", label: "Squad", icon: Users },
   { href: "/compare", label: "Compare", icon: Swords },
   { href: "/gallery", label: "Gallery", icon: Image },
+  { href: "/scouting", label: "Scouting", icon: Radar },
 ];
 
 // 모바일 탭 바에 표시할 내비게이션 항목 (4개)

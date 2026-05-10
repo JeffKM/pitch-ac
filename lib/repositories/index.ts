@@ -23,5 +23,24 @@ export {
   getPlayerSeasonStats,
   getPlayerSeasonStatsByIds,
 } from "./player-repository";
+export type {
+  ScoutlabActionMapRow,
+  ScoutlabMetricsRow,
+  ScoutlabPlayerRow,
+  ScoutlabRadarRow,
+  ScoutlabSimilarityRow,
+} from "./scoutlab-mappers";
+export {
+  getRankingData,
+  getScatterData,
+  getScoutlabActionMaps,
+  getScoutlabFilterOptions,
+  getScoutlabMetrics,
+  getScoutlabPlayerById,
+  getScoutlabProgression,
+  getScoutlabRadar,
+  getScoutlabSimilarity,
+  searchScoutlabPlayers,
+} from "./scoutlab-repository";
 export { getStandingsByTeamIds } from "./standing-repository";
 export { getAllTeams, getTeamsByIds } from "./team-repository";
