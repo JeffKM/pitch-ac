@@ -32,7 +32,9 @@ export interface ScoutlabParamsState {
   adjustment: ScoutlabAdjustment;
 }
 
-type ParamUpdates = Partial<ScoutlabParamsState>;
+type ParamUpdates = Partial<ScoutlabParamsState> & {
+  compareId?: number | null;
+};
 
 /** searchParams 값을 whitelist 검증 후 반환 */
 function validateEnum<T extends string>(
