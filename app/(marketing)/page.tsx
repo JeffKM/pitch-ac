@@ -4,7 +4,7 @@ import { ComicHome } from "./_components/comic-home";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-comic-white">
+    <div className="min-h-screen paper-texture">
       <ComicHeader />
       <ComicHome />
       <ComicFooter />

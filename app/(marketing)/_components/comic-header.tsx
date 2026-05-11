@@ -26,7 +26,7 @@ export function ComicHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="border-comic-black border-b-[var(--comic-border-width)] bg-comic-white pb-4">
+    <header className="border-comic-black border-b-[var(--comic-border-width)] bg-transparent pb-4">
       {/* 로고 섹션 */}
       <div className="flex items-center justify-center gap-4 px-4 pt-6">
         <Diamonds />
@@ -49,7 +49,7 @@ export function ComicHeader() {
                 letterSpacing: "var(--comic-tracking-wide)",
               }}
             >
-              MAN CITY CARTOON WORLD
+              THE ULTIMATE 5-LEAGUE DATA HUB
             </span>
           </div>
         </div>

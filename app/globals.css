@@ -11,6 +11,50 @@
   }
 }
 
+/* 종이 질감 배경 — 카툰 뉴스레터/스포츠 잡지 느낌 */
+@utility paper-texture {
+  background-color: oklch(0.97 0.005 90);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      oklch(0.92 0.01 90 / 0.3) 3px,
+      transparent 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 5px,
+      oklch(0.93 0.01 90 / 0.15) 5px,
+      transparent 6px
+    );
+}
+
+/* 다크모드 종이 질감 */
+.dark {
+  & .paper-texture {
+    background-color: oklch(0.2 0.02 260);
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E"),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        oklch(0.3 0.02 260 / 0.3) 3px,
+        transparent 4px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 5px,
+        oklch(0.28 0.02 260 / 0.15) 5px,
+        transparent 6px
+      );
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
