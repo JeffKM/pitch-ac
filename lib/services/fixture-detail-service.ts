@@ -1,7 +1,7 @@
 // Fixture 상세 데이터 조립 서비스 — page.tsx와 API route 공통 로직
 import "server-only";
 
-import { CURRENT_SEASON_LABEL } from "@/lib/api/sportmonks/constants";
+import { CURRENT_SEASON_LABEL } from "@/lib/constants/football";
 import {
   getInjuriesByTeamId,
   getStandingsByTeamIds,

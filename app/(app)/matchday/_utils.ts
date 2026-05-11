@@ -1,6 +1,6 @@
 // 매치데이 공용 유틸 함수 — Server/Client Component 양쪽에서 사용
 
-import { PL_LEAGUE_ID } from "@/lib/api/sportmonks/constants";
+import { PL_LEAGUE_ID } from "@/lib/constants/football";
 import { formatDateLabel, formatShortDate, toDateKey } from "@/lib/date-utils";
 import type { Fixture } from "@/types";
 

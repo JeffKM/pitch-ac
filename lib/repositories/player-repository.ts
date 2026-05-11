@@ -3,7 +3,7 @@ import "server-only";
 
 import { cache } from "react";
 
-import { MCITY_TEAM_ID } from "@/lib/api/sportmonks/constants";
+import { MCITY_TEAM_ID } from "@/lib/constants/football";
 import { createClient } from "@/lib/supabase/server";
 import type { Player, PlayerMatchStats, PlayerSeasonStats } from "@/types";
 

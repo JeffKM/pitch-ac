@@ -47,12 +47,21 @@ npm run validate     # type-check + lint + format:check 통합 검증
 - 서버: `@/lib/supabase/server` (매 요청마다 새 인스턴스 생성 필수)
 - 세션 갱신: `lib/supabase/proxy.ts`의 `updateSession()`
 
+## 외부 API
+
+- **API-Football** (v3.football.api-sports.io) — 무료 플랜 (100 요청/일)
+- 인증: `x-apisports-key` 헤더
+- PL League ID: 39, 시즌 형식: 연도(2025), 맨시티 Team ID: 50
+- 클라이언트: `lib/api/api-football/client.ts`
+- Rate limiter: `lib/api/api-football/rate-limiter.ts` (일일 90회 이후 경고)
+
 ## 환경 변수
 
 `.env.local` 필수:
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `API_FOOTBALL_KEY`
 
 ## Summary Instructions
 

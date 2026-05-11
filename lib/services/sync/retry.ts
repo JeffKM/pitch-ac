@@ -1,11 +1,11 @@
 import "server-only";
 
-import { RateLimitError } from "@/lib/api/sportmonks/client";
+import { DailyLimitError } from "@/lib/api/api-football/client";
 
 /**
- * Rate limit 대응 재시도 래퍼
- * RateLimitError 발생 시 retryAfterSeconds만큼 대기 후 재시도
- * 그 외 에러는 즉시 throw
+ * 일일 한도 대응 재시도 래퍼
+ * DailyLimitError 발생 시 즉시 throw (일일 한도 초과는 재시도 무의미)
+ * 그 외 에러는 1회 재시도
  */
 export async function withRetry<T>(
   fn: () => Promise<T>,
@@ -18,9 +18,13 @@ export async function withRetry<T>(
       return await fn();
     } catch (error) {
       lastError = error;
-      if (error instanceof RateLimitError && attempt < maxRetries) {
-        const waitMs = Math.min(error.retryAfterSeconds * 1000, 30_000);
-        await new Promise((resolve) => setTimeout(resolve, waitMs));
+      // 일일 한도 초과는 재시도 무의미
+      if (error instanceof DailyLimitError) {
+        throw error;
+      }
+      if (attempt < maxRetries) {
+        // 짧은 대기 후 재시도
+        await new Promise((resolve) => setTimeout(resolve, 2000));
         continue;
       }
       throw error;

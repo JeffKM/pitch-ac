@@ -1,20 +1,20 @@
 import "server-only";
 
-import { getPlayerById } from "@/lib/api/sportmonks";
-import { mapSmPlayerToSeasonStats } from "@/lib/api/sportmonks/mappers";
+import {
+  getLeaguePlayers,
+  mapAfPlayerToSeasonStats,
+} from "@/lib/api/api-football";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 import { seasonStatsToDbRow } from "./db-mappers";
 import { extractErrorMessage, type SyncResult, writeSyncLog } from "./log";
 
 const SEASON_LABEL = "2025/2026";
-/** 1회 API 호출 배치 크기 (Vercel Cron 60초 제한 고려) */
-const BATCH_SIZE = 50;
 
 /**
  * 선수 시즌 통계 동기화
- * Starter 플랜에서 statistics bulk 엔드포인트 미지원 →
- * players 테이블의 전체 ID를 BATCH_SIZE씩 나눠 처리
+ * API-Football: getLeaguePlayers() 페이지네이션 일괄 조회 (~25 요청/500명)
+ * 일일 한도 고려: 최대 25페이지까지만 처리
  */
 export async function syncSeasonStats(): Promise<SyncResult> {
   const supabase = createAdminClient();
@@ -22,7 +22,7 @@ export async function syncSeasonStats(): Promise<SyncResult> {
   let failedCount = 0;
 
   try {
-    // 1. players 테이블에서 전체 선수 ID 조회 (limit 제거)
+    // players 테이블에서 전체 선수 ID 조회 (DB에 있는 선수만 스탯 업데이트)
     const { data: existingPlayers, error: fetchError } = await supabase
       .from("players")
       .select("id")
@@ -30,9 +30,11 @@ export async function syncSeasonStats(): Promise<SyncResult> {
 
     if (fetchError) throw fetchError;
 
-    const allPlayerIds = (existingPlayers ?? []).map((p) => p.id as number);
+    const existingIds = new Set(
+      (existingPlayers ?? []).map((p) => p.id as number),
+    );
 
-    if (allPlayerIds.length === 0) {
+    if (existingIds.size === 0) {
       const result: SyncResult = {
         entity: "player_season_stats",
         status: "success",
@@ -44,28 +46,41 @@ export async function syncSeasonStats(): Promise<SyncResult> {
       return result;
     }
 
-    // 2. BATCH_SIZE씩 나눠서 순차 처리
-    for (let offset = 0; offset < allPlayerIds.length; offset += BATCH_SIZE) {
-      const batch = allPlayerIds.slice(offset, offset + BATCH_SIZE);
+    // 페이지네이션으로 전체 PL 선수 조회
+    let page = 1;
+    const maxPages = 25; // 일일 한도 고려
 
-      for (const playerId of batch) {
-        try {
-          const raw = await getPlayerById(playerId);
-          const stats = mapSmPlayerToSeasonStats(raw, SEASON_LABEL);
-          if (!stats) continue;
+    while (page <= maxPages) {
+      try {
+        const res = await getLeaguePlayers(page);
 
-          const { error } = await supabase
-            .from("player_season_stats")
-            .upsert(seasonStatsToDbRow(stats), {
-              onConflict: "player_id,season",
-            });
+        for (const raw of res.response) {
+          // DB에 있는 선수만 스탯 업데이트
+          if (!existingIds.has(raw.player.id)) continue;
 
-          if (!error) totalSynced++;
-        } catch {
-          failedCount++;
-          // 개별 선수 실패는 건너뜀 (로그에 실패 수 기록)
-          continue;
+          try {
+            const stats = mapAfPlayerToSeasonStats(raw, SEASON_LABEL);
+            if (!stats) continue;
+
+            const { error } = await supabase
+              .from("player_season_stats")
+              .upsert(seasonStatsToDbRow(stats), {
+                onConflict: "player_id,season",
+              });
+
+            if (!error) totalSynced++;
+          } catch {
+            failedCount++;
+            continue;
+          }
         }
+
+        // 마지막 페이지 도달
+        if (page >= res.paging.total) break;
+        page++;
+      } catch {
+        // 한도 초과 등으로 중단 시 지금까지 결과 반환
+        break;
       }
     }
 

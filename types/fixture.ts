@@ -112,7 +112,7 @@ export interface Fixture {
   liveStats: FixtureLiveStats | null;
   /** 라인업 (NS일 때 null) */
   lineups: { home: Lineup; away: Lineup } | null;
-  /** SportMonks league_id (PL=8) */
+  /** API-Football league_id (PL=39) */
   leagueId: number;
   /** 대회 표시명 (PL이면 null, 컵 경기만 표시) */
   competitionName: string | null;

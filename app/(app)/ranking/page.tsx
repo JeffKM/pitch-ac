@@ -3,7 +3,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import { CURRENT_SEASON_LABEL } from "@/lib/api/sportmonks/constants";
+import { CURRENT_SEASON_LABEL } from "@/lib/constants/football";
 import { getAllStandings, getAllTeams } from "@/lib/repositories";
 
 import { RankingContent } from "./_components/ranking-content";

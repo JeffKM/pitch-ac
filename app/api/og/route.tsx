@@ -4,7 +4,7 @@
 import { ImageResponse } from "next/og";
 import { type NextRequest, NextResponse } from "next/server";
 
-import { CURRENT_SEASON_LABEL } from "@/lib/api/sportmonks/constants";
+import { CURRENT_SEASON_LABEL } from "@/lib/constants/football";
 import {
   getPlayerById,
   getPlayerSeasonStats,

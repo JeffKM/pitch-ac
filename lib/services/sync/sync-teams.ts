@@ -1,10 +1,11 @@
 import "server-only";
 
-import { getLeagueTeams, getStandings } from "@/lib/api/sportmonks";
 import {
-  mapSmStandingToTeamStanding,
-  mapSmTeamToTeam,
-} from "@/lib/api/sportmonks/mappers";
+  getLeagueTeams,
+  getStandings,
+  mapAfStandingToTeamStanding,
+  mapAfTeamToTeam,
+} from "@/lib/api/api-football";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 import { standingToDbRow, teamToDbRow } from "./db-mappers";
@@ -19,7 +20,7 @@ export async function syncTeams(): Promise<SyncResult> {
     const rawTeams = await getLeagueTeams();
 
     const teamRows = rawTeams.map((raw) => {
-      const team = mapSmTeamToTeam(raw, SEASON_LABEL);
+      const team = mapAfTeamToTeam(raw, SEASON_LABEL);
       return teamToDbRow(team);
     });
 
@@ -52,10 +53,14 @@ export async function syncTeams(): Promise<SyncResult> {
 export async function syncStandings(): Promise<SyncResult> {
   const supabase = createAdminClient();
   try {
-    const rawStandings = await getStandings();
+    const standingsRes = await getStandings();
+    if (!standingsRes?.league.standings?.[0]) {
+      throw new Error("순위표 응답이 비어있습니다");
+    }
 
+    const rawStandings = standingsRes.league.standings[0];
     const standingRows = rawStandings.map((raw) => {
-      const standing = mapSmStandingToTeamStanding(raw);
+      const standing = mapAfStandingToTeamStanding(raw);
       return standingToDbRow(standing, SEASON_LABEL);
     });
 

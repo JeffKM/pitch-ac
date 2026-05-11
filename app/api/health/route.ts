@@ -7,11 +7,11 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET() {
   const checks: Record<string, { ok: boolean; message: string }> = {};
 
-  // 1. SportMonks API 키 확인
-  const apiKey = process.env.SPORTMONKS_API_KEY;
-  checks.sportmonks_api_key = {
+  // 1. API-Football API 키 확인
+  const apiKey = process.env.API_FOOTBALL_KEY;
+  checks.api_football_key = {
     ok: Boolean(apiKey && apiKey.length > 10),
-    message: apiKey ? "API 키 설정됨" : "SPORTMONKS_API_KEY 환경변수 없음",
+    message: apiKey ? "API 키 설정됨" : "API_FOOTBALL_KEY 환경변수 없음",
   };
 
   // 2. Supabase DB 연결 확인

@@ -1,7 +1,7 @@
 // 대회명 배지 — 컵 경기에만 표시 (PL 경기는 표시 안 함)
 
 import { Badge } from "@/components/ui/badge";
-import { CUP_LEAGUE_IDS } from "@/lib/api/sportmonks/constants";
+import { CUP_LEAGUE_IDS } from "@/lib/constants/football";
 import { cn } from "@/lib/utils";
 
 interface CompetitionBadgeProps {

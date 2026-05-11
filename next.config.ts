@@ -6,7 +6,7 @@ const cspHeader = `
   default-src 'self';
   script-src 'self' 'unsafe-inline' 'unsafe-eval';
   style-src 'self' 'unsafe-inline';
-  img-src 'self' blob: data: https://cdn.sportmonks.com https://*.supabase.co;
+  img-src 'self' blob: data: https://media.api-sports.io https://*.supabase.co;
   font-src 'self';
   connect-src 'self' https://*.supabase.co wss://*.supabase.co;
   frame-ancestors 'none';
@@ -23,8 +23,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "cdn.sportmonks.com",
-        pathname: "/images/**",
+        hostname: "media.api-sports.io",
+        pathname: "/**",
       },
       {
         protocol: "https",
