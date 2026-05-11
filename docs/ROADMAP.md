@@ -476,6 +476,56 @@ S311 (Glossary) ──── 독립
 
 ---
 
+## Phase N1: 5대 리그 데이터 플랫폼 전환 ✅
+
+PL 맨시티 전용 → 5대 리그 데이터 플랫폼으로 피벗. 네비게이션 구조 전면 개편 + Ranking/News 페이지 신설.
+
+- **Task N101: 네비게이션 구조 전면 개편** ✅
+  - ✅ `nav-config.ts`: Squad/Compare/Gallery 제거 → Home/Ranking/News 추가 (5개 메뉴)
+  - ✅ `app-header.tsx`, `mobile-tab-bar.tsx`: HOME(`/`) 정확한 매칭 isActive 로직
+  - ✅ `comic-header.tsx`: 마케팅 헤더 navItems 교체 (HOME/MATCHDAY/RANKING/SCOUTING)
+
+- **Task N102: Ranking 페이지 신설** ✅
+  - ✅ `app/(app)/ranking/page.tsx`: Suspense 래핑 서버 컴포넌트
+  - ✅ `ranking-content.tsx`: 5대 리그 탭 UI (EPL 활성, 나머지 Coming Soon + Lock 아이콘)
+  - ✅ `standings-table.tsx`: EPL 순위표 (#, Team, P, W, D, L, GF, GA, GD, Pts, Form)
+  - ✅ 팀 로고, 폼 뱃지(W/D/L), UCL/UEL/강등 색상 하이라이트, 반응형 컬럼
+  - ✅ `standing-repository.ts`: `getAllStandings()` 함수 추가
+
+- **Task N103: News 페이지 신설** ✅
+  - ✅ `app/(app)/news/page.tsx`: Coming Soon placeholder (Newspaper 아이콘)
+
+- **Task N104: 기존 페이지 삭제 + SEO 리다이렉트** ✅
+  - ✅ `app/(app)/gallery/`, `app/(app)/more/`, `app/(app)/compare/`, `app/(app)/squad/` 완전 삭제
+  - ✅ `next.config.ts`: 4개 리다이렉트 (/squad→/scouting, /squad/:id→/scouting?playerId=:id, /compare→/scouting/compare, /gallery→/)
+  - ✅ `player-name-link.tsx`: `/squad/:id` → `/scouting?playerId=:id` 경로 변경
+  - ✅ `sitemap.ts`: /ranking, /scouting, /news 추가, 동적 player routes 제거
+  - ✅ `robots.ts`: allow/disallow 갱신
+
+---
+
+## Phase AF: API-Football 마이그레이션 (SportMonks → API-Football) ✅
+
+> **상태**: ✅ 완료 (2026-05-11)
+> SportMonks API 토큰 만료 → 무료 API-Football API(100 요청/일)로 전환
+
+| Task | 기능                           | 상태 | 파일                                                      |
+| ---- | ------------------------------ | ---- | --------------------------------------------------------- |
+| AF01 | 공통 상수 모듈 분리            | ✅   | `lib/constants/football.ts`                               |
+| AF02 | DB 마이그레이션 (ID 체계 전환) | ✅   | `supabase/migrations/0007_api_football_migration.sql`     |
+| AF03 | API-Football HTTP 클라이언트   | ✅   | `lib/api/api-football/client.ts`                          |
+| AF04 | Raw 타입 정의                  | ✅   | `lib/api/api-football/types.ts`                           |
+| AF05 | 매퍼 구현                      | ✅   | `lib/api/api-football/mappers.ts`                         |
+| AF06 | API 서비스 함수                | ✅   | `lib/api/api-football/{fixtures,players,teams,rounds}.ts` |
+| AF07 | 동기화 서비스 업데이트         | ✅   | `lib/services/sync/sync-*.ts`                             |
+| AF08 | 라이브 서비스 업데이트         | ✅   | `lib/services/live/live-fixture-service.ts`               |
+| AF09 | Cron/디버그 라우트 교체        | ✅   | `app/api/debug/api-football/`                             |
+| AF10 | 일일 요청 카운터 + 안전장치    | ✅   | `lib/api/api-football/rate-limiter.ts`                    |
+| AF11 | 환경변수 + 레거시 정리         | ✅   | `lib/api/sportmonks/` 삭제                                |
+| AF12 | 통합 검증                      | ✅   | validate + build 통과                                     |
+
+---
+
 ## Phase 8: 카툰 매치데이 (핵심) — 예정
 
 - **Task 801: 카툰 포메이션 피치 뷰**
@@ -565,8 +615,11 @@ S311 (Glossary) ──── 독립
 | F123    | ScoutLab 분석 뷰         | Task S301~S312 |
 | F124    | ScoutLab 데이터 적재     | Task S401~S403 |
 | F125    | ScoutLab 통합 테스트     | Task S404~S405 |
+| F126    | 네비게이션 구조 개편     | Task N101      |
+| F127    | Ranking 순위표 페이지    | Task N102      |
+| F128    | SEO 리다이렉트           | Task N104      |
 
 ---
 
-**최종 업데이트**: 2026-05-10 (Phase S4 완료 — 데이터 적재 + 통합 테스트 통과)
-**진행 상황**: Phase 1~5A 레거시 완료 ✅ | Phase 6 완료 ✅ | Phase 7+7B+7C+7D+7E+7E6 완료 ✅ | Phase S1+S2+S3+S4 완료 ✅ | Phase 8~10 예정
+**최종 업데이트**: 2026-05-11 (Phase N1 완료 — 네비게이션 개편 + Ranking/News 페이지)
+**진행 상황**: Phase 1~5A 레거시 완료 ✅ | Phase 6 완료 ✅ | Phase 7+7B+7C+7D+7E+7E6 완료 ✅ | Phase S1+S2+S3+S4 완료 ✅ | Phase N1 완료 ✅ | Phase 8~10 예정
