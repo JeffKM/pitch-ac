@@ -22,9 +22,98 @@ export const CUP_LEAGUE_IDS = {
   COMMUNITY_SHIELD: 528,
 } as const;
 
+// ─── 5대 리그 설정 ───────────────────────────────────────────────
+
+/** 리그 슬러그 타입 */
+export type LeagueSlug = "epl" | "laliga" | "seriea" | "bundesliga" | "ligue1";
+
+/** 리그 설정 인터페이스 */
+export interface LeagueConfig {
+  id: number;
+  slug: LeagueSlug;
+  name: string;
+  shortName: string;
+  country: string;
+  maxRounds: number;
+  teamsCount: number;
+}
+
+/** 5대 리그 설정 배열 */
+export const TOP5_LEAGUES: LeagueConfig[] = [
+  {
+    id: 39,
+    slug: "epl",
+    name: "Premier League",
+    shortName: "EPL",
+    country: "England",
+    maxRounds: 38,
+    teamsCount: 20,
+  },
+  {
+    id: 140,
+    slug: "laliga",
+    name: "La Liga",
+    shortName: "La Liga",
+    country: "Spain",
+    maxRounds: 38,
+    teamsCount: 20,
+  },
+  {
+    id: 135,
+    slug: "seriea",
+    name: "Serie A",
+    shortName: "Serie A",
+    country: "Italy",
+    maxRounds: 38,
+    teamsCount: 20,
+  },
+  {
+    id: 78,
+    slug: "bundesliga",
+    name: "Bundesliga",
+    shortName: "Bundesliga",
+    country: "Germany",
+    maxRounds: 34,
+    teamsCount: 18,
+  },
+  {
+    id: 61,
+    slug: "ligue1",
+    name: "Ligue 1",
+    shortName: "Ligue 1",
+    country: "France",
+    maxRounds: 34,
+    teamsCount: 18,
+  },
+];
+
+/** slug → LeagueConfig 매핑 */
+export const LEAGUE_BY_SLUG: Record<LeagueSlug, LeagueConfig> =
+  Object.fromEntries(TOP5_LEAGUES.map((l) => [l.slug, l])) as Record<
+    LeagueSlug,
+    LeagueConfig
+  >;
+
+/** league_id → LeagueConfig 매핑 */
+export const LEAGUE_BY_ID: Record<number, LeagueConfig> = Object.fromEntries(
+  TOP5_LEAGUES.map((l) => [l.id, l]),
+);
+
+/** 5대 리그 ID Set (라이브 필터링용) */
+export const TOP5_LEAGUE_IDS: Set<number> = new Set(
+  TOP5_LEAGUES.map((l) => l.id),
+);
+
+/** 기본 리그 */
+export const DEFAULT_LEAGUE: LeagueSlug = "epl";
+
 /** league_id → 대회 표시명 매핑 */
 export const LEAGUE_NAME_MAP: Record<number, string> = {
   [PL_LEAGUE_ID]: "Premier League",
+  140: "La Liga",
+  135: "Serie A",
+  78: "Bundesliga",
+  61: "Ligue 1",
   [CUP_LEAGUE_IDS.FA_CUP]: "FA Cup",
   [CUP_LEAGUE_IDS.EFL_CUP]: "EFL Cup",
   [CUP_LEAGUE_IDS.UCL]: "Champions League",

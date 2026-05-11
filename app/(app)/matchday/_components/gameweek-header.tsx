@@ -1,25 +1,35 @@
-// 게임위크 네비게이션 헤더 (이전/다음 화살표 포함)
+// 게임위크 네비게이션 헤더 (이전/다음 화살표 포함, 리그별 maxRounds)
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
+import type { LeagueSlug } from "@/lib/constants/football";
+
 const MIN_GW = 1;
-const MAX_GW = 38;
 
 interface GameweekHeaderProps {
   gameweek: number;
   dateRange: string;
+  maxRounds?: number;
+  leagueSlug?: LeagueSlug;
 }
 
-export function GameweekHeader({ gameweek, dateRange }: GameweekHeaderProps) {
+export function GameweekHeader({
+  gameweek,
+  dateRange,
+  maxRounds = 38,
+  leagueSlug = "epl",
+}: GameweekHeaderProps) {
   const hasPrev = gameweek > MIN_GW;
-  const hasNext = gameweek < MAX_GW;
+  const hasNext = gameweek < maxRounds;
+
+  const buildHref = (gw: number) => `/matchday?league=${leagueSlug}&gw=${gw}`;
 
   return (
     <div className="flex items-center justify-between">
       {hasPrev ? (
         <Link
-          href={`/matchday?gw=${gameweek - 1}`}
+          href={buildHref(gameweek - 1)}
           className="flex size-10 items-center justify-center rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white transition-colors hover:bg-comic-cream"
           aria-label="Previous gameweek"
         >
@@ -42,7 +52,7 @@ export function GameweekHeader({ gameweek, dateRange }: GameweekHeaderProps) {
 
       {hasNext ? (
         <Link
-          href={`/matchday?gw=${gameweek + 1}`}
+          href={buildHref(gameweek + 1)}
           className="flex size-10 items-center justify-center rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white transition-colors hover:bg-comic-cream"
           aria-label="Next gameweek"
         >

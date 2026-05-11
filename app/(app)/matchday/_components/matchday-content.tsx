@@ -20,7 +20,11 @@ interface MatchdayContentProps {
 }
 
 export function MatchdayContent({ initialData }: MatchdayContentProps) {
-  const { data } = useMatchdayFixtures(initialData.gameweek, initialData);
+  const { data } = useMatchdayFixtures(
+    initialData.gameweek,
+    initialData.leagueSlug,
+    initialData,
+  );
   const { detectChanges } = useScoreChangeDetector();
 
   // 폴링 데이터 변경 시 스코어 변경 감지 → 골 알림 트리거

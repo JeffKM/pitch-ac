@@ -4,18 +4,17 @@ import { Lock } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TOP5_LEAGUES } from "@/lib/constants/football";
 import type { Team, TeamStanding } from "@/types";
 
 import { StandingsTable } from "./standings-table";
 
-// 5대 리그 탭 정의
-const LEAGUES = [
-  { id: "epl", label: "EPL", available: true },
-  { id: "laliga", label: "La Liga", available: false },
-  { id: "bundesliga", label: "Bundesliga", available: false },
-  { id: "seriea", label: "Serie A", available: false },
-  { id: "ligue1", label: "Ligue 1", available: false },
-] as const;
+// TOP5_LEAGUES에서 파생, EPL만 활성화
+const LEAGUES = TOP5_LEAGUES.map((l) => ({
+  id: l.slug,
+  label: l.shortName,
+  available: l.slug === "epl",
+}));
 
 type RankingContentProps = {
   standings: TeamStanding[];

@@ -6,7 +6,11 @@ import {
   mapAfFixtureToFixture,
 } from "@/lib/api/api-football";
 import type { AfFixture } from "@/lib/api/api-football/types";
-import { MCITY_TEAM_ID, PL_LEAGUE_ID } from "@/lib/constants/football";
+import {
+  MCITY_TEAM_ID,
+  PL_LEAGUE_ID,
+  TOP5_LEAGUES,
+} from "@/lib/constants/football";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 import { fixtureToDbRow, teamToDbRow } from "./db-mappers";
@@ -19,23 +23,26 @@ import { extractErrorMessage, type SyncResult, writeSyncLog } from "./log";
 const SEASON_LABEL = "2025/2026";
 
 /**
- * 시즌 전체 PL 경기 동기화
- * API-Football: getAllSeasonFixtures() 1요청으로 380경기 전체 조회
- * SportMonks 대비 39→1 요청으로 대폭 최적화
+ * 단일 리그 시즌 전체 경기 동기화
+ * API-Football: getAllSeasonFixtures(leagueId) 1요청
  */
-export async function syncFixtures(): Promise<SyncResult> {
+export async function syncLeagueFixtures(
+  leagueId: number = PL_LEAGUE_ID,
+): Promise<SyncResult> {
   const supabase = createAdminClient();
   let totalSynced = 0;
+  const entityName = `fixtures-league-${leagueId}`;
 
   try {
     // DB에서 POSTP 상태인 fixture ID 조회 (수동 설정 보존용)
     const { data: postpRows } = await supabase
       .from("fixtures")
       .select("id")
-      .eq("status", "POSTP");
+      .eq("status", "POSTP")
+      .eq("league_id", leagueId);
     const postpIds = new Set((postpRows ?? []).map((r) => r.id));
 
-    const allFixtures = await getAllSeasonFixtures();
+    const allFixtures = await getAllSeasonFixtures(leagueId);
 
     // 팀 정보 upsert — fixtures에서 추출
     const seenTeamIds = new Set<number>();
@@ -89,7 +96,7 @@ export async function syncFixtures(): Promise<SyncResult> {
     }
 
     const result: SyncResult = {
-      entity: "fixtures",
+      entity: entityName,
       status: "success",
       recordsSynced: totalSynced,
     };
@@ -97,7 +104,7 @@ export async function syncFixtures(): Promise<SyncResult> {
     return result;
   } catch (error) {
     const result: SyncResult = {
-      entity: "fixtures",
+      entity: entityName,
       status: "error",
       recordsSynced: totalSynced,
       errorMessage: extractErrorMessage(error),
@@ -105,6 +112,21 @@ export async function syncFixtures(): Promise<SyncResult> {
     await writeSyncLog(supabase, result);
     return result;
   }
+}
+
+/** 기존 PL 동기화 — 하위 호환 */
+export async function syncFixtures(): Promise<SyncResult> {
+  return syncLeagueFixtures(PL_LEAGUE_ID);
+}
+
+/** 5대 리그 전체 동기화 (5 API 요청, 순차 실행) */
+export async function syncAllLeagueFixtures(): Promise<SyncResult[]> {
+  const results: SyncResult[] = [];
+  for (const league of TOP5_LEAGUES) {
+    const result = await syncLeagueFixtures(league.id);
+    results.push(result);
+  }
+  return results;
 }
 
 /**

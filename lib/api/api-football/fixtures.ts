@@ -12,14 +12,15 @@ import type {
   AfLineup,
 } from "./types";
 
-/** PL 시즌 전체 경기 조회 (380경기, 1요청) */
+/** 리그 시즌 전체 경기 조회 (기본값: PL, 380경기, 1요청) */
 export async function getAllSeasonFixtures(
+  leagueId: number = PL_LEAGUE_ID,
   season: number = CURRENT_SEASON,
 ): Promise<AfFixture[]> {
   const res = await apiFootballFetch<AfFixture>("/fixtures", {
-    params: { league: PL_LEAGUE_ID, season },
+    params: { league: leagueId, season },
     revalidate: 3600,
-    tags: ["season-fixtures"],
+    tags: [`season-fixtures-${leagueId}`],
   });
   return res.response;
 }
@@ -122,12 +123,13 @@ export async function getTeamFixtures(
 /** 특정 라운드의 경기 조회 */
 export async function getFixturesByRound(
   round: string,
+  leagueId: number = PL_LEAGUE_ID,
   season: number = CURRENT_SEASON,
 ): Promise<AfFixture[]> {
   const res = await apiFootballFetch<AfFixture>("/fixtures", {
-    params: { league: PL_LEAGUE_ID, season, round },
+    params: { league: leagueId, season, round },
     revalidate: 3600,
-    tags: [`round-fixtures-${round}`],
+    tags: [`round-fixtures-${leagueId}-${round}`],
   });
   return res.response;
 }

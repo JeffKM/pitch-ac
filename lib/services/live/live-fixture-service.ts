@@ -12,7 +12,7 @@ import {
   mapAfFixtureToFixture,
   mapAfStatisticsToLiveStats,
 } from "@/lib/api/api-football/mappers";
-import { MCITY_TEAM_ID } from "@/lib/constants/football";
+import { TOP5_LEAGUE_IDS } from "@/lib/constants/football";
 import type { Fixture, FixtureEvent } from "@/types";
 
 // 서버 인메모리 캐시 — 120초 TTL (일일 한도 절약)
@@ -20,7 +20,7 @@ let cachedLiveFixtures: Fixture[] | null = null;
 let cacheTimestamp = 0;
 const CACHE_TTL_MS = 120_000;
 
-/** 현재 진행 중인 맨시티 라이브 경기 목록 반환 (서버 인메모리 캐시 120초) */
+/** 현재 진행 중인 5대 리그 라이브 경기 목록 반환 (서버 인메모리 캐시 120초) */
 export async function getLiveFixtures(): Promise<Fixture[]> {
   const now = Date.now();
   if (cachedLiveFixtures !== null && now - cacheTimestamp < CACHE_TTL_MS) {
@@ -29,18 +29,23 @@ export async function getLiveFixtures(): Promise<Fixture[]> {
 
   try {
     const allLive = await getAfLiveFixtures();
-    // 맨시티 참가 경기만 필터
-    const mcityLive = allLive.filter(
-      (f) =>
-        f.teams.home.id === MCITY_TEAM_ID || f.teams.away.id === MCITY_TEAM_ID,
-    );
-    cachedLiveFixtures = mcityLive.map(mapAfFixtureToFixture);
+    // 5대 리그 경기만 필터
+    const top5Live = allLive.filter((f) => TOP5_LEAGUE_IDS.has(f.league.id));
+    cachedLiveFixtures = top5Live.map(mapAfFixtureToFixture);
     cacheTimestamp = now;
     return cachedLiveFixtures;
   } catch (error) {
     console.error("[getLiveFixtures] API-Football API 호출 실패:", error);
     return cachedLiveFixtures ?? [];
   }
+}
+
+/** 전체 라이브 데이터에서 특정 리그만 추출 */
+export function filterLiveByLeague(
+  liveFixtures: Fixture[],
+  leagueId: number,
+): Fixture[] {
+  return liveFixtures.filter((f) => f.leagueId === leagueId);
 }
 
 /** 특정 경기의 실시간 데이터 조회 (events/statistics 별도 호출) */
