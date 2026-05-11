@@ -1,7 +1,6 @@
 "use client";
 
 // 매치데이 경기 데이터 폴링 커스텀 훅
-// 라이브 경기 존재 시 60초, 없으면 5분 간격으로 자동 갱신
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -19,14 +18,9 @@ export function useMatchdayFixtures(date: string, initialData: MatchdayData) {
     queryKey: ["matchday", "fixtures", date],
     queryFn: () => fetchMatchdayFixtures(date),
     initialData,
-    staleTime: 30_000, // 30초간 fresh — 탭 전환/재마운트 시 불필요한 요청 차단
-    // 현재 데이터의 hasLive에 따라 폴링 간격 동적 전환
-    refetchInterval: (query) => {
-      const data = query.state.data;
-      if (!data) return 300_000; // 5분
-      return data.hasLive ? 60_000 : 300_000;
-    },
-    refetchIntervalInBackground: false, // 탭 비활성 시 폴링 중단
+    staleTime: 30_000,
+    refetchInterval: 300_000, // 5분 간격 폴링
+    refetchIntervalInBackground: false,
   });
 }
 

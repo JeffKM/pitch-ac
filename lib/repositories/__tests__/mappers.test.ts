@@ -34,7 +34,6 @@ describe("fixtureRowToFixture", () => {
     status: "FT",
     home_score: 3,
     away_score: 1,
-    minute: null,
     events: [
       {
         type: "goal",
@@ -44,9 +43,7 @@ describe("fixtureRowToFixture", () => {
         playerName: "Salah",
       },
     ],
-    live_stats: null,
-    lineups: null,
-    league_id: 8,
+    league_id: 2021,
     competition_name: null,
   };
 

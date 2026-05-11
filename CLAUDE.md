@@ -49,11 +49,13 @@ npm run validate     # type-check + lint + format:check 통합 검증
 
 ## 외부 API
 
-- **API-Football** (v3.football.api-sports.io) — 무료 플랜 (100 요청/일)
-- 인증: `x-apisports-key` 헤더
-- PL League ID: 39, 시즌 형식: 연도(2025), 맨시티 Team ID: 50
-- 클라이언트: `lib/api/api-football/client.ts`
-- Rate limiter: `lib/api/api-football/rate-limiter.ts` (일일 90회 이후 경고)
+- **football-data.org** (api.football-data.org/v4) — 무료 플랜 (10 요청/분)
+- 인증: `X-Auth-Token` 헤더
+- Competition codes: PL, PD(La Liga), SA(Serie A), BL1(Bundesliga), FL1(Ligue 1)
+- PL Competition ID: 2021, 맨시티 Team ID: 65
+- 클라이언트: `lib/api/football-data/client.ts`
+- Rate limiter: `lib/api/football-data/rate-limiter.ts` (분당 10회 슬라이딩 윈도우)
+- 이미지: `crests.football-data.org` (SVG 크레스트)
 
 ## 환경 변수
 
@@ -61,7 +63,7 @@ npm run validate     # type-check + lint + format:check 통합 검증
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-- `API_FOOTBALL_KEY`
+- `FOOTBALL_DATA_API_KEY`
 
 ## Summary Instructions
 

@@ -1,5 +1,4 @@
 // 앱 내부 타입(camelCase) → DB row(snake_case) 변환
-// 기존 mappers.ts는 수정하지 않고, DB 저장 시점에만 이 함수들을 사용
 import "server-only";
 
 import type {
@@ -37,7 +36,6 @@ export function playerToDbRow(player: Player) {
 
 /** PlayerSeasonStats → player_season_stats 테이블 행 */
 export function seasonStatsToDbRow(stats: PlayerSeasonStats) {
-  // 각 필드별 StatContext를 하나의 JSONB 객체로 합침
   const context = {
     goals: stats.goalsContext,
     assists: stats.assistsContext,
@@ -86,10 +84,7 @@ export function fixtureToDbRow(fixture: Fixture) {
     status: fixture.status,
     home_score: fixture.homeScore,
     away_score: fixture.awayScore,
-    minute: fixture.minute,
     events: fixture.events,
-    live_stats: fixture.liveStats,
-    lineups: fixture.lineups,
     league_id: fixture.leagueId,
     competition_name: fixture.competitionName,
   };

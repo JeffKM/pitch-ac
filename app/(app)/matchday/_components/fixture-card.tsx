@@ -1,4 +1,4 @@
-// 경기 카드 컴포넌트 — 상태(NS/LIVE/FT)별 UI 분기
+// 경기 카드 컴포넌트 — 상태(NS/FT/POSTP)별 UI 분기
 
 import Image from "next/image";
 import Link from "next/link";
@@ -10,8 +10,6 @@ import type { Fixture, Team, TeamStanding } from "@/types";
 
 import { CompetitionBadge } from "./competition-badge";
 import { FixtureStatusBadge } from "./fixture-status-badge";
-import { LivePulse } from "./live-pulse";
-import { ScoreFlash } from "./score-flash";
 
 interface FixtureCardProps {
   fixture: Fixture;
@@ -28,8 +26,6 @@ export function FixtureCard({
   homeStanding,
   awayStanding,
 }: FixtureCardProps) {
-  const isLive = fixture.status === "LIVE";
-  const isFt = fixture.status === "FT";
   const isPostp = fixture.status === "POSTP";
 
   const kickoffTime = formatKickoffTime(fixture.date);
@@ -38,10 +34,8 @@ export function FixtureCard({
     <Card
       className={cn(
         "rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white transition-colors hover:bg-comic-cream",
-        isLive && "border-comic-green bg-comic-green/10",
         isPostp && "border-comic-red/50 opacity-60",
       )}
-      data-live={isLive || undefined}
       data-fixture-id={fixture.id}
     >
       <CardContent className="p-[var(--comic-panel-padding)]">
@@ -80,18 +74,9 @@ export function FixtureCard({
           {/* 스코어 / 배지 */}
           <div className="flex flex-col items-center gap-1.5">
             {fixture.homeScore !== null && fixture.awayScore !== null ? (
-              <div className="flex items-center gap-1.5">
-                {isLive && <LivePulse />}
-                <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-2xl)] text-comic-black tabular-nums">
-                  <ScoreFlash score={fixture.homeScore}>
-                    {fixture.homeScore}
-                  </ScoreFlash>
-                  {" – "}
-                  <ScoreFlash score={fixture.awayScore}>
-                    {fixture.awayScore}
-                  </ScoreFlash>
-                </p>
-              </div>
+              <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-2xl)] text-comic-black tabular-nums">
+                {fixture.homeScore} – {fixture.awayScore}
+              </p>
             ) : (
               <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-lg)] text-comic-black/40">
                 vs
@@ -99,7 +84,6 @@ export function FixtureCard({
             )}
             <FixtureStatusBadge
               status={fixture.status}
-              minute={fixture.minute}
               kickoffTime={kickoffTime}
             />
           </div>
@@ -125,25 +109,6 @@ export function FixtureCard({
             </div>
           </div>
         </div>
-
-        {/* FT 전용: xG + 점유율 미리보기 */}
-        {isFt && fixture.liveStats && (
-          <div className="mt-3 border-comic-black/20 border-t-[var(--comic-border-thin)] pt-3">
-            <div className="grid grid-cols-3 gap-2 text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
-              <span>{fixture.liveStats.home.xg?.toFixed(2) ?? "N/A"}</span>
-              <span className="font-[family-name:var(--font-bangers)] text-comic-black">
-                xG
-              </span>
-              <span>{fixture.liveStats.away.xg?.toFixed(2) ?? "N/A"}</span>
-
-              <span>{fixture.liveStats.home.possession}%</span>
-              <span className="font-[family-name:var(--font-bangers)] text-comic-black">
-                Possession
-              </span>
-              <span>{fixture.liveStats.away.possession}%</span>
-            </div>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

@@ -67,7 +67,7 @@ export interface PlayerMatchStats {
 export interface PlayerIdMapping {
   playerId: number;
   sportmonksId: number | null;
-  apiFootballId: number | null;
+  footballDataId: number | null;
   /** 수동 검증 완료 여부 */
   verified: boolean;
 }

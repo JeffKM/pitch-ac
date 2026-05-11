@@ -1,11 +1,12 @@
 import "server-only";
 
 import {
-  getLeagueTeams,
-  getStandings,
-  mapAfStandingToTeamStanding,
-  mapAfTeamToTeam,
-} from "@/lib/api/api-football";
+  getCompetitionStandings,
+  getCompetitionTeams,
+  mapFdStandingToTeamStanding,
+  mapFdTeamToTeam,
+} from "@/lib/api/football-data";
+import { CURRENT_SEASON, TOP5_LEAGUES } from "@/lib/constants/football";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 import { standingToDbRow, teamToDbRow } from "./db-mappers";
@@ -17,10 +18,10 @@ const SEASON_LABEL = "2025/2026";
 export async function syncTeams(): Promise<SyncResult> {
   const supabase = createAdminClient();
   try {
-    const rawTeams = await getLeagueTeams();
+    const res = await getCompetitionTeams("PL", CURRENT_SEASON);
 
-    const teamRows = rawTeams.map((raw) => {
-      const team = mapAfTeamToTeam(raw, SEASON_LABEL);
+    const teamRows = res.teams.map((raw) => {
+      const team = mapFdTeamToTeam(raw, SEASON_LABEL);
       return teamToDbRow(team);
     });
 
@@ -49,18 +50,23 @@ export async function syncTeams(): Promise<SyncResult> {
   }
 }
 
-/** 리그 순위표 동기화 */
-export async function syncStandings(): Promise<SyncResult> {
+/** 단일 리그 순위표 동기화 */
+export async function syncStandings(
+  leagueCode: string = "PL",
+): Promise<SyncResult> {
   const supabase = createAdminClient();
   try {
-    const standingsRes = await getStandings();
-    if (!standingsRes?.league.standings?.[0]) {
-      throw new Error("순위표 응답이 비어있습니다");
+    const standingsRes = await getCompetitionStandings(
+      leagueCode,
+      CURRENT_SEASON,
+    );
+    const totalTable = standingsRes.standings.find((s) => s.type === "TOTAL");
+    if (!totalTable?.table?.length) {
+      throw new Error(`${leagueCode} 순위표 응답이 비어있습니다`);
     }
 
-    const rawStandings = standingsRes.league.standings[0];
-    const standingRows = rawStandings.map((raw) => {
-      const standing = mapAfStandingToTeamStanding(raw);
+    const standingRows = totalTable.table.map((raw) => {
+      const standing = mapFdStandingToTeamStanding(raw);
       return standingToDbRow(standing, SEASON_LABEL);
     });
 
@@ -71,7 +77,7 @@ export async function syncStandings(): Promise<SyncResult> {
     if (error) throw error;
 
     const result: SyncResult = {
-      entity: "standings",
+      entity: `standings-${leagueCode}`,
       status: "success",
       recordsSynced: standingRows.length,
     };
@@ -79,7 +85,7 @@ export async function syncStandings(): Promise<SyncResult> {
     return result;
   } catch (error) {
     const result: SyncResult = {
-      entity: "standings",
+      entity: `standings-${leagueCode}`,
       status: "error",
       recordsSynced: 0,
       errorMessage: extractErrorMessage(error),
@@ -87,4 +93,14 @@ export async function syncStandings(): Promise<SyncResult> {
     await writeSyncLog(supabase, result);
     return result;
   }
+}
+
+/** 5대 리그 전체 순위표 동기화 */
+export async function syncAllLeagueStandings(): Promise<SyncResult[]> {
+  const results: SyncResult[] = [];
+  for (const league of TOP5_LEAGUES) {
+    const result = await syncStandings(league.code);
+    results.push(result);
+  }
+  return results;
 }

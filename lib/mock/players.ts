@@ -9,7 +9,7 @@ export const mockPlayers: Player[] = [
   {
     id: 101,
     name: "Aaron Ramsdale",
-    photoUrl: "https://media.api-sports.io/football/players/2935.png",
+    photoUrl: "https://crests.football-data.org/players/2935.png",
     teamId: 42, // Arsenal
     position: "GK",
     number: 32,
@@ -18,7 +18,7 @@ export const mockPlayers: Player[] = [
   {
     id: 102,
     name: "Alisson Becker",
-    photoUrl: "https://media.api-sports.io/football/players/762.png",
+    photoUrl: "https://crests.football-data.org/players/762.png",
     teamId: 40, // Liverpool
     position: "GK",
     number: 1,
@@ -28,7 +28,7 @@ export const mockPlayers: Player[] = [
   {
     id: 103,
     name: "William Saliba",
-    photoUrl: "https://media.api-sports.io/football/players/47189.png",
+    photoUrl: "https://crests.football-data.org/players/47189.png",
     teamId: 42, // Arsenal
     position: "DEF",
     number: 12,
@@ -37,7 +37,7 @@ export const mockPlayers: Player[] = [
   {
     id: 104,
     name: "Virgil van Dijk",
-    photoUrl: "https://media.api-sports.io/football/players/306.png",
+    photoUrl: "https://crests.football-data.org/players/306.png",
     teamId: 40, // Liverpool
     position: "DEF",
     number: 4,
@@ -46,7 +46,7 @@ export const mockPlayers: Player[] = [
   {
     id: 105,
     name: "Reece James",
-    photoUrl: "https://media.api-sports.io/football/players/19220.png",
+    photoUrl: "https://crests.football-data.org/players/19220.png",
     teamId: 49, // Chelsea
     position: "DEF",
     number: 24,
@@ -56,7 +56,7 @@ export const mockPlayers: Player[] = [
   {
     id: 106,
     name: "Martin Odegaard",
-    photoUrl: "https://media.api-sports.io/football/players/19220.png",
+    photoUrl: "https://crests.football-data.org/players/19220.png",
     teamId: 42, // Arsenal
     position: "MID",
     number: 8,
@@ -65,7 +65,7 @@ export const mockPlayers: Player[] = [
   {
     id: 107,
     name: "Kevin De Bruyne",
-    photoUrl: "https://media.api-sports.io/football/players/627.png",
+    photoUrl: "https://crests.football-data.org/players/627.png",
     teamId: 50, // Man City
     position: "MID",
     number: 17,
@@ -74,7 +74,7 @@ export const mockPlayers: Player[] = [
   {
     id: 108,
     name: "Bruno Fernandes",
-    photoUrl: "https://media.api-sports.io/football/players/521.png",
+    photoUrl: "https://crests.football-data.org/players/521.png",
     teamId: 33, // Man United
     position: "MID",
     number: 8,
@@ -83,7 +83,7 @@ export const mockPlayers: Player[] = [
   {
     id: 109,
     name: "James Maddison",
-    photoUrl: "https://media.api-sports.io/football/players/19765.png",
+    photoUrl: "https://crests.football-data.org/players/19765.png",
     teamId: 47, // Tottenham
     position: "MID",
     number: 10,
@@ -93,7 +93,7 @@ export const mockPlayers: Player[] = [
   {
     id: 110,
     name: "Mohamed Salah",
-    photoUrl: "https://media.api-sports.io/football/players/742.png",
+    photoUrl: "https://crests.football-data.org/players/742.png",
     teamId: 40, // Liverpool
     position: "FWD",
     number: 11,
@@ -102,7 +102,7 @@ export const mockPlayers: Player[] = [
   {
     id: 111,
     name: "Erling Haaland",
-    photoUrl: "https://media.api-sports.io/football/players/1100.png",
+    photoUrl: "https://crests.football-data.org/players/1100.png",
     teamId: 50, // Man City
     position: "FWD",
     number: 9,
@@ -111,7 +111,7 @@ export const mockPlayers: Player[] = [
   {
     id: 112,
     name: "Bukayo Saka",
-    photoUrl: "https://media.api-sports.io/football/players/47232.png",
+    photoUrl: "https://crests.football-data.org/players/47232.png",
     teamId: 42, // Arsenal
     position: "FWD",
     number: 7,

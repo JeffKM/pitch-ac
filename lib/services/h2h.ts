@@ -1,21 +1,39 @@
-// H2H(맞대결) 데이터 조회 서비스 — API-Football API 호출
+// H2H(맞대결) 데이터 조회 서비스 — DB 쿼리 기반
 import "server-only";
 
-import { getH2HFixtures } from "@/lib/api/api-football/fixtures";
-import { mapAfFixtureToH2HResult } from "@/lib/api/api-football/mappers";
+import { createClient } from "@/lib/supabase/server";
 import type { H2HResult } from "@/types";
 
 /**
  * 두 팀 간 H2H 최근 5경기 결과 조회
- * API-Football API 직접 호출 (24시간 캐시)
+ * fixtures 테이블에서 status='FT' AND 양 팀 조건으로 DB 직접 쿼리
  */
 export async function fetchH2HResults(
   teamIdA: number,
   teamIdB: number,
 ): Promise<H2HResult[]> {
-  const rawFixtures = await getH2HFixtures(teamIdA, teamIdB);
+  const supabase = await createClient();
 
-  return rawFixtures
-    .map(mapAfFixtureToH2HResult)
-    .filter((r): r is H2HResult => r !== null);
+  // 양 팀이 맞붙은 FT 경기를 최근순 5개 조회
+  const { data, error } = await supabase
+    .from("fixtures")
+    .select("id, date, home_team_id, away_team_id, home_score, away_score")
+    .eq("status", "FT")
+    .or(
+      `and(home_team_id.eq.${teamIdA},away_team_id.eq.${teamIdB}),and(home_team_id.eq.${teamIdB},away_team_id.eq.${teamIdA})`,
+    )
+    .order("date", { ascending: false })
+    .limit(5);
+
+  if (error) throw new Error(`H2H 조회 실패: ${error.message}`);
+  if (!data) return [];
+
+  return data.map((row) => ({
+    fixtureId: row.id,
+    date: row.date,
+    homeTeamId: row.home_team_id,
+    awayTeamId: row.away_team_id,
+    homeScore: row.home_score,
+    awayScore: row.away_score,
+  }));
 }

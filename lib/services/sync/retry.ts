@@ -1,10 +1,10 @@
 import "server-only";
 
-import { DailyLimitError } from "@/lib/api/api-football/client";
+import { RateLimitError } from "@/lib/api/football-data/client";
 
 /**
- * 일일 한도 대응 재시도 래퍼
- * DailyLimitError 발생 시 즉시 throw (일일 한도 초과는 재시도 무의미)
+ * 레이트 리밋 대응 재시도 래퍼
+ * RateLimitError 발생 시 즉시 throw (분당 한도 초과는 대기 필요)
  * 그 외 에러는 1회 재시도
  */
 export async function withRetry<T>(
@@ -18,12 +18,10 @@ export async function withRetry<T>(
       return await fn();
     } catch (error) {
       lastError = error;
-      // 일일 한도 초과는 재시도 무의미
-      if (error instanceof DailyLimitError) {
+      if (error instanceof RateLimitError) {
         throw error;
       }
       if (attempt < maxRetries) {
-        // 짧은 대기 후 재시도
         await new Promise((resolve) => setTimeout(resolve, 2000));
         continue;
       }

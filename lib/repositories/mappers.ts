@@ -1,14 +1,10 @@
 // DB row(snake_case) → 앱 타입(camelCase) 역방향 변환
-// fixtureToDbRow 등이 camelCase 객체를 JSONB에 그대로 저장하므로
-// JSONB 내부(events, live_stats, lineups)는 변환 없이 타입 캐스팅만 수행
 import "server-only";
 
 import type {
   Fixture,
   FixtureEvent,
-  FixtureLiveStats,
   InjuredPlayer,
-  Lineup,
   Player,
   PlayerMatchStats,
   PlayerPosition,
@@ -29,10 +25,7 @@ export interface FixtureRow {
   status: "NS" | "LIVE" | "FT" | "POSTP";
   home_score: number | null;
   away_score: number | null;
-  minute: number | null;
   events: FixtureEvent[] | null;
-  live_stats: FixtureLiveStats | null;
-  lineups: { home: Lineup; away: Lineup } | null;
   league_id: number;
   competition_name: string | null;
 }
@@ -73,11 +66,8 @@ export function fixtureRowToFixture(row: FixtureRow): Fixture {
     status: row.status,
     homeScore: row.home_score,
     awayScore: row.away_score,
-    minute: row.minute,
     events: row.events ?? [],
-    liveStats: row.live_stats,
-    lineups: row.lineups,
-    leagueId: row.league_id ?? 8,
+    leagueId: row.league_id,
     competitionName: row.competition_name ?? null,
   };
 }

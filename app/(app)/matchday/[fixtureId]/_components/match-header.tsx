@@ -4,11 +4,9 @@ import Image from "next/image";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { formatKickoffDate, formatKickoffTime } from "@/lib/date-utils";
-import { cn } from "@/lib/utils";
 import type { Fixture, Team, TeamStanding } from "@/types";
 
 import { FixtureStatusBadge } from "../../_components/fixture-status-badge";
-import { ScoreFlash } from "../../_components/score-flash";
 
 interface MatchHeaderProps {
   fixture: Fixture;
@@ -25,18 +23,11 @@ export function MatchHeader({
   homeStanding,
   awayStanding,
 }: MatchHeaderProps) {
-  const isLive = fixture.status === "LIVE";
-
   const kickoffDate = formatKickoffDate(fixture.date);
   const kickoffTime = formatKickoffTime(fixture.date);
 
   return (
-    <Card
-      className={cn(
-        "overflow-hidden rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white",
-        isLive && "border-comic-green bg-comic-green/10",
-      )}
-    >
+    <Card className="overflow-hidden rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
       <CardContent className="p-6">
         {/* GW + 날짜 */}
         <div className="mb-4 text-center">
@@ -73,13 +64,7 @@ export function MatchHeader({
           <div className="flex flex-col items-center gap-2">
             {fixture.homeScore !== null && fixture.awayScore !== null ? (
               <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-4xl)] text-comic-black tabular-nums">
-                <ScoreFlash score={fixture.homeScore}>
-                  {fixture.homeScore}
-                </ScoreFlash>
-                {" – "}
-                <ScoreFlash score={fixture.awayScore}>
-                  {fixture.awayScore}
-                </ScoreFlash>
+                {fixture.homeScore} – {fixture.awayScore}
               </p>
             ) : (
               <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-2xl)] text-comic-black/40">
@@ -88,7 +73,6 @@ export function MatchHeader({
             )}
             <FixtureStatusBadge
               status={fixture.status}
-              minute={fixture.minute}
               kickoffTime={kickoffTime}
             />
           </div>

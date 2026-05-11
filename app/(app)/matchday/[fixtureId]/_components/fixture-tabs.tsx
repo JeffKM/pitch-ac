@@ -1,7 +1,6 @@
 "use client";
 
-// 경기 상세 탭 네비게이션 — 프리매치 / 라이브 / 포스트매치
-// activeTab + onTabChange prop으로 외부에서 제어 가능한 컴포넌트
+// 경기 상세 탭 네비게이션 — Pre-match / Post-match 2탭 구성
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type {
@@ -12,12 +11,10 @@ import type {
   TeamStanding,
 } from "@/types";
 
-import { LivePulse } from "../../_components/live-pulse";
-import { LiveTab } from "./live-tab";
 import { PostmatchTab } from "./postmatch-tab";
 import { PrematchTab } from "./prematch-tab";
 
-type TabValue = "prematch" | "live" | "postmatch";
+type TabValue = "prematch" | "postmatch";
 
 interface FixtureTabsProps {
   fixture: Fixture;
@@ -44,8 +41,6 @@ export function FixtureTabs({
   activeTab,
   onTabChange,
 }: FixtureTabsProps) {
-  const isLive = fixture.status === "LIVE";
-
   return (
     <Tabs value={activeTab} onValueChange={(v) => onTabChange(v as TabValue)}>
       <TabsList className="w-full rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-cream">
@@ -54,13 +49,6 @@ export function FixtureTabs({
           className="flex-1 rounded-[var(--comic-panel-radius)] font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] tracking-[var(--comic-tracking-normal)] data-[state=active]:bg-comic-yellow data-[state=active]:text-comic-black"
         >
           Pre-match
-        </TabsTrigger>
-        <TabsTrigger
-          value="live"
-          className="flex-1 gap-1.5 rounded-[var(--comic-panel-radius)] font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] tracking-[var(--comic-tracking-normal)] data-[state=active]:bg-comic-yellow data-[state=active]:text-comic-black"
-        >
-          {isLive && <LivePulse />}
-          Live
         </TabsTrigger>
         <TabsTrigger
           value="postmatch"
@@ -81,10 +69,6 @@ export function FixtureTabs({
           homeInjuries={homeInjuries}
           awayInjuries={awayInjuries}
         />
-      </TabsContent>
-
-      <TabsContent value="live" className="mt-4">
-        <LiveTab fixture={fixture} homeTeam={homeTeam} awayTeam={awayTeam} />
       </TabsContent>
 
       <TabsContent value="postmatch" className="mt-4">

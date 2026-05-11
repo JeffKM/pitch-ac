@@ -21,11 +21,8 @@ function makeFixture(overrides: Partial<Fixture> = {}): Fixture {
     status: "NS",
     homeScore: null,
     awayScore: null,
-    minute: null,
     events: [],
-    liveStats: null,
-    lineups: null,
-    leagueId: 8,
+    leagueId: 2021,
     competitionName: null,
     ...overrides,
   };
@@ -134,7 +131,7 @@ describe("buildDateRange", () => {
 
   it("컵 경기 날짜는 범위에서 제외", () => {
     const fixtures = [
-      // PL 경기: 3/22 (API-Football PL league_id = 39)
+      // PL 경기: 3/22 (football-data.org PL competition_id = 2021)
       makeFixture({ id: 1, date: "2026-03-22T20:00:00Z", leagueId: 39 }),
       // FA Cup 경기: 3/8 (범위에 포함되면 안 됨)
       makeFixture({

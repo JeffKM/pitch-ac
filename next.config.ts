@@ -6,7 +6,7 @@ const cspHeader = `
   default-src 'self';
   script-src 'self' 'unsafe-inline' 'unsafe-eval';
   style-src 'self' 'unsafe-inline';
-  img-src 'self' blob: data: https://media.api-sports.io https://*.supabase.co;
+  img-src 'self' blob: data: https://crests.football-data.org https://*.supabase.co;
   font-src 'self';
   connect-src 'self' https://*.supabase.co wss://*.supabase.co;
   frame-ancestors 'none';
@@ -23,7 +23,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "media.api-sports.io",
+        hostname: "crests.football-data.org",
         pathname: "/**",
       },
       {
@@ -32,6 +32,7 @@ const nextConfig: NextConfig = {
         pathname: "/storage/v1/object/public/cartoon-assets/**",
       },
     ],
+    dangerouslyAllowSVG: true,
   },
   async redirects() {
     return [

@@ -1,4 +1,4 @@
-// 팀 더미 데이터 — 빅6 실제 API Football ID 사용
+// 팀 더미 데이터 — 빅6 (mock용 placeholder ID)
 
 import type { Team, TeamStanding } from "@/types";
 
@@ -7,42 +7,42 @@ export const mockTeams: Team[] = [
     id: 42,
     name: "Arsenal",
     shortName: "ARS",
-    logoUrl: "https://media.api-sports.io/football/teams/42.png",
+    logoUrl: "https://crests.football-data.org/42.svg",
     season: "2024-25",
   },
   {
     id: 49,
     name: "Chelsea",
     shortName: "CHE",
-    logoUrl: "https://media.api-sports.io/football/teams/49.png",
+    logoUrl: "https://crests.football-data.org/49.svg",
     season: "2024-25",
   },
   {
     id: 40,
     name: "Liverpool",
     shortName: "LIV",
-    logoUrl: "https://media.api-sports.io/football/teams/40.png",
+    logoUrl: "https://crests.football-data.org/40.svg",
     season: "2024-25",
   },
   {
     id: 50,
     name: "Manchester City",
     shortName: "MCI",
-    logoUrl: "https://media.api-sports.io/football/teams/50.png",
+    logoUrl: "https://crests.football-data.org/50.svg",
     season: "2024-25",
   },
   {
     id: 33,
     name: "Manchester United",
     shortName: "MUN",
-    logoUrl: "https://media.api-sports.io/football/teams/33.png",
+    logoUrl: "https://crests.football-data.org/33.svg",
     season: "2024-25",
   },
   {
     id: 47,
     name: "Tottenham",
     shortName: "TOT",
-    logoUrl: "https://media.api-sports.io/football/teams/47.png",
+    logoUrl: "https://crests.football-data.org/47.svg",
     season: "2024-25",
   },
 ];

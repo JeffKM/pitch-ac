@@ -1,7 +1,7 @@
-// 대회명 배지 — 컵 경기에만 표시 (PL 경기는 표시 안 함)
+// 대회명 배지 — 리그별 색상 구분 표시
 
 import { Badge } from "@/components/ui/badge";
-import { CUP_LEAGUE_IDS } from "@/lib/constants/football";
+import { TOP5_LEAGUES } from "@/lib/constants/football";
 import { cn } from "@/lib/utils";
 
 interface CompetitionBadgeProps {
@@ -11,15 +11,22 @@ interface CompetitionBadgeProps {
 
 /** 대회별 색상 클래스 */
 function getCompetitionColorClass(leagueId: number): string {
-  switch (leagueId) {
-    case CUP_LEAGUE_IDS.UCL:
+  const league = TOP5_LEAGUES.find((l) => l.id === leagueId);
+  if (!league) {
+    return "border-comic-black/30 bg-comic-cream text-comic-black/70";
+  }
+  // 리그 코드 기반 색상
+  switch (league.code) {
+    case "PL":
+      return "border-purple-500 bg-purple-500/10 text-purple-700";
+    case "PD":
+      return "border-orange-500 bg-orange-500/10 text-orange-700";
+    case "SA":
       return "border-sky-500 bg-sky-500/10 text-sky-700";
-    case CUP_LEAGUE_IDS.FA_CUP:
+    case "BL1":
       return "border-comic-red bg-comic-red/10 text-comic-red";
-    case CUP_LEAGUE_IDS.EFL_CUP:
+    case "FL1":
       return "border-emerald-500 bg-emerald-500/10 text-emerald-700";
-    case CUP_LEAGUE_IDS.COMMUNITY_SHIELD:
-      return "border-amber-500 bg-amber-500/10 text-amber-700";
     default:
       return "border-comic-black/30 bg-comic-cream text-comic-black/70";
   }

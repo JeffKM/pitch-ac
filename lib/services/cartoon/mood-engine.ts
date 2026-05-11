@@ -142,12 +142,6 @@ function eventToTrigger(event: FixtureEvent): CartoonTrigger | null {
   switch (event.type) {
     case "goal":
       return "goal_scored";
-    case "substitution":
-      return "substitution_out";
-    case "yellow_card":
-      return "yellow_card";
-    case "red_card":
-      return "red_card";
     default:
       return null;
   }

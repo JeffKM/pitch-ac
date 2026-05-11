@@ -12,7 +12,11 @@ export {
 } from "./db-mappers";
 export { type SyncResult, writeSyncLog } from "./log";
 export { withRetry } from "./retry";
-export { syncFixtures } from "./sync-fixtures";
+export {
+  syncAllLeagueFixtures,
+  syncFixtures,
+  syncLeagueFixtures,
+} from "./sync-fixtures";
 export { syncPlayers } from "./sync-players";
 export { syncSeasonStats } from "./sync-stats";
-export { syncStandings, syncTeams } from "./sync-teams";
+export { syncAllLeagueStandings, syncStandings, syncTeams } from "./sync-teams";

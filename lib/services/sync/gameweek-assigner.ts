@@ -1,7 +1,6 @@
 // 컵 경기 → PL 게임위크 할당 알고리즘
+// football-data.org 전환 후 matchday 필드를 직접 사용하므로 이 모듈은 레거시
 import "server-only";
-
-import { parseRoundNumber } from "@/lib/api/api-football/mappers";
 
 /** 맨시티 PL 실제 경기 날짜 기반 GW 앵커 */
 export interface McityPlAnchor {
@@ -16,22 +15,6 @@ export interface GameweekRange {
   end: Date;
   /** 범위 중앙값 (거리 계산용) */
   midpoint: number;
-}
-
-/** API-Football 라운드 문자열 배열 → 날짜 범위 배열 생성 (fallback용) */
-export function buildGameweekRangesFromRounds(
-  rounds: string[],
-): GameweekRange[] {
-  // API-Football rounds는 날짜 범위가 없음 → 빈 배열 반환 (앵커 기반 사용)
-  return rounds
-    .map((r) => parseRoundNumber(r))
-    .filter((n): n is number => n !== null)
-    .map((gw) => ({
-      gameweek: gw,
-      start: new Date(0),
-      end: new Date(0),
-      midpoint: 0,
-    }));
 }
 
 /** 최대 허용 거리 (30일, ms) */
