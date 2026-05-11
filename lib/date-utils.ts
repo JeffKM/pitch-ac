@@ -54,3 +54,54 @@ export function toDateKey(dateStr: string): string {
     timeZone: "Asia/Seoul",
   });
 }
+
+// ─── 매치데이 날짜 네비게이션용 ──────────────────────────────────
+
+/** 오늘 KST 기준 YYYY-MM-DD */
+export function getTodayDateKey(): string {
+  return new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
+}
+
+/** YYYY-MM-DD 형식 검증 */
+export function isValidDateKey(dateStr: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+  const d = new Date(dateStr + "T00:00:00");
+  return !isNaN(d.getTime());
+}
+
+/** 날짜 덧셈 (YYYY-MM-DD 기준) */
+export function addDays(dateStr: string, days: number): string {
+  const d = new Date(dateStr + "T12:00:00+09:00"); // KST 정오 기준
+  d.setDate(d.getDate() + days);
+  return d.toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
+}
+
+/** 날짜 스트립용 짧은 레이블 */
+export function formatStripDate(dateStr: string): {
+  day: string;
+  weekday: string;
+} {
+  const d = new Date(dateStr + "T12:00:00+09:00");
+  const dayNum = d.toLocaleDateString("ko-KR", {
+    day: "numeric",
+    timeZone: "Asia/Seoul",
+  });
+  // ko-KR day: "numeric"은 "11" 또는 "11일"을 반환 — 숫자만 추출 후 "일" 접미사
+  const dayDigits = dayNum.replace(/\D/g, "");
+  const weekday = new Intl.DateTimeFormat("ko-KR", {
+    weekday: "short",
+    timeZone: "Asia/Seoul",
+  }).format(d);
+  return { day: `${dayDigits}일`, weekday };
+}
+
+/** YYYY-MM-DD → "5월 11일 일요일" 형태 */
+export function formatFullDate(dateStr: string): string {
+  const d = new Date(dateStr + "T12:00:00+09:00");
+  return new Intl.DateTimeFormat("ko-KR", {
+    month: "long",
+    day: "numeric",
+    weekday: "long",
+    timeZone: "Asia/Seoul",
+  }).format(d);
+}

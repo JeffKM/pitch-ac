@@ -6,28 +6,18 @@
 import { useQuery } from "@tanstack/react-query";
 
 import type { MatchdayData } from "@/app/api/matchday/fixtures/route";
-import type { LeagueSlug } from "@/lib/constants/football";
 
-async function fetchMatchdayFixtures(
-  gameweek: number,
-  leagueSlug: LeagueSlug,
-): Promise<MatchdayData> {
-  const res = await fetch(
-    `/api/matchday/fixtures?league=${leagueSlug}&gw=${gameweek}`,
-  );
+async function fetchMatchdayFixtures(date: string): Promise<MatchdayData> {
+  const res = await fetch(`/api/matchday/fixtures?date=${date}`);
   if (!res.ok) throw new Error("매치데이 데이터 요청 실패");
   const json = await res.json();
   return json.data as MatchdayData;
 }
 
-export function useMatchdayFixtures(
-  gameweek: number,
-  leagueSlug: LeagueSlug,
-  initialData: MatchdayData,
-) {
+export function useMatchdayFixtures(date: string, initialData: MatchdayData) {
   return useQuery({
-    queryKey: ["matchday", "fixtures", leagueSlug, gameweek],
-    queryFn: () => fetchMatchdayFixtures(gameweek, leagueSlug),
+    queryKey: ["matchday", "fixtures", date],
+    queryFn: () => fetchMatchdayFixtures(date),
     initialData,
     staleTime: 30_000, // 30초간 fresh — 탭 전환/재마운트 시 불필요한 요청 차단
     // 현재 데이터의 hasLive에 따라 폴링 간격 동적 전환

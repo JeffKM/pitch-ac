@@ -3,7 +3,7 @@ import "server-only";
 
 import { cache } from "react";
 
-import { PL_LEAGUE_ID } from "@/lib/constants/football";
+import { PL_LEAGUE_ID, TOP5_LEAGUE_IDS } from "@/lib/constants/football";
 import { createClient } from "@/lib/supabase/server";
 import type { Fixture } from "@/types";
 
@@ -92,6 +92,29 @@ export async function getFixturesByGameweek(
     .select("*")
     .eq("gameweek", gameweek)
     .eq("league_id", leagueId)
+    .order("date", { ascending: true });
+
+  if (error) throw new Error(`fixtures 조회 실패: ${error.message}`);
+
+  return (data as FixtureRow[]).map(fixtureRowToFixture);
+}
+
+/** KST 날짜 기준 5대 리그 경기 조회 */
+export async function getFixturesByDate(dateStr: string): Promise<Fixture[]> {
+  const supabase = await createClient();
+
+  // KST 00:00~23:59:59 → UTC 변환
+  const startKST = new Date(`${dateStr}T00:00:00+09:00`);
+  const endKST = new Date(`${dateStr}T23:59:59.999+09:00`);
+
+  const leagueIds = Array.from(TOP5_LEAGUE_IDS);
+
+  const { data, error } = await supabase
+    .from("fixtures")
+    .select("*")
+    .in("league_id", leagueIds)
+    .gte("date", startKST.toISOString())
+    .lte("date", endKST.toISOString())
     .order("date", { ascending: true });
 
   if (error) throw new Error(`fixtures 조회 실패: ${error.message}`);

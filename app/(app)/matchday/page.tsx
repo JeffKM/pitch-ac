@@ -1,67 +1,53 @@
-// 매치데이 대시보드 — 5대 리그 경기 뷰
+// 매치데이 대시보드 — 날짜 기반 5대 리그 경기 뷰
 
 import type { Metadata } from "next";
 
+import { CURRENT_SEASON_LABEL } from "@/lib/constants/football";
 import {
-  CURRENT_SEASON_LABEL,
-  DEFAULT_LEAGUE,
-  LEAGUE_BY_SLUG,
-  type LeagueSlug,
-} from "@/lib/constants/football";
+  formatFullDate,
+  getTodayDateKey,
+  isValidDateKey,
+} from "@/lib/date-utils";
 import {
-  getCurrentGameweek,
-  getFixturesByGameweek,
+  getFixturesByDate,
   getStandingsByTeamIds,
   getTeamsByIds,
 } from "@/lib/repositories";
 
-import { EmptyGameweek } from "./_components/empty-gameweek";
-import { GameweekHeader } from "./_components/gameweek-header";
-import { LeagueTabs } from "./_components/league-tabs";
+import { DateStrip } from "./_components/date-strip";
+import { EmptyMatchday } from "./_components/empty-matchday";
 import { MatchdayContent } from "./_components/matchday-content";
-import { buildDateRange } from "./_utils";
 
 interface PageProps {
-  searchParams: Promise<{ gw?: string; league?: string }>;
-}
-
-function resolveLeague(leagueParam?: string): LeagueSlug {
-  if (leagueParam && leagueParam in LEAGUE_BY_SLUG) {
-    return leagueParam as LeagueSlug;
-  }
-  return DEFAULT_LEAGUE;
+  searchParams: Promise<{ date?: string }>;
 }
 
 export async function generateMetadata({
   searchParams,
 }: PageProps): Promise<Metadata> {
-  const { gw, league: leagueParam } = await searchParams;
-  const leagueSlug = resolveLeague(leagueParam);
-  const leagueConfig = LEAGUE_BY_SLUG[leagueSlug];
-  const currentGw = await getCurrentGameweek(leagueConfig.id);
-  const gameweek = Number(gw) || currentGw;
+  const { date: dateParam } = await searchParams;
+  const date =
+    dateParam && isValidDateKey(dateParam) ? dateParam : getTodayDateKey();
+  const dateLabel = formatFullDate(date);
 
   return {
-    title: `${leagueConfig.shortName} GW${gameweek} Matchday`,
-    description: `${leagueConfig.name} GW${gameweek} fixtures and results`,
+    title: `${dateLabel} Matchday`,
+    description: `${dateLabel} 5대 리그 경기 일정 및 결과`,
     openGraph: {
-      title: `${leagueConfig.shortName} GW${gameweek} Matchday | pitch-ac`,
-      description: `${leagueConfig.name} GW${gameweek} fixtures and results`,
+      title: `${dateLabel} Matchday | pitch-ac`,
+      description: `${dateLabel} 5대 리그 경기 일정 및 결과`,
     },
   };
 }
 
 export default async function MatchdayPage({ searchParams }: PageProps) {
-  const { gw, league: leagueParam } = await searchParams;
+  const { date: dateParam } = await searchParams;
 
-  const leagueSlug = resolveLeague(leagueParam);
-  const leagueConfig = LEAGUE_BY_SLUG[leagueSlug];
+  // date 파라미터 검증, 없거나 유효하지 않으면 오늘 KST
+  const date =
+    dateParam && isValidDateKey(dateParam) ? dateParam : getTodayDateKey();
 
-  // gw 파라미터 없으면 현재 게임위크 자동 감지
-  const currentGw = await getCurrentGameweek(leagueConfig.id);
-  const gameweek = Number(gw) || currentGw;
-
-  const fixtures = await getFixturesByGameweek(gameweek, leagueConfig.id);
+  const fixtures = await getFixturesByDate(date);
 
   // 팀/순위 배치 조회 (중복 제거)
   const teamIds = [
@@ -75,30 +61,20 @@ export default async function MatchdayPage({ searchParams }: PageProps) {
     getStandingsByTeamIds(teamIds, CURRENT_SEASON_LABEL),
   ]);
 
-  const dateRange = buildDateRange(fixtures);
-
   const initialData = {
     fixtures,
     teams: Object.fromEntries(teamsMap),
     standings: Object.fromEntries(standingsMap),
-    gameweek,
+    date,
     hasLive: fixtures.some((f) => f.status === "LIVE"),
-    leagueSlug,
-    maxRounds: leagueConfig.maxRounds,
   };
 
   return (
     <div className="space-y-8">
-      <LeagueTabs activeLeague={leagueSlug} gameweek={gameweek} />
-      <GameweekHeader
-        gameweek={gameweek}
-        dateRange={dateRange}
-        maxRounds={leagueConfig.maxRounds}
-        leagueSlug={leagueSlug}
-      />
+      <DateStrip selectedDate={date} />
 
       {fixtures.length === 0 ? (
-        <EmptyGameweek />
+        <EmptyMatchday date={date} />
       ) : (
         <MatchdayContent initialData={initialData} />
       )}

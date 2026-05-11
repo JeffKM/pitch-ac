@@ -10,21 +10,17 @@ import {
 } from "@/lib/hooks/use-matchday-fixtures";
 import { useScoreChangeDetector } from "@/lib/hooks/use-score-change";
 
-import { groupFixturesByDate } from "../_utils";
+import { groupFixturesByLeague } from "../_utils";
 import { FixtureCard } from "./fixture-card";
-import { FixtureDateGroup } from "./fixture-date-group";
 import { showGoalNotification } from "./goal-notification";
+import { LeagueFixtureGroup } from "./league-fixture-group";
 
 interface MatchdayContentProps {
   initialData: MatchdayData;
 }
 
 export function MatchdayContent({ initialData }: MatchdayContentProps) {
-  const { data } = useMatchdayFixtures(
-    initialData.gameweek,
-    initialData.leagueSlug,
-    initialData,
-  );
+  const { data } = useMatchdayFixtures(initialData.date, initialData);
   const { detectChanges } = useScoreChangeDetector();
 
   // 폴링 데이터 변경 시 스코어 변경 감지 → 골 알림 트리거
@@ -37,12 +33,16 @@ export function MatchdayContent({ initialData }: MatchdayContentProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.fixtures]);
 
-  const dateGroups = groupFixturesByDate(data.fixtures);
+  const leagueGroups = groupFixturesByLeague(data.fixtures);
 
   return (
     <>
-      {dateGroups.map(({ dateKey, dateLabel, fixtures: groupFixtures }) => (
-        <FixtureDateGroup key={dateKey} dateLabel={dateLabel}>
+      {leagueGroups.map(({ league, fixtures: groupFixtures }) => (
+        <LeagueFixtureGroup
+          key={league.id}
+          shortName={league.shortName}
+          country={league.country}
+        >
           {groupFixtures.map((fixture) => {
             const homeTeam = data.teams[fixture.homeTeamId];
             const awayTeam = data.teams[fixture.awayTeamId];
@@ -60,7 +60,7 @@ export function MatchdayContent({ initialData }: MatchdayContentProps) {
               />
             );
           })}
-        </FixtureDateGroup>
+        </LeagueFixtureGroup>
       ))}
     </>
   );

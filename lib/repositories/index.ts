@@ -4,6 +4,7 @@ import "server-only";
 export {
   getCurrentGameweek,
   getFixtureById,
+  getFixturesByDate,
   getFixturesByGameweek,
 } from "./fixture-repository";
 export { getInjuriesByTeamId } from "./injury-repository";
