@@ -15,6 +15,7 @@ describe("parseScoutlabParams", () => {
       position: null,
       mode: "per90",
       adjustment: "padj",
+      comparisonPosition: "AM/W",
     });
   });
 
@@ -27,6 +28,7 @@ describe("parseScoutlabParams", () => {
       position: "FW",
       mode: "total",
       adjustment: "raw",
+      comparisonPosition: "CB",
     });
     expect(result).toEqual({
       playerId: 42,
@@ -36,6 +38,7 @@ describe("parseScoutlabParams", () => {
       position: "FW",
       mode: "total",
       adjustment: "raw",
+      comparisonPosition: "CB",
     });
   });
 
@@ -91,5 +94,23 @@ describe("parseScoutlabParams", () => {
     for (const league of leagues) {
       expect(parseScoutlabParams({ league }).league).toBe(league);
     }
+  });
+
+  it("유효한 comparisonPosition 목록 전체 확인", () => {
+    const positions = ["CB", "FB", "MF", "AM/W", "FW"];
+    for (const pos of positions) {
+      expect(
+        parseScoutlabParams({ comparisonPosition: pos }).comparisonPosition,
+      ).toBe(pos);
+    }
+  });
+
+  it("무효한 comparisonPosition → 기본값 AM/W", () => {
+    expect(
+      parseScoutlabParams({ comparisonPosition: "GK" }).comparisonPosition,
+    ).toBe("AM/W");
+    expect(
+      parseScoutlabParams({ comparisonPosition: "AM" }).comparisonPosition,
+    ).toBe("AM/W");
   });
 });

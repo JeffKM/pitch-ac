@@ -47,13 +47,17 @@ export async function upsertMetrics(
     string,
     Record<string, { value: number; percentile: number }>
   >,
+  mode: "per90" | "total" = "per90",
+  adjustment: "padj" | "raw" = "padj",
+  comparisonPosition: string = "AM/W",
 ): Promise<void> {
   const { error } = await supabase.from("scoutlab_metrics").upsert(
     {
       player_id: playerId,
       season,
-      mode: "per90",
-      adjustment: "padj",
+      mode,
+      adjustment,
+      comparison_position: comparisonPosition,
       final_product: grouped["final_product"] ?? {},
       shooting: grouped["shooting"] ?? {},
       creation: grouped["creation"] ?? {},
@@ -66,7 +70,9 @@ export async function upsertMetrics(
       vaep_overview: grouped["vaep_overview"] ?? {},
       misc: grouped["misc"] ?? {},
     },
-    { onConflict: "player_id,season,mode,adjustment" },
+    {
+      onConflict: "player_id,season,mode,adjustment,comparison_position",
+    },
   );
 
   if (error) {

@@ -3,6 +3,7 @@ import "server-only";
 
 import type {
   ScoutlabAdjustment,
+  ScoutlabComparisonPosition,
   ScoutlabLeague,
   ScoutlabMode,
   ScoutlabPosition,
@@ -10,9 +11,11 @@ import type {
 
 import {
   DEFAULT_ADJUSTMENT,
+  DEFAULT_COMPARISON_POSITION,
   DEFAULT_MODE,
   DEFAULT_SEASON,
   VALID_ADJUSTMENTS,
+  VALID_COMPARISON_POSITIONS,
   VALID_LEAGUES,
   VALID_MODES,
   VALID_POSITIONS,
@@ -27,6 +30,7 @@ export interface ScoutlabPageParams {
   position: ScoutlabPosition | null;
   mode: ScoutlabMode;
   adjustment: ScoutlabAdjustment;
+  comparisonPosition: ScoutlabComparisonPosition;
 }
 
 /** searchParams를 파싱하여 타입 안전한 객체로 변환 */
@@ -70,6 +74,13 @@ export function parseScoutlabParams(
       ? (adjStr as ScoutlabAdjustment)
       : DEFAULT_ADJUSTMENT;
 
+  const cpStr = raw("comparisonPosition");
+  const comparisonPosition =
+    cpStr &&
+    VALID_COMPARISON_POSITIONS.includes(cpStr as ScoutlabComparisonPosition)
+      ? (cpStr as ScoutlabComparisonPosition)
+      : DEFAULT_COMPARISON_POSITION;
+
   return {
     playerId: playerId && !isNaN(playerId) ? playerId : null,
     season,
@@ -78,5 +89,6 @@ export function parseScoutlabParams(
     position,
     mode,
     adjustment,
+    comparisonPosition,
   };
 }

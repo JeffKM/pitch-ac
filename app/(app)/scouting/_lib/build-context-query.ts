@@ -2,6 +2,7 @@
 
 import {
   DEFAULT_ADJUSTMENT,
+  DEFAULT_COMPARISON_POSITION,
   DEFAULT_MODE,
   DEFAULT_SEASON,
 } from "./scoutlab-constants";
@@ -12,6 +13,7 @@ export const CONTEXT_PARAMS = [
   "season",
   "mode",
   "adjustment",
+  "comparisonPosition",
 ] as const;
 
 /** 현재 searchParams에서 컨텍스트 파라미터만 추출하여 query string 생성 */
@@ -26,6 +28,8 @@ export function buildContextQuery(searchParams: URLSearchParams): string {
     if (key === "season" && value === DEFAULT_SEASON) continue;
     if (key === "mode" && value === DEFAULT_MODE) continue;
     if (key === "adjustment" && value === DEFAULT_ADJUSTMENT) continue;
+    if (key === "comparisonPosition" && value === DEFAULT_COMPARISON_POSITION)
+      continue;
 
     params.set(key, value);
   }

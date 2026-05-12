@@ -7,6 +7,7 @@ import type {
   ScoutlabActionType,
   ScoutlabAdjustment,
   ScoutlabCategoryMetrics,
+  ScoutlabComparisonPosition,
   ScoutlabLeague,
   ScoutlabMetrics,
   ScoutlabMode,
@@ -40,6 +41,7 @@ export interface ScoutlabMetricsRow {
   season: string;
   mode: string;
   adjustment: string;
+  comparison_position: string;
   final_product: ScoutlabCategoryMetrics;
   shooting: ScoutlabCategoryMetrics;
   creation: ScoutlabCategoryMetrics;
@@ -106,6 +108,7 @@ export function scoutlabMetricsRowToMetrics(
     season: row.season,
     mode: row.mode as ScoutlabMode,
     adjustment: row.adjustment as ScoutlabAdjustment,
+    comparisonPosition: row.comparison_position as ScoutlabComparisonPosition,
     finalProduct: row.final_product,
     shooting: row.shooting,
     creation: row.creation,

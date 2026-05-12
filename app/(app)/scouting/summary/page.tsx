@@ -7,6 +7,7 @@ import {
 } from "@/lib/repositories/scoutlab-repository";
 
 import { CategoryPercentileBars } from "../_components/category-percentile-bars";
+import { MetricContextSubtitle } from "../_components/metric-context-subtitle";
 import { PlayerCardHeader } from "../_components/player-card-header";
 import { parseScoutlabParams } from "../_lib/scoutlab-search-params";
 
@@ -26,6 +27,7 @@ export default async function SummaryPage({ searchParams }: PageProps) {
           params.season,
           params.mode,
           params.adjustment,
+          params.comparisonPosition,
         )
       : null,
   ]);
@@ -51,8 +53,13 @@ export default async function SummaryPage({ searchParams }: PageProps) {
       data-testid="summary-layout"
     >
       {/* 좌: 선수 카드 헤더 */}
-      <div>
+      <div className="space-y-2">
         <PlayerCardHeader player={selectedPlayer} />
+        <MetricContextSubtitle
+          comparisonPosition={params.comparisonPosition}
+          mode={params.mode}
+          adjustment={params.adjustment}
+        />
       </div>
 
       {/* 우: 카테고리 백분위 바 */}

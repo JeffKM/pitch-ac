@@ -9,6 +9,7 @@ import {
 } from "@/lib/repositories/scoutlab-repository";
 
 import { MetricCompareTable } from "../_components/metric-compare-table";
+import { MetricContextSubtitle } from "../_components/metric-context-subtitle";
 import { PlayerCardHeader } from "../_components/player-card-header";
 import { DynamicRadarChart } from "../_components/scoutlab-charts";
 import { ScoutlabCompareSearch } from "../_components/scoutlab-compare-search";
@@ -43,6 +44,7 @@ export default async function ScoutingComparePage({ searchParams }: PageProps) {
           params.season,
           params.mode,
           params.adjustment,
+          params.comparisonPosition,
         )
       : null,
     playerB
@@ -51,6 +53,7 @@ export default async function ScoutingComparePage({ searchParams }: PageProps) {
           params.season,
           params.mode,
           params.adjustment,
+          params.comparisonPosition,
         )
       : null,
     playerA ? getScoutlabRadar(playerA.id, params.season) : null,
@@ -73,6 +76,11 @@ export default async function ScoutingComparePage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-4">
+      <MetricContextSubtitle
+        comparisonPosition={params.comparisonPosition}
+        mode={params.mode}
+        adjustment={params.adjustment}
+      />
       {/* 두 선수 헤더 나란히 */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto_1fr]">
         <PlayerCardHeader player={playerA} />

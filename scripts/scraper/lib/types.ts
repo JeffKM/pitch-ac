@@ -9,6 +9,12 @@ export interface ScraperOptions {
   headless: boolean;
   dryRun: boolean;
   delay: number;
+  /** 특정 mode만 스크래핑 (미지정 시 per90+total 모두) */
+  mode?: "per90" | "total";
+  /** 특정 adjustment만 스크래핑 (미지정 시 padj+raw 모두) */
+  adjustment?: "padj" | "raw";
+  /** 포지션 비교 그룹 스크래핑 스킵 (기본 AM/W만 저장) */
+  skipPositions: boolean;
 }
 
 /** 파싱된 선수 정보 */

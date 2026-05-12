@@ -62,4 +62,14 @@ describe("buildContextQuery", () => {
     const sp = new URLSearchParams("season=25/26&mode=per90&adjustment=padj");
     expect(buildContextQuery(sp)).toBe("");
   });
+
+  it("기본값 comparisonPosition(AM/W)는 URL에 포함하지 않음", () => {
+    const sp = new URLSearchParams("playerId=1&comparisonPosition=AM/W");
+    expect(buildContextQuery(sp)).toBe("?playerId=1");
+  });
+
+  it("비기본 comparisonPosition(CB) → URL에 포함", () => {
+    const sp = new URLSearchParams("playerId=1&comparisonPosition=CB");
+    expect(buildContextQuery(sp)).toBe("?playerId=1&comparisonPosition=CB");
+  });
 });

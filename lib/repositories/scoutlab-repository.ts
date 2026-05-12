@@ -9,6 +9,7 @@ import type {
   ScoutlabActionType,
   ScoutlabAdjustment,
   ScoutlabCategory,
+  ScoutlabComparisonPosition,
   ScoutlabFilterOptions,
   ScoutlabLeague,
   ScoutlabMetrics,
@@ -85,6 +86,7 @@ export const getScoutlabMetrics = cache(
     season: string,
     mode: ScoutlabMode = "per90",
     adjustment: ScoutlabAdjustment = "padj",
+    comparisonPosition: ScoutlabComparisonPosition = "AM/W",
   ): Promise<ScoutlabMetrics | null> => {
     const supabase = await createClient();
 
@@ -95,6 +97,7 @@ export const getScoutlabMetrics = cache(
       .eq("season", season)
       .eq("mode", mode)
       .eq("adjustment", adjustment)
+      .eq("comparison_position", comparisonPosition)
       .maybeSingle();
 
     if (error) throw new Error(`scoutlab_metrics 조회 실패: ${error.message}`);
@@ -109,6 +112,7 @@ export async function getScoutlabProgression(
   playerId: number,
   mode: ScoutlabMode = "per90",
   adjustment: ScoutlabAdjustment = "padj",
+  comparisonPosition: ScoutlabComparisonPosition = "AM/W",
 ): Promise<ScoutlabMetrics[]> {
   const supabase = await createClient();
 
@@ -118,6 +122,7 @@ export async function getScoutlabProgression(
     .eq("player_id", playerId)
     .eq("mode", mode)
     .eq("adjustment", adjustment)
+    .eq("comparison_position", comparisonPosition)
     .order("season", { ascending: true });
 
   if (error)

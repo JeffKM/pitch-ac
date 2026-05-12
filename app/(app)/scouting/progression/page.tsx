@@ -20,7 +20,12 @@ export default async function ProgressionPage({ searchParams }: PageProps) {
   const [selectedPlayer, progressionData] = await Promise.all([
     params.playerId ? getScoutlabPlayerById(params.playerId) : null,
     params.playerId
-      ? getScoutlabProgression(params.playerId, params.mode, params.adjustment)
+      ? getScoutlabProgression(
+          params.playerId,
+          params.mode,
+          params.adjustment,
+          params.comparisonPosition,
+        )
       : [],
   ]);
 

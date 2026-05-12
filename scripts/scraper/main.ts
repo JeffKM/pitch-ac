@@ -46,6 +46,9 @@ import {
   selectSeason,
   selectSidebarTab,
   selectTeam,
+  toggleAdjustment,
+  toggleComparisonPosition,
+  toggleMode,
 } from "./lib/navigation";
 import {
   groupMetricsByCategory,
@@ -55,6 +58,11 @@ import {
 } from "./lib/parsers";
 import { createScraperClient } from "./lib/supabase";
 import type { ScraperOptions, ScrapeStats } from "./lib/types";
+
+/** 유효한 mode/adjustment 조합 */
+const ALL_MODES = ["per90", "total"] as const;
+const ALL_ADJUSTMENTS = ["padj", "raw"] as const;
+const ALL_COMPARISON_POSITIONS = ["CB", "FB", "MF", "AM/W", "FW"] as const;
 
 /** CLI 인자 파싱 */
 function parseCliArgs(): ScraperOptions {
@@ -67,9 +75,15 @@ function parseCliArgs(): ScraperOptions {
       headless: { type: "string", default: "true" },
       "dry-run": { type: "boolean", default: false },
       delay: { type: "string", default: String(DEFAULT_DELAY) },
+      mode: { type: "string" },
+      adjustment: { type: "string" },
+      "skip-positions": { type: "boolean", default: false },
     },
     strict: false,
   });
+
+  const modeVal = values.mode as string | undefined;
+  const adjVal = values.adjustment as string | undefined;
 
   return {
     season: String(values.season ?? DEFAULT_SEASON),
@@ -79,6 +93,15 @@ function parseCliArgs(): ScraperOptions {
     headless: String(values.headless) !== "false",
     dryRun: Boolean(values["dry-run"]),
     delay: parseInt(String(values.delay ?? DEFAULT_DELAY), 10),
+    mode:
+      modeVal && (ALL_MODES as readonly string[]).includes(modeVal)
+        ? (modeVal as "per90" | "total")
+        : undefined,
+    adjustment:
+      adjVal && (ALL_ADJUSTMENTS as readonly string[]).includes(adjVal)
+        ? (adjVal as "padj" | "raw")
+        : undefined,
+    skipPositions: Boolean(values["skip-positions"]),
   };
 }
 
@@ -91,13 +114,19 @@ async function parseAndSave(
   league: string,
   season: string,
   dryRun: boolean,
+  mode: "per90" | "total" = "per90",
+  adjustment: "padj" | "raw" = "padj",
+  comparisonPosition: string = "AM/W",
 ): Promise<boolean> {
   const playerInfo = await parsePlayerInfo(iframe);
   const metrics = await parseMetrics(iframe);
-  const similar = await parseSimilarPlayers(iframe, page);
+
+  // 유사 선수는 기본 조합(per90+padj+자체포지션)에서만 수집
+  const isDefault = mode === "per90" && adjustment === "padj";
+  const similar = isDefault ? await parseSimilarPlayers(iframe, page) : [];
 
   logInfo(
-    `  ${playerInfo.name} | ${playerInfo.position} | ${playerInfo.minutes}분 | 메트릭 ${metrics.length}개 | 유사 ${similar.length}명`,
+    `  ${playerInfo.name} | ${mode}/${adjustment}/${comparisonPosition} | 메트릭 ${metrics.length}개`,
   );
 
   if (dryRun) {
@@ -107,7 +136,15 @@ async function parseAndSave(
 
   const grouped = groupMetricsByCategory(metrics);
   const playerId = await upsertPlayer(supabase, playerInfo, league);
-  await upsertMetrics(supabase, playerId, season, grouped);
+  await upsertMetrics(
+    supabase,
+    playerId,
+    season,
+    grouped,
+    mode,
+    adjustment,
+    comparisonPosition,
+  );
 
   if (similar.length > 0) {
     await upsertSimilarity(supabase, playerId, season, similar);
@@ -115,6 +152,59 @@ async function parseAndSave(
 
   logSuccess(`  ${playerInfo.name} 저장 완료 (id: ${playerId})`);
   return true;
+}
+
+/** 현재 선수에 대해 mode×adjustment×position 조합 순회 스크래핑 */
+async function scrapeAllCombinations(
+  iframe: FrameLocator,
+  page: Page,
+  supabase: ReturnType<typeof createScraperClient>,
+  playerName: string,
+  league: string,
+  season: string,
+  opts: ScraperOptions,
+  stats: ScrapeStats,
+): Promise<void> {
+  const modes = opts.mode ? [opts.mode] : [...ALL_MODES];
+  const adjustments = opts.adjustment
+    ? [opts.adjustment]
+    : [...ALL_ADJUSTMENTS];
+  const positions = opts.skipPositions
+    ? ["AM/W"]
+    : [...ALL_COMPARISON_POSITIONS];
+
+  for (const mode of modes) {
+    await toggleMode(iframe, page, mode);
+    for (const adj of adjustments) {
+      await toggleAdjustment(iframe, page, adj);
+      for (const pos of positions) {
+        await toggleComparisonPosition(iframe, page, pos);
+        try {
+          const success = await parseAndSave(
+            iframe,
+            page,
+            supabase,
+            playerName,
+            league,
+            season,
+            opts.dryRun,
+            mode,
+            adj,
+            pos,
+          );
+          if (success) stats.successCount++;
+          else {
+            stats.failCount++;
+            stats.failedPlayers.push(`${playerName}(${mode}/${adj}/${pos})`);
+          }
+        } catch (error) {
+          logError(`  ${playerName} (${mode}/${adj}/${pos}) 실패`, error);
+          stats.failCount++;
+          stats.failedPlayers.push(`${playerName}(${mode}/${adj}/${pos})`);
+        }
+      }
+    }
+  }
 }
 
 /** 메인 실행 */
@@ -148,22 +238,17 @@ async function main(): Promise<void> {
       stats.totalPlayers = 1;
       try {
         await searchPlayer(iframe, page, opts.player);
-        // 검색 후 Player Card 탭 재선택 (검색이 탭 상태를 리셋할 수 있음)
         await selectSidebarTab(iframe, page, "Player Card");
-        const success = await parseAndSave(
+        await scrapeAllCombinations(
           iframe,
           page,
           supabase,
           opts.player,
           opts.league,
           opts.season,
-          opts.dryRun,
+          opts,
+          stats,
         );
-        if (success) stats.successCount++;
-        else {
-          stats.failCount++;
-          stats.failedPlayers.push(opts.player);
-        }
       } catch (error) {
         logError(`  ${opts.player} 스크래핑 실패`, error);
         stats.failCount++;
@@ -179,20 +264,16 @@ async function main(): Promise<void> {
         stats.totalPlayers = 1;
         try {
           await selectPlayer(iframe, page, opts.player);
-          const success = await parseAndSave(
+          await scrapeAllCombinations(
             iframe,
             page,
             supabase,
             opts.player,
             opts.league,
             opts.season,
-            opts.dryRun,
+            opts,
+            stats,
           );
-          if (success) stats.successCount++;
-          else {
-            stats.failCount++;
-            stats.failedPlayers.push(opts.player);
-          }
         } catch (error) {
           logError(`  ${opts.player} 스크래핑 실패`, error);
           stats.failCount++;
@@ -221,20 +302,16 @@ async function main(): Promise<void> {
 
               try {
                 await selectPlayer(iframe, page, playerName);
-                const success = await parseAndSave(
+                await scrapeAllCombinations(
                   iframe,
                   page,
                   supabase,
                   playerName,
                   opts.league,
                   opts.season,
-                  opts.dryRun,
+                  opts,
+                  stats,
                 );
-                if (success) stats.successCount++;
-                else {
-                  stats.failCount++;
-                  stats.failedPlayers.push(playerName);
-                }
               } catch (error) {
                 logError(`  ${playerName} 스크래핑 실패`, error);
                 stats.failCount++;

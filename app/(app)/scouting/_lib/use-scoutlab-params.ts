@@ -7,6 +7,7 @@ import { useCallback, useMemo } from "react";
 
 import type {
   ScoutlabAdjustment,
+  ScoutlabComparisonPosition,
   ScoutlabLeague,
   ScoutlabMode,
   ScoutlabPosition,
@@ -14,9 +15,11 @@ import type {
 
 import {
   DEFAULT_ADJUSTMENT,
+  DEFAULT_COMPARISON_POSITION,
   DEFAULT_MODE,
   DEFAULT_SEASON,
   VALID_ADJUSTMENTS,
+  VALID_COMPARISON_POSITIONS,
   VALID_LEAGUES,
   VALID_MODES,
   VALID_POSITIONS,
@@ -30,6 +33,7 @@ export interface ScoutlabParamsState {
   position: ScoutlabPosition | null;
   mode: ScoutlabMode;
   adjustment: ScoutlabAdjustment;
+  comparisonPosition: ScoutlabComparisonPosition;
 }
 
 type ParamUpdates = Partial<ScoutlabParamsState> & {
@@ -82,6 +86,11 @@ export function useScoutlabParams() {
         VALID_ADJUSTMENTS,
         DEFAULT_ADJUSTMENT,
       ),
+      comparisonPosition: validateEnum(
+        searchParams.get("comparisonPosition"),
+        VALID_COMPARISON_POSITIONS,
+        DEFAULT_COMPARISON_POSITION,
+      ),
     };
   }, [searchParams]);
 
@@ -103,6 +112,8 @@ export function useScoutlabParams() {
       if (params.get("adjustment") === DEFAULT_ADJUSTMENT)
         params.delete("adjustment");
       if (params.get("season") === DEFAULT_SEASON) params.delete("season");
+      if (params.get("comparisonPosition") === DEFAULT_COMPARISON_POSITION)
+        params.delete("comparisonPosition");
 
       const qs = params.toString();
       router.push(`${pathname}${qs ? `?${qs}` : ""}`, { scroll: false });

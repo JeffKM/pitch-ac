@@ -17,6 +17,9 @@ export type ScoutlabMode = "per90" | "total";
 
 export type ScoutlabAdjustment = "padj" | "raw";
 
+/** 포지션 비교 그룹 (백분위 비교 대상) */
+export type ScoutlabComparisonPosition = "CB" | "FB" | "MF" | "AM/W" | "FW";
+
 export type ScoutlabActionType = "carries" | "passes" | "crosses";
 
 // ── 메트릭 카테고리명 ──
@@ -82,6 +85,7 @@ export interface ScoutlabMetrics {
   season: string;
   mode: ScoutlabMode;
   adjustment: ScoutlabAdjustment;
+  comparisonPosition: ScoutlabComparisonPosition;
   finalProduct: ScoutlabCategoryMetrics;
   shooting: ScoutlabCategoryMetrics;
   creation: ScoutlabCategoryMetrics;

@@ -197,6 +197,54 @@ export async function extractPlayerList(
   return extractAllComboboxOptions(iframe, page, "Player");
 }
 
+/** Streamlit segmented control에서 특정 값 선택 */
+async function selectSegmentedControl(
+  iframe: FrameLocator,
+  page: Page,
+  label: string,
+): Promise<void> {
+  // Streamlit segmented control 버튼 선택
+  const btn = iframe
+    .locator('[data-testid="stBaseButton-segmented_control"]')
+    .filter({ hasText: label })
+    .first();
+  await btn.waitFor({ state: "visible", timeout: 10_000 });
+  await btn.click();
+  await waitForStreamlitUpdate(iframe, page);
+}
+
+/** 수치 모드 토글 (P90 / Total) */
+export async function toggleMode(
+  iframe: FrameLocator,
+  page: Page,
+  mode: "per90" | "total",
+): Promise<void> {
+  const label = mode === "per90" ? "P90" : "Total";
+  logInfo(`모드 토글: ${label}`);
+  await selectSegmentedControl(iframe, page, label);
+}
+
+/** 보정 모드 토글 (PAdj. / Raw) */
+export async function toggleAdjustment(
+  iframe: FrameLocator,
+  page: Page,
+  adjustment: "padj" | "raw",
+): Promise<void> {
+  const label = adjustment === "padj" ? "Padj." : "Raw";
+  logInfo(`보정 토글: ${label}`);
+  await selectSegmentedControl(iframe, page, label);
+}
+
+/** 포지션 비교 그룹 토글 (CB / FB / MF / AM/W / FW) */
+export async function toggleComparisonPosition(
+  iframe: FrameLocator,
+  page: Page,
+  position: string,
+): Promise<void> {
+  logInfo(`비교 그룹 토글: ${position}`);
+  await selectSegmentedControl(iframe, page, position);
+}
+
 /** Streamlit 데이터 업데이트 대기 */
 async function waitForStreamlitUpdate(
   iframe: FrameLocator,

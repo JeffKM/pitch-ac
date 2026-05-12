@@ -2,6 +2,7 @@
 
 import type {
   ScoutlabAdjustment,
+  ScoutlabComparisonPosition,
   ScoutlabLeague,
   ScoutlabMode,
   ScoutlabPosition,
@@ -29,6 +30,26 @@ export const VALID_MODES: ScoutlabMode[] = ["per90", "total"];
 
 export const VALID_ADJUSTMENTS: ScoutlabAdjustment[] = ["padj", "raw"];
 
+export const VALID_COMPARISON_POSITIONS: ScoutlabComparisonPosition[] = [
+  "CB",
+  "FB",
+  "MF",
+  "AM/W",
+  "FW",
+];
+
+export const COMPARISON_POSITION_LABELS: Record<
+  ScoutlabComparisonPosition,
+  string
+> = {
+  CB: "Centre-Backs",
+  FB: "Full-Backs",
+  MF: "Midfielders",
+  "AM/W": "Att Mid/Wingers",
+  FW: "Forwards",
+};
+
 export const DEFAULT_SEASON = "25/26";
 export const DEFAULT_MODE: ScoutlabMode = "per90";
 export const DEFAULT_ADJUSTMENT: ScoutlabAdjustment = "padj";
+export const DEFAULT_COMPARISON_POSITION: ScoutlabComparisonPosition = "AM/W";

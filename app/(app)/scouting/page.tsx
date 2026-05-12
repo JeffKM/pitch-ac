@@ -9,6 +9,7 @@ import {
 } from "@/lib/repositories/scoutlab-repository";
 
 import { MetricCategoryTable } from "./_components/metric-category-table";
+import { MetricContextSubtitle } from "./_components/metric-context-subtitle";
 import { PlayerCardHeader } from "./_components/player-card-header";
 import { ScoutlabFilterBar } from "./_components/scoutlab-filter-bar";
 import { ScoutlabModeToggle } from "./_components/scoutlab-mode-toggle";
@@ -30,7 +31,6 @@ export default async function ScoutingPage({ searchParams }: PageProps) {
       season: params.season,
       league: params.league ?? undefined,
       team: params.team ?? undefined,
-      position: params.position ?? undefined,
     }),
     params.playerId ? getScoutlabPlayerById(params.playerId) : null,
   ]);
@@ -42,6 +42,7 @@ export default async function ScoutingPage({ searchParams }: PageProps) {
         params.season,
         params.mode,
         params.adjustment,
+        params.comparisonPosition,
       )
     : null;
 
@@ -66,6 +67,11 @@ export default async function ScoutingPage({ searchParams }: PageProps) {
       {selectedPlayer ? (
         <div className="space-y-4">
           <PlayerCardHeader player={selectedPlayer} />
+          <MetricContextSubtitle
+            comparisonPosition={params.comparisonPosition}
+            mode={params.mode}
+            adjustment={params.adjustment}
+          />
           {metrics ? (
             <MetricCategoryTable metrics={metrics} />
           ) : (
