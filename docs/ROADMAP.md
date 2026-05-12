@@ -653,6 +653,39 @@ Ranking 페이지를 EPL 전용에서 5대 리그(EPL, La Liga, Serie A, Bundesl
 
 ---
 
+## Phase PD: PL 선수 데이터 동기화 ✅
+
+football-data.org squad 엔드포인트로 PL 20팀의 전체 선수 데이터를 `players` + `scoutlab_players` 테이블에 동기화. Scouting 페이지에서 선수 검색이 가능하도록 기반 데이터 적재.
+
+- **Task PD01: 포지션 매핑 + 시즌 변환 유틸** ✅
+  - `lib/constants/football.ts`: `SCOUTLAB_POSITION_MAP` (GK→null, Defence→CB, Midfield→MF, Offence→FW)
+  - `lib/constants/football.ts`: `toScoutlabSeason()` ("2025/2026" → "25/26")
+
+- **Task PD02: 나이 계산 유틸** ✅
+  - `lib/api/football-data/mappers.ts`: `calculateAge(dateOfBirth)` 함수
+
+- **Task PD03: 선수 동기화 핵심 로직** ✅
+  - `lib/services/sync/sync-players.ts`: stub → 실제 구현
+  - `getCompetitionTeams("PL")` 1회 호출 → 20팀 ~500명 squad
+  - teams 테이블 upsert (FK 보장) → players 테이블 upsert (GK 포함) → scoutlab_players 테이블 upsert (GK 제외)
+  - scorers 보강: 등번호 + 출전시간 근사값
+
+- **Task PD04: 디버그 엔드포인트** ✅
+  - `app/api/debug/football-data/sync-players/route.ts`: 신규
+  - `app/api/debug/football-data/sync/route.ts`: syncPlayers 호출 추가
+
+- **Task PD05: 데이터 동기화 실행 + 검증** ✅
+  - 디버그 엔드포인트 호출로 PL 선수 데이터 적재
+  - `/scouting` 페이지에서 선수 검색 작동 확인
+
+- **Task PD06: scoutlab_players 중복 방지 로직** ✅
+  - 원인: football-data.org 팀명("Liverpool FC")과 스크래퍼 팀명("Liverpool")이 달라 upsert 충돌 키(`name,team,season`)가 중복 미감지
+  - DB 정리: 307개 중복 레코드 삭제 + `pitch_ac_player_id` 이관 (626명 → 중복 0)
+  - `sync-players.ts`: 동기화 전 기존 선수를 이름 기준으로 조회, 기존 선수는 `pitch_ac_player_id`만 업데이트, 새 선수만 삽입
+  - 테스트: 중복 방지 검증 2개 추가 (기존 선수 스킵 / 이미 ID 있으면 업데이트 건너뜀), 7개 전체 통과
+
+---
+
 ## Phase 8: 카툰 매치데이 (핵심) — 예정
 
 - **Task 801: 카툰 포메이션 피치 뷰**
@@ -750,8 +783,9 @@ Ranking 페이지를 EPL 전용에서 5대 리그(EPL, La Liga, Serie A, Bundesl
 | F131    | 홈페이지 종이 질감 배경  | Task HP01      |
 | F132    | 슬로건 업데이트          | Task HP02      |
 | F133    | Ranking 5대 리그 순위표  | Task RK01~RK06 |
+| F134    | PL 선수 데이터 동기화    | Task PD01~PD06 |
 
 ---
 
-**최종 업데이트**: 2026-05-12 (Phase RK 완료 — Ranking 5대 리그 확장)
-**진행 상황**: Phase 1~5A 레거시 완료 ✅ | Phase 6 완료 ✅ | Phase 7+7B+7C+7D+7E+7E6 완료 ✅ | Phase S1+S2+S3+S4 완료 ✅ | Phase N1+N2 완료 ✅ | Phase AF 완료 ✅ | Phase FD 완료 ✅ | Phase HP 완료 ✅ | Phase RK 완료 ✅ | Phase 8~10 예정
+**최종 업데이트**: 2026-05-12 (Task PD06 — scoutlab_players 중복 방지 로직 추가)
+**진행 상황**: Phase 1~5A 레거시 완료 ✅ | Phase 6 완료 ✅ | Phase 7+7B+7C+7D+7E+7E6 완료 ✅ | Phase S1+S2+S3+S4 완료 ✅ | Phase N1+N2 완료 ✅ | Phase AF 완료 ✅ | Phase FD 완료 ✅ | Phase HP 완료 ✅ | Phase RK 완료 ✅ | Phase PD 완료 ✅ | Phase 8~10 예정

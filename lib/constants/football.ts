@@ -115,8 +115,9 @@ export const LEAGUE_NAME_MAP: Record<number, string> = {
   2015: "Ligue 1",
 };
 
-/** football-data.org 포지션 문자열 → 앱 포지션 */
+/** football-data.org 포지션 문자열 → 앱 포지션 (4분류) */
 export const POSITION_MAP: Record<string, string> = {
+  // 광의 분류 (squad endpoint 기본)
   Goalkeeper: "GK",
   Defence: "DEF",
   Defender: "DEF",
@@ -124,7 +125,52 @@ export const POSITION_MAP: Record<string, string> = {
   Midfielder: "MID",
   Offence: "FWD",
   Attacker: "FWD",
+  // 세부 포지션 → 4분류 매핑
+  "Centre-Back": "DEF",
+  "Left-Back": "DEF",
+  "Right-Back": "DEF",
+  "Defensive Midfield": "MID",
+  "Central Midfield": "MID",
+  "Attacking Midfield": "MID",
+  "Left Winger": "FWD",
+  "Right Winger": "FWD",
+  "Centre-Forward": "FWD",
+  "Second Striker": "FWD",
 };
+
+/** football-data.org 포지션 → ScoutLab 포지션 (GK → null: scoutlab 제외) */
+export const SCOUTLAB_POSITION_MAP: Record<string, string | null> = {
+  // squad endpoint position 값 (4종)
+  Goalkeeper: null,
+  Defence: "CB",
+  Defender: "CB",
+  Midfield: "MF",
+  Midfielder: "MF",
+  Offence: "FW",
+  Attacker: "FW",
+  // scorers endpoint section 값 — 대문자 (구 API 호환)
+  GOALKEEPER: null,
+  DEFENCE: "CB",
+  MIDFIELD: "MF",
+  OFFENCE: "FW",
+  // scorers endpoint section 값 — 세부 포지션명
+  "Centre-Forward": "FW",
+  "Second Striker": "FW",
+  "Right Winger": "W",
+  "Left Winger": "W",
+  "Attacking Midfield": "AM",
+  "Central Midfield": "MF",
+  "Defensive Midfield": "MF",
+  "Centre-Back": "CB",
+  "Left-Back": "FB",
+  "Right-Back": "FB",
+};
+
+/** 시즌 레이블 → ScoutLab 시즌 형식 ("2025/2026" → "25/26") */
+export function toScoutlabSeason(seasonLabel: string): string {
+  const [start, end] = seasonLabel.split("/");
+  return `${start.slice(-2)}/${end.slice(-2)}`;
+}
 
 /** football-data.org match status → 앱 FixtureStatus */
 export const FIXTURE_STATUS_MAP: Record<string, FixtureStatus> = {

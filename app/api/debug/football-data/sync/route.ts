@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import {
   syncAllLeagueFixtures,
   syncAllLeagueStandings,
+  syncPlayers,
 } from "@/lib/services/sync";
 
 export async function GET() {
@@ -14,10 +15,12 @@ export async function GET() {
   try {
     const fixtureResults = await syncAllLeagueFixtures();
     const standingResults = await syncAllLeagueStandings();
+    const playerResult = await syncPlayers();
 
     return NextResponse.json({
       fixtures: fixtureResults,
       standings: standingResults,
+      players: playerResult,
     });
   } catch (error) {
     return NextResponse.json(

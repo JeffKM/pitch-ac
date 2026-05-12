@@ -12,6 +12,7 @@ export type {
   FdMatchesResponse,
   FdScorer,
   FdScorersResponse,
+  FdSquadPlayer,
   FdStandingEntry,
   FdStandingsResponse,
   FdTeam,
