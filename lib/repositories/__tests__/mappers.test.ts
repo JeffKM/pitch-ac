@@ -98,6 +98,7 @@ describe("standingRowToStanding", () => {
     const row: StandingRow = {
       team_id: 1,
       season: "2025/2026",
+      league_id: 2021,
       position: 3,
       played: 30,
       won: 20,
@@ -111,6 +112,7 @@ describe("standingRowToStanding", () => {
     };
     const result = standingRowToStanding(row);
     expect(result.teamId).toBe(1);
+    expect(result.leagueId).toBe(2021);
     expect(result.goalDifference).toBe(35);
     expect(result.form).toEqual(["W", "D", "L", "W", "W"]);
   });
@@ -119,6 +121,7 @@ describe("standingRowToStanding", () => {
     const row: StandingRow = {
       team_id: 1,
       season: "2025/2026",
+      league_id: 2021,
       position: 1,
       played: 0,
       won: 0,

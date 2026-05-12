@@ -14,11 +14,13 @@ import { extractErrorMessage, type SyncResult, writeSyncLog } from "./log";
 
 const SEASON_LABEL = "2025/2026";
 
-/** PL 20팀 기본정보 동기화 */
-export async function syncTeams(): Promise<SyncResult> {
+/** 단일 리그 팀 기본정보 동기화 */
+export async function syncTeams(
+  leagueCode: string = "PL",
+): Promise<SyncResult> {
   const supabase = createAdminClient();
   try {
-    const res = await getCompetitionTeams("PL", CURRENT_SEASON);
+    const res = await getCompetitionTeams(leagueCode, CURRENT_SEASON);
 
     const teamRows = res.teams.map((raw) => {
       const team = mapFdTeamToTeam(raw, SEASON_LABEL);
@@ -32,7 +34,7 @@ export async function syncTeams(): Promise<SyncResult> {
     if (error) throw error;
 
     const result: SyncResult = {
-      entity: "teams",
+      entity: `teams-${leagueCode}`,
       status: "success",
       recordsSynced: teamRows.length,
     };
@@ -40,7 +42,7 @@ export async function syncTeams(): Promise<SyncResult> {
     return result;
   } catch (error) {
     const result: SyncResult = {
-      entity: "teams",
+      entity: `teams-${leagueCode}`,
       status: "error",
       recordsSynced: 0,
       errorMessage: extractErrorMessage(error),
@@ -50,9 +52,20 @@ export async function syncTeams(): Promise<SyncResult> {
   }
 }
 
+/** 5대 리그 전체 팀 동기화 */
+export async function syncAllLeagueTeams(): Promise<SyncResult[]> {
+  const results: SyncResult[] = [];
+  for (const league of TOP5_LEAGUES) {
+    const result = await syncTeams(league.code);
+    results.push(result);
+  }
+  return results;
+}
+
 /** 단일 리그 순위표 동기화 */
 export async function syncStandings(
   leagueCode: string = "PL",
+  leagueId: number = 2021,
 ): Promise<SyncResult> {
   const supabase = createAdminClient();
   try {
@@ -66,7 +79,7 @@ export async function syncStandings(
     }
 
     const standingRows = totalTable.table.map((raw) => {
-      const standing = mapFdStandingToTeamStanding(raw);
+      const standing = mapFdStandingToTeamStanding(raw, leagueId);
       return standingToDbRow(standing, SEASON_LABEL);
     });
 
@@ -99,7 +112,7 @@ export async function syncStandings(
 export async function syncAllLeagueStandings(): Promise<SyncResult[]> {
   const results: SyncResult[] = [];
   for (const league of TOP5_LEAGUES) {
-    const result = await syncStandings(league.code);
+    const result = await syncStandings(league.code, league.id);
     results.push(result);
   }
   return results;

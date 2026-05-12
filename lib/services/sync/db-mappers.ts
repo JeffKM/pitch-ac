@@ -98,6 +98,7 @@ export function standingToDbRow(standing: TeamStanding, season: string) {
   return {
     team_id: standing.teamId,
     season,
+    league_id: standing.leagueId,
     position: standing.position,
     played: standing.played,
     won: standing.won,

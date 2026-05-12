@@ -19,4 +19,9 @@ export {
 } from "./sync-fixtures";
 export { syncPlayers } from "./sync-players";
 export { syncSeasonStats } from "./sync-stats";
-export { syncAllLeagueStandings, syncStandings, syncTeams } from "./sync-teams";
+export {
+  syncAllLeagueStandings,
+  syncAllLeagueTeams,
+  syncStandings,
+  syncTeams,
+} from "./sync-teams";

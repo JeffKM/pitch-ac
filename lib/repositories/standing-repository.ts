@@ -3,6 +3,7 @@ import "server-only";
 
 import { cache } from "react";
 
+import { TOP5_LEAGUES } from "@/lib/constants/football";
 import { createClient } from "@/lib/supabase/server";
 import type { TeamStanding } from "@/types";
 
@@ -22,6 +23,33 @@ export const getAllStandings = cache(
     if (error) throw new Error(`standings 전체 조회 실패: ${error.message}`);
 
     return (data as StandingRow[]).map(standingRowToStanding);
+  },
+);
+
+/** 5대 리그 전체 순위 조회 → Map<leagueId, TeamStanding[]> */
+export const getAllLeagueStandings = cache(
+  async (season: string): Promise<Map<number, TeamStanding[]>> => {
+    const supabase = await createClient();
+    const leagueIds = TOP5_LEAGUES.map((l) => l.id);
+
+    const { data, error } = await supabase
+      .from("standings")
+      .select("*")
+      .in("league_id", leagueIds)
+      .eq("season", season)
+      .order("position", { ascending: true });
+
+    if (error)
+      throw new Error(`standings 5대 리그 조회 실패: ${error.message}`);
+
+    const map = new Map<number, TeamStanding[]>();
+    for (const row of data as StandingRow[]) {
+      const standing = standingRowToStanding(row);
+      const list = map.get(row.league_id) ?? [];
+      list.push(standing);
+      map.set(row.league_id, list);
+    }
+    return map;
   },
 );
 

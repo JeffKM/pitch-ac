@@ -50,6 +50,7 @@ export const mockTeams: Team[] = [
 export const mockStandings: TeamStanding[] = [
   {
     teamId: 40,
+    leagueId: 2021,
     position: 1,
     played: 27,
     won: 20,
@@ -63,6 +64,7 @@ export const mockStandings: TeamStanding[] = [
   },
   {
     teamId: 42,
+    leagueId: 2021,
     position: 2,
     played: 27,
     won: 18,
@@ -76,6 +78,7 @@ export const mockStandings: TeamStanding[] = [
   },
   {
     teamId: 50,
+    leagueId: 2021,
     position: 3,
     played: 27,
     won: 16,
@@ -89,6 +92,7 @@ export const mockStandings: TeamStanding[] = [
   },
   {
     teamId: 49,
+    leagueId: 2021,
     position: 4,
     played: 27,
     won: 14,
@@ -102,6 +106,7 @@ export const mockStandings: TeamStanding[] = [
   },
   {
     teamId: 47,
+    leagueId: 2021,
     position: 9,
     played: 27,
     won: 10,
@@ -115,6 +120,7 @@ export const mockStandings: TeamStanding[] = [
   },
   {
     teamId: 33,
+    leagueId: 2021,
     position: 13,
     played: 27,
     won: 8,

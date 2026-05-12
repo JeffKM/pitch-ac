@@ -14,6 +14,8 @@ export interface Team {
 /** 리그 순위표 항목 */
 export interface TeamStanding {
   teamId: number;
+  /** football-data.org competition ID (예: 2021=PL) */
+  leagueId: number;
   position: number;
   played: number;
   won: number;

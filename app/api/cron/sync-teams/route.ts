@@ -1,25 +1,28 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { verifyCronAuth } from "@/lib/services/sync/auth";
-import { syncStandings, syncTeams } from "@/lib/services/sync/sync-teams";
+import {
+  syncAllLeagueStandings,
+  syncAllLeagueTeams,
+} from "@/lib/services/sync/sync-teams";
 
-export const maxDuration = 60;
+export const maxDuration = 120;
 
-/** 팀 기본정보 + 순위표 동기화 (주 1회: 매주 월요일 04:00 UTC) */
+/** 5대 리그 팀 + 순위표 동기화 (주 1회: 매주 월요일 04:00 UTC) */
 export async function GET(request: NextRequest) {
   const authError = verifyCronAuth(request);
   if (authError) return authError;
 
   try {
-    const teamsResult = await syncTeams();
-    const standingsResult = await syncStandings();
+    const teamsResults = await syncAllLeagueTeams();
+    const standingsResults = await syncAllLeagueStandings();
 
-    const ok =
-      teamsResult.status === "success" && standingsResult.status === "success";
+    const allResults = [...teamsResults, ...standingsResults];
+    const ok = allResults.every((r) => r.status === "success");
 
     return NextResponse.json({
       ok,
-      results: [teamsResult, standingsResult],
+      results: allResults,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {

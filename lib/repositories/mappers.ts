@@ -43,6 +43,7 @@ export interface TeamRow {
 export interface StandingRow {
   team_id: number;
   season: string;
+  league_id: number;
   position: number;
   played: number;
   won: number;
@@ -208,6 +209,7 @@ export function playerMatchStatsRowToStats(
 export function standingRowToStanding(row: StandingRow): TeamStanding {
   return {
     teamId: row.team_id,
+    leagueId: row.league_id,
     position: row.position,
     played: row.played,
     won: row.won,

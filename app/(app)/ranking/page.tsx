@@ -4,24 +4,24 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { CURRENT_SEASON_LABEL } from "@/lib/constants/football";
-import { getAllStandings, getAllTeams } from "@/lib/repositories";
+import { getAllLeagueStandings, getAllTeams } from "@/lib/repositories";
 
 import { RankingContent } from "./_components/ranking-content";
 
 export const metadata: Metadata = {
   title: "Ranking",
-  description: "Premier League standings and league table",
+  description: "Top 5 European league standings",
 };
 
 async function RankingData() {
-  const [standings, teams] = await Promise.all([
-    getAllStandings(CURRENT_SEASON_LABEL),
+  const [standingsMap, teams] = await Promise.all([
+    getAllLeagueStandings(CURRENT_SEASON_LABEL),
     getAllTeams(),
   ]);
 
   const teamMap = new Map(teams.map((t) => [t.id, t]));
 
-  return <RankingContent standings={standings} teamMap={teamMap} />;
+  return <RankingContent standingsMap={standingsMap} teamMap={teamMap} />;
 }
 
 function RankingFallback() {

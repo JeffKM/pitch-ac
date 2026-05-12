@@ -104,6 +104,7 @@ export function mapFdMatchToH2HResult(raw: FdMatch): H2HResult | null {
 /** FdStandingEntry → TeamStanding */
 export function mapFdStandingToTeamStanding(
   raw: FdStandingEntry,
+  leagueId: number = 2021,
 ): TeamStanding {
   // form: "W,D,L,W,W" → ["W","D","L","W","W"]
   const form: Array<"W" | "D" | "L"> = raw.form
@@ -114,6 +115,7 @@ export function mapFdStandingToTeamStanding(
 
   return {
     teamId: raw.team.id,
+    leagueId,
     position: raw.position,
     played: raw.playedGames,
     won: raw.won,

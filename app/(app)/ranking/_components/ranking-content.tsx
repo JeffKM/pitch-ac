@@ -1,7 +1,5 @@
 "use client";
 
-import { Lock } from "lucide-react";
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TOP5_LEAGUES } from "@/lib/constants/football";
@@ -9,55 +7,51 @@ import type { Team, TeamStanding } from "@/types";
 
 import { StandingsTable } from "./standings-table";
 
-// TOP5_LEAGUES에서 파생, EPL만 활성화
-const LEAGUES = TOP5_LEAGUES.map((l) => ({
-  id: l.slug,
-  label: l.shortName,
-  available: l.slug === "epl",
-}));
-
 type RankingContentProps = {
-  standings: TeamStanding[];
+  standingsMap: Map<number, TeamStanding[]>;
   teamMap: Map<number, Team>;
 };
 
-export function RankingContent({ standings, teamMap }: RankingContentProps) {
+export function RankingContent({ standingsMap, teamMap }: RankingContentProps) {
   return (
     <Tabs defaultValue="epl">
       <TabsList className="w-full justify-start rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-cream">
-        {LEAGUES.map((league) => (
+        {TOP5_LEAGUES.map((league) => (
           <TabsTrigger
-            key={league.id}
-            value={league.id}
-            disabled={!league.available}
+            key={league.slug}
+            value={league.slug}
             className="font-[family-name:var(--font-bangers)] tracking-[var(--comic-tracking-normal)] data-[state=active]:bg-comic-yellow data-[state=active]:text-comic-black"
           >
-            {league.label}
-            {!league.available && <Lock className="ml-1 size-3" />}
+            {league.shortName}
           </TabsTrigger>
         ))}
       </TabsList>
 
-      {/* EPL 순위표 */}
-      <TabsContent value="epl" className="mt-4">
-        <StandingsTable standings={standings} teamMap={teamMap} />
-      </TabsContent>
-
-      {/* 나머지 리그 Coming Soon */}
-      {LEAGUES.filter((l) => !l.available).map((league) => (
-        <TabsContent key={league.id} value={league.id} className="mt-4">
-          <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-cream">
-            <CardContent className="flex flex-col items-center justify-center gap-2 py-12 text-center">
-              <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-lg)] text-comic-black">
-                {league.label} — Coming Soon
-              </p>
-              <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] text-comic-black/60">
-                Data integration in progress
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      ))}
+      {TOP5_LEAGUES.map((league) => {
+        const standings = standingsMap.get(league.id) ?? [];
+        return (
+          <TabsContent key={league.slug} value={league.slug} className="mt-4">
+            {standings.length > 0 ? (
+              <StandingsTable
+                standings={standings}
+                teamMap={teamMap}
+                leagueId={league.id}
+              />
+            ) : (
+              <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-cream">
+                <CardContent className="flex flex-col items-center justify-center gap-2 py-12 text-center">
+                  <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-lg)] text-comic-black">
+                    {league.shortName} — No Data
+                  </p>
+                  <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] text-comic-black/60">
+                    Standings will be available after sync
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+        );
+      })}
     </Tabs>
   );
 }

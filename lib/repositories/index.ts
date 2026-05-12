@@ -43,5 +43,9 @@ export {
   getScoutlabSimilarity,
   searchScoutlabPlayers,
 } from "./scoutlab-repository";
-export { getAllStandings, getStandingsByTeamIds } from "./standing-repository";
+export {
+  getAllLeagueStandings,
+  getAllStandings,
+  getStandingsByTeamIds,
+} from "./standing-repository";
 export { getAllTeams, getTeamsByIds } from "./team-repository";

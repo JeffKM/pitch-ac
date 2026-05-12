@@ -1,24 +1,121 @@
-// EPL 순위 테이블 컴포넌트
+// 순위 테이블 컴포넌트 — 리그별 하이라이트 규칙 지원
 
 import Image from "next/image";
 
+import { PL_LEAGUE_ID } from "@/lib/constants/football";
 import { cn } from "@/lib/utils";
 import type { Team, TeamStanding } from "@/types";
 
 type StandingsTableProps = {
   standings: TeamStanding[];
   teamMap: Map<number, Team>;
+  leagueId: number;
 };
 
-// 순위별 배경색 (챔피언스리그, 유로파, 강등권)
-function getPositionClass(position: number): string {
-  if (position <= 4) return "border-l-2 border-l-blue-500";
-  if (position === 5) return "border-l-2 border-l-orange-400";
-  if (position >= 18) return "border-l-2 border-l-red-500";
+// ─── 리그별 순위 하이라이트 규칙 ───────────────────
+
+type PositionZone = "ucl" | "uel" | "uecl" | "relegation-po" | "relegation";
+
+interface ZoneRule {
+  zone: PositionZone;
+  /** 해당 존에 속하는 순위 (포함) */
+  positions: number[];
+}
+
+/** 리그별 하이라이트 규칙 */
+const LEAGUE_ZONE_RULES: Record<number, ZoneRule[]> = {
+  // EPL: 1-4 UCL, 5 UEL, 18-20 강등
+  [PL_LEAGUE_ID]: [
+    { zone: "ucl", positions: [1, 2, 3, 4] },
+    { zone: "uel", positions: [5] },
+    { zone: "relegation", positions: [18, 19, 20] },
+  ],
+  // La Liga: 1-4 UCL, 5 UEL, 6 UECL, 18-20 강등
+  2014: [
+    { zone: "ucl", positions: [1, 2, 3, 4] },
+    { zone: "uel", positions: [5] },
+    { zone: "uecl", positions: [6] },
+    { zone: "relegation", positions: [18, 19, 20] },
+  ],
+  // Serie A: 1-4 UCL, 5 UEL, 6 UECL, 18-20 강등
+  2019: [
+    { zone: "ucl", positions: [1, 2, 3, 4] },
+    { zone: "uel", positions: [5] },
+    { zone: "uecl", positions: [6] },
+    { zone: "relegation", positions: [18, 19, 20] },
+  ],
+  // Bundesliga: 1-4 UCL, 5 UEL, 6 UECL, 16 강등PO, 17-18 강등
+  2002: [
+    { zone: "ucl", positions: [1, 2, 3, 4] },
+    { zone: "uel", positions: [5] },
+    { zone: "uecl", positions: [6] },
+    { zone: "relegation-po", positions: [16] },
+    { zone: "relegation", positions: [17, 18] },
+  ],
+  // Ligue 1: 1-3 UCL, 4 UEL, 16 강등PO, 17-18 강등
+  2015: [
+    { zone: "ucl", positions: [1, 2, 3] },
+    { zone: "uel", positions: [4] },
+    { zone: "relegation-po", positions: [16] },
+    { zone: "relegation", positions: [17, 18] },
+  ],
+};
+
+const ZONE_STYLES: Record<PositionZone, string> = {
+  ucl: "border-l-2 border-l-blue-500",
+  uel: "border-l-2 border-l-orange-400",
+  uecl: "border-l-2 border-l-green-500",
+  "relegation-po": "border-l-2 border-l-red-300",
+  relegation: "border-l-2 border-l-red-500",
+};
+
+function getPositionClass(position: number, leagueId: number): string {
+  const rules = LEAGUE_ZONE_RULES[leagueId] ?? LEAGUE_ZONE_RULES[PL_LEAGUE_ID];
+  for (const rule of rules) {
+    if (rule.positions.includes(position)) {
+      return ZONE_STYLES[rule.zone];
+    }
+  }
   return "";
 }
 
-// 폼 뱃지 색상
+// ─── 동적 범례 생성 ───────────────────────────────
+
+interface LegendItem {
+  label: string;
+  colorClass: string;
+}
+
+function getLegendItems(leagueId: number): LegendItem[] {
+  const rules = LEAGUE_ZONE_RULES[leagueId] ?? LEAGUE_ZONE_RULES[PL_LEAGUE_ID];
+  const zones = new Set(rules.map((r) => r.zone));
+
+  const items: LegendItem[] = [
+    { label: "Champions League", colorClass: "bg-blue-500" },
+    { label: "Europa League", colorClass: "bg-orange-400" },
+  ];
+
+  if (zones.has("uecl")) {
+    items.push({
+      label: "Conference League",
+      colorClass: "bg-green-500",
+    });
+  }
+
+  if (zones.has("relegation-po")) {
+    items.push({
+      label: "Relegation Play-off",
+      colorClass: "bg-red-300",
+    });
+  }
+
+  items.push({ label: "Relegation", colorClass: "bg-red-500" });
+
+  return items;
+}
+
+// ─── 폼 뱃지 색상 ───────────────────────────────
+
 function getFormColor(result: "W" | "D" | "L"): string {
   switch (result) {
     case "W":
@@ -30,9 +127,15 @@ function getFormColor(result: "W" | "D" | "L"): string {
   }
 }
 
-export function StandingsTable({ standings, teamMap }: StandingsTableProps) {
-  // position 오름차순 정렬
+// ─── 컴포넌트 ─────────────────────────────────────
+
+export function StandingsTable({
+  standings,
+  teamMap,
+  leagueId,
+}: StandingsTableProps) {
   const sorted = [...standings].sort((a, b) => a.position - b.position);
+  const legendItems = getLegendItems(leagueId);
 
   return (
     <div className="overflow-x-auto rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
@@ -60,7 +163,7 @@ export function StandingsTable({ standings, teamMap }: StandingsTableProps) {
                 key={row.teamId}
                 className={cn(
                   "border-b border-comic-black/20 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] text-comic-black transition-colors hover:bg-comic-cream/50",
-                  getPositionClass(row.position),
+                  getPositionClass(row.position, leagueId),
                 )}
               >
                 <td className="px-3 py-2.5 text-center font-[family-name:var(--font-bangers)]">
@@ -130,19 +233,14 @@ export function StandingsTable({ standings, teamMap }: StandingsTableProps) {
         </tbody>
       </table>
 
-      {/* 범례 */}
+      {/* 동적 범례 */}
       <div className="flex flex-wrap gap-4 border-t border-comic-black/20 px-3 py-2 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-3 w-0.5 bg-blue-500" /> Champions
-          League
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-3 w-0.5 bg-orange-400" /> Europa
-          League
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-3 w-0.5 bg-red-500" /> Relegation
-        </span>
+        {legendItems.map((item) => (
+          <span key={item.label} className="flex items-center gap-1">
+            <span className={cn("inline-block h-3 w-0.5", item.colorClass)} />
+            {item.label}
+          </span>
+        ))}
       </div>
     </div>
   );
