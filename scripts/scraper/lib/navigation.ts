@@ -122,56 +122,79 @@ export async function searchPlayer(
   await waitForStreamlitUpdate(iframe, page);
 }
 
-/** 팀 목록 추출 (Club combobox 옵션 파싱) */
+/**
+ * Streamlit 가상화 combobox에서 전체 옵션 수집
+ * option의 grandparent (overflow:auto DIV)를 직접 스크롤하여 가상화 우회
+ */
+async function extractAllComboboxOptions(
+  iframe: FrameLocator,
+  page: Page,
+  labelKeyword: string,
+): Promise<string[]> {
+  const combobox = iframe
+    .locator(`input[role="combobox"][aria-label*="${labelKeyword}"]`)
+    .first();
+  await combobox.waitFor({ state: "visible", timeout: 10_000 });
+  await combobox.click();
+  await page.waitForTimeout(800);
+
+  const collected = new Set<string>();
+
+  // 현재 보이는 옵션 수집
+  const collectVisible = async () => {
+    const options = iframe.locator('[role="option"]');
+    const count = await options.count();
+    for (let i = 0; i < count; i++) {
+      const text = await options.nth(i).textContent();
+      if (text) collected.add(text.trim());
+    }
+  };
+
+  await collectVisible();
+
+  // 스크롤 컨테이너 = option의 grandparent (overflow:auto DIV)
+  const firstOption = iframe.locator('[role="option"]').first();
+  const optionExists = (await firstOption.count()) > 0;
+
+  if (optionExists) {
+    const scrollContainer = firstOption.locator("xpath=ancestor::*[2]");
+
+    for (let i = 0; i < 50; i++) {
+      await scrollContainer.evaluate((el) => {
+        el.scrollTop += 200;
+      });
+      await page.waitForTimeout(200);
+      await collectVisible();
+
+      // 끝에 도달했는지 확인
+      const atEnd = await scrollContainer.evaluate(
+        (el) => el.scrollTop + el.clientHeight >= el.scrollHeight - 10,
+      );
+      if (atEnd) break;
+    }
+  }
+
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(200);
+
+  logInfo(`  ${labelKeyword} combobox: ${collected.size}개 옵션 수집`);
+  return [...collected].sort((a, b) => a.localeCompare(b));
+}
+
+/** 팀 목록 추출 (Club combobox 전체 스크롤) */
 export async function extractTeamList(
   iframe: FrameLocator,
   page: Page,
 ): Promise<string[]> {
-  const combobox = iframe
-    .locator('input[role="combobox"][aria-label*="Club"]')
-    .first();
-  await combobox.waitFor({ state: "visible", timeout: 10_000 });
-  await combobox.click();
-  await page.waitForTimeout(800);
-
-  const options = iframe.locator('[role="option"]');
-  const count = await options.count();
-  const teams: string[] = [];
-  for (let i = 0; i < count; i++) {
-    const text = await options.nth(i).textContent();
-    if (text) teams.push(text.trim());
-  }
-
-  await page.keyboard.press("Escape");
-  await page.waitForTimeout(200);
-
-  return teams;
+  return extractAllComboboxOptions(iframe, page, "Club");
 }
 
-/** 선수 목록 추출 (Player combobox 옵션 파싱) */
+/** 선수 목록 추출 (Player combobox 전체 스크롤) */
 export async function extractPlayerList(
   iframe: FrameLocator,
   page: Page,
 ): Promise<string[]> {
-  const combobox = iframe
-    .locator('input[role="combobox"][aria-label*="Player"]')
-    .first();
-  await combobox.waitFor({ state: "visible", timeout: 10_000 });
-  await combobox.click();
-  await page.waitForTimeout(800);
-
-  const options = iframe.locator('[role="option"]');
-  const count = await options.count();
-  const players: string[] = [];
-  for (let i = 0; i < count; i++) {
-    const text = await options.nth(i).textContent();
-    if (text) players.push(text.trim());
-  }
-
-  await page.keyboard.press("Escape");
-  await page.waitForTimeout(200);
-
-  return players;
+  return extractAllComboboxOptions(iframe, page, "Player");
 }
 
 /** Streamlit 데이터 업데이트 대기 */
