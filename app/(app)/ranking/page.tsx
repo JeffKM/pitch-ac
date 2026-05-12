@@ -5,6 +5,7 @@ import { Suspense } from "react";
 
 import { CURRENT_SEASON_LABEL } from "@/lib/constants/football";
 import { getAllLeagueStandings, getAllTeams } from "@/lib/repositories";
+import type { Team, TeamStanding } from "@/types";
 
 import { RankingContent } from "./_components/ranking-content";
 
@@ -19,9 +20,20 @@ async function RankingData() {
     getAllTeams(),
   ]);
 
-  const teamMap = new Map(teams.map((t) => [t.id, t]));
+  // Map은 RSC → Client Component 직렬화 불가 → Record로 변환
+  const standingsRecord: Record<number, TeamStanding[]> = {};
+  for (const [leagueId, standings] of standingsMap) {
+    standingsRecord[leagueId] = standings;
+  }
 
-  return <RankingContent standingsMap={standingsMap} teamMap={teamMap} />;
+  const teamRecord: Record<number, Team> = {};
+  for (const t of teams) {
+    teamRecord[t.id] = t;
+  }
+
+  return (
+    <RankingContent standingsRecord={standingsRecord} teamRecord={teamRecord} />
+  );
 }
 
 function RankingFallback() {

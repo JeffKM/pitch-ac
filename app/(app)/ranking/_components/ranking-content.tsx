@@ -8,11 +8,14 @@ import type { Team, TeamStanding } from "@/types";
 import { StandingsTable } from "./standings-table";
 
 type RankingContentProps = {
-  standingsMap: Map<number, TeamStanding[]>;
-  teamMap: Map<number, Team>;
+  standingsRecord: Record<number, TeamStanding[]>;
+  teamRecord: Record<number, Team>;
 };
 
-export function RankingContent({ standingsMap, teamMap }: RankingContentProps) {
+export function RankingContent({
+  standingsRecord,
+  teamRecord,
+}: RankingContentProps) {
   return (
     <Tabs defaultValue="epl">
       <TabsList className="w-full justify-start rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-cream">
@@ -28,13 +31,13 @@ export function RankingContent({ standingsMap, teamMap }: RankingContentProps) {
       </TabsList>
 
       {TOP5_LEAGUES.map((league) => {
-        const standings = standingsMap.get(league.id) ?? [];
+        const standings = standingsRecord[league.id] ?? [];
         return (
           <TabsContent key={league.slug} value={league.slug} className="mt-4">
             {standings.length > 0 ? (
               <StandingsTable
                 standings={standings}
-                teamMap={teamMap}
+                teamRecord={teamRecord}
                 leagueId={league.id}
               />
             ) : (

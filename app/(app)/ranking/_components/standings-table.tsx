@@ -8,13 +8,19 @@ import type { Team, TeamStanding } from "@/types";
 
 type StandingsTableProps = {
   standings: TeamStanding[];
-  teamMap: Map<number, Team>;
+  teamRecord: Record<number, Team>;
   leagueId: number;
 };
 
 // ─── 리그별 순위 하이라이트 규칙 ───────────────────
 
-type PositionZone = "ucl" | "uel" | "uecl" | "relegation-po" | "relegation";
+type PositionZone =
+  | "ucl"
+  | "ucl-q"
+  | "uel"
+  | "uecl"
+  | "relegation-po"
+  | "relegation";
 
 interface ZoneRule {
   zone: PositionZone;
@@ -22,19 +28,26 @@ interface ZoneRule {
   positions: number[];
 }
 
-/** 리그별 하이라이트 규칙 */
+/**
+ * 리그별 하이라이트 규칙 (2025/26 시즌 → 2026/27 유럽대항전 기준)
+ * 출처: UEFA Access List, kassiesa.net/uefa/AccessList2025
+ * - 잉글랜드/스페인: EPS(유럽 퍼포먼스 스팟)로 UCL 5장
+ * - 이탈리아/독일: UCL 4장
+ * - 프랑스: UCL 3장 + 예선 1장
+ */
 const LEAGUE_ZONE_RULES: Record<number, ZoneRule[]> = {
-  // EPL: 1-4 UCL, 5 UEL, 18-20 강등
+  // EPL: 1-5 UCL, 6 UEL, 7 UECL, 18-20 강등
   [PL_LEAGUE_ID]: [
-    { zone: "ucl", positions: [1, 2, 3, 4] },
-    { zone: "uel", positions: [5] },
+    { zone: "ucl", positions: [1, 2, 3, 4, 5] },
+    { zone: "uel", positions: [6] },
+    { zone: "uecl", positions: [7] },
     { zone: "relegation", positions: [18, 19, 20] },
   ],
-  // La Liga: 1-4 UCL, 5 UEL, 6 UECL, 18-20 강등
+  // La Liga: 1-5 UCL, 6 UEL, 7 UECL, 18-20 강등
   2014: [
-    { zone: "ucl", positions: [1, 2, 3, 4] },
-    { zone: "uel", positions: [5] },
-    { zone: "uecl", positions: [6] },
+    { zone: "ucl", positions: [1, 2, 3, 4, 5] },
+    { zone: "uel", positions: [6] },
+    { zone: "uecl", positions: [7] },
     { zone: "relegation", positions: [18, 19, 20] },
   ],
   // Serie A: 1-4 UCL, 5 UEL, 6 UECL, 18-20 강등
@@ -52,17 +65,20 @@ const LEAGUE_ZONE_RULES: Record<number, ZoneRule[]> = {
     { zone: "relegation-po", positions: [16] },
     { zone: "relegation", positions: [17, 18] },
   ],
-  // Ligue 1: 1-3 UCL, 4 UEL, 16 강등PO, 17-18 강등
+  // Ligue 1: 1-3 UCL, 4 UCL예선, 5 UEL, 6 UECL, 17 강등PO, 18 강등
   2015: [
     { zone: "ucl", positions: [1, 2, 3] },
-    { zone: "uel", positions: [4] },
-    { zone: "relegation-po", positions: [16] },
-    { zone: "relegation", positions: [17, 18] },
+    { zone: "ucl-q", positions: [4] },
+    { zone: "uel", positions: [5] },
+    { zone: "uecl", positions: [6] },
+    { zone: "relegation-po", positions: [17] },
+    { zone: "relegation", positions: [18] },
   ],
 };
 
 const ZONE_STYLES: Record<PositionZone, string> = {
   ucl: "border-l-2 border-l-blue-500",
+  "ucl-q": "border-l-2 border-l-blue-300",
   uel: "border-l-2 border-l-orange-400",
   uecl: "border-l-2 border-l-green-500",
   "relegation-po": "border-l-2 border-l-red-300",
@@ -92,8 +108,13 @@ function getLegendItems(leagueId: number): LegendItem[] {
 
   const items: LegendItem[] = [
     { label: "Champions League", colorClass: "bg-blue-500" },
-    { label: "Europa League", colorClass: "bg-orange-400" },
   ];
+
+  if (zones.has("ucl-q")) {
+    items.push({ label: "UCL Qualifying", colorClass: "bg-blue-300" });
+  }
+
+  items.push({ label: "Europa League", colorClass: "bg-orange-400" });
 
   if (zones.has("uecl")) {
     items.push({
@@ -131,7 +152,7 @@ function getFormColor(result: "W" | "D" | "L"): string {
 
 export function StandingsTable({
   standings,
-  teamMap,
+  teamRecord,
   leagueId,
 }: StandingsTableProps) {
   const sorted = [...standings].sort((a, b) => a.position - b.position);
@@ -157,7 +178,7 @@ export function StandingsTable({
         </thead>
         <tbody>
           {sorted.map((row) => {
-            const team = teamMap.get(row.teamId);
+            const team = teamRecord[row.teamId];
             return (
               <tr
                 key={row.teamId}
