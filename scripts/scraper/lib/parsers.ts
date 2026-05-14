@@ -124,6 +124,7 @@ const CATEGORY_KEY_MAP: Record<string, string> = {
   PROGRESSION: "passing",
   "PASSING ACCURACY": "passing",
   "ACTIVE DEFENDING (PADJ.)": "defending",
+  "ACTIVE DEFENDING (RAW)": "defending",
   "ACTIVE DEFENDING": "defending",
   AERIAL: "aerial",
   "SET PIECES": "set_pieces",
@@ -138,7 +139,7 @@ export async function parseMetrics(
   try {
     // "FINAL PRODUCT" 카테고리 헤더로 카드 렌더링 대기
     const firstCategory = iframe.locator('text="FINAL PRODUCT"').first();
-    await firstCategory.waitFor({ state: "attached", timeout: 20_000 });
+    await firstCategory.waitFor({ state: "visible", timeout: 20_000 });
 
     for (const [cat, categoryKey] of Object.entries(CATEGORY_KEY_MAP)) {
       const catHeader = iframe.locator(`text="${cat}"`).first();

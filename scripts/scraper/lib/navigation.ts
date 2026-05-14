@@ -203,7 +203,14 @@ async function selectSegmentedControl(
   page: Page,
   label: string,
 ): Promise<void> {
-  // Streamlit segmented control 버튼 선택
+  // 이미 활성 상태면 건너뜀
+  const activeBtn = iframe
+    .locator('[data-testid="stBaseButton-segmented_controlActive"]')
+    .filter({ hasText: label })
+    .first();
+  if ((await activeBtn.count()) > 0) return;
+
+  // 비활성 버튼 클릭
   const btn = iframe
     .locator('[data-testid="stBaseButton-segmented_control"]')
     .filter({ hasText: label })
