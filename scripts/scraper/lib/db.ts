@@ -98,7 +98,7 @@ export async function upsertSimilarity(
       league: "", // Player Card에서는 리그 정보가 별도로 표시되지 않음
       age: parsed.age,
       position: parsed.position,
-      score: 0, // 유사도 점수는 별도 탭에서 확인 가능
+      score: s.score ?? 0,
     };
   });
 

@@ -15,6 +15,10 @@ export interface ScraperOptions {
   adjustment?: "padj" | "raw";
   /** 포지션 비교 그룹 스크래핑 스킵 (기본 AM/W만 저장) */
   skipPositions: boolean;
+  /** 특정 포지션만 스크래핑 (e.g., ["CB", "FB", "MF", "FW"]) */
+  positions?: string[];
+  /** similarity만 수집 (메트릭 스크래핑 스킵) */
+  similarityOnly: boolean;
 }
 
 /** 파싱된 선수 정보 */
@@ -42,6 +46,7 @@ export interface ParsedSimilarPlayer {
   rank: number;
   name: string;
   info: string; // "18, AM/W, Barcelona"
+  score?: number; // 0~1 소수 (Similarity Score 탭에서 수집 시)
 }
 
 /** 스크래핑 결과 통계 */

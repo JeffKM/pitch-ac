@@ -54,7 +54,7 @@ import {
   groupMetricsByCategory,
   parseMetrics,
   parsePlayerInfo,
-  parseSimilarPlayers,
+  parseSimilarPlayersFromTab,
 } from "./lib/parsers";
 import { createScraperClient } from "./lib/supabase";
 import type { ScraperOptions, ScrapeStats } from "./lib/types";
@@ -78,6 +78,8 @@ function parseCliArgs(): ScraperOptions {
       mode: { type: "string" },
       adjustment: { type: "string" },
       "skip-positions": { type: "boolean", default: false },
+      positions: { type: "string" },
+      "similarity-only": { type: "boolean", default: false },
     },
     strict: false,
   });
@@ -102,7 +104,23 @@ function parseCliArgs(): ScraperOptions {
         ? (adjVal as "padj" | "raw")
         : undefined,
     skipPositions: Boolean(values["skip-positions"]),
+    positions: parsePositionsArg(values.positions as string | undefined),
+    similarityOnly: Boolean(values["similarity-only"]),
   };
+}
+
+/** --positions=CB,FB,MF,FW → 유효성 검증 후 배열 반환 */
+function parsePositionsArg(raw: string | undefined): string[] | undefined {
+  if (!raw) return undefined;
+  const valid = new Set<string>(ALL_COMPARISON_POSITIONS);
+  const parsed = raw.split(",").map((s) => s.trim());
+  const invalid = parsed.filter((p) => !valid.has(p));
+  if (invalid.length > 0) {
+    throw new Error(
+      `유효하지 않은 포지션: ${invalid.join(", ")} (가능: ${[...valid].join(", ")})`,
+    );
+  }
+  return parsed;
 }
 
 /** 선수 DOM 파싱 + DB 저장 */
@@ -120,10 +138,6 @@ async function parseAndSave(
 ): Promise<boolean> {
   const playerInfo = await parsePlayerInfo(iframe);
   const metrics = await parseMetrics(iframe);
-
-  // 유사 선수는 기본 조합(per90+padj+자체포지션)에서만 수집
-  const isDefault = mode === "per90" && adjustment === "padj";
-  const similar = isDefault ? await parseSimilarPlayers(iframe, page) : [];
 
   logInfo(
     `  ${playerInfo.name} | ${mode}/${adjustment}/${comparisonPosition} | 메트릭 ${metrics.length}개`,
@@ -146,12 +160,43 @@ async function parseAndSave(
     comparisonPosition,
   );
 
-  if (similar.length > 0) {
-    await upsertSimilarity(supabase, playerId, season, similar);
-  }
-
   logSuccess(`  ${playerInfo.name} 저장 완료 (id: ${playerId})`);
   return true;
+}
+
+/** 현재 선수에 대해 Similarity Score 탭 파싱 → DB 저장 (1회) */
+async function scrapeSimilarity(
+  iframe: FrameLocator,
+  page: Page,
+  supabase: ReturnType<typeof createScraperClient>,
+  playerName: string,
+  league: string,
+  season: string,
+  dryRun: boolean,
+): Promise<void> {
+  try {
+    // 선수 기본 정보에서 playerId 확보
+    const playerInfo = await parsePlayerInfo(iframe);
+    const playerId = dryRun
+      ? 0
+      : await upsertPlayer(supabase, playerInfo, league);
+
+    // Similarity Score 탭 → 20명 파싱 → Player Card 복귀
+    const similar = await parseSimilarPlayersFromTab(iframe, page);
+
+    if (similar.length > 0 && !dryRun) {
+      await upsertSimilarity(supabase, playerId, season, similar);
+      logSuccess(
+        `  ${playerName} similarity 저장 완료 (${similar.length}명, id: ${playerId})`,
+      );
+    } else if (dryRun) {
+      logWarn(
+        `  [DRY-RUN] similarity ${similar.length}명 파싱됨, DB 쓰기 스킵`,
+      );
+    }
+  } catch (error) {
+    logError(`  ${playerName} similarity 수집 실패`, error);
+  }
 }
 
 /** 현재 선수에 대해 mode×adjustment×position 조합 순회 스크래핑 */
@@ -165,13 +210,27 @@ async function scrapeAllCombinations(
   opts: ScraperOptions,
   stats: ScrapeStats,
 ): Promise<void> {
+  // Similarity Score 탭에서 1회 수집 (메트릭 루프 전)
+  await scrapeSimilarity(
+    iframe,
+    page,
+    supabase,
+    playerName,
+    league,
+    season,
+    opts.dryRun,
+  );
+
   const modes = opts.mode ? [opts.mode] : [...ALL_MODES];
   const adjustments = opts.adjustment
     ? [opts.adjustment]
     : [...ALL_ADJUSTMENTS];
-  const positions = opts.skipPositions
-    ? ["AM/W"]
-    : [...ALL_COMPARISON_POSITIONS];
+  // 우선순위: --positions > --skip-positions > 전체
+  const positions = opts.positions?.length
+    ? opts.positions
+    : opts.skipPositions
+      ? ["AM/W"]
+      : [...ALL_COMPARISON_POSITIONS];
 
   for (const mode of modes) {
     await toggleMode(iframe, page, mode);
@@ -207,12 +266,52 @@ async function scrapeAllCombinations(
   }
 }
 
+/** 선수 1명에 대한 스크래핑 실행 (similarity-only / 전체 조합) */
+async function scrapePlayer(
+  iframe: FrameLocator,
+  page: Page,
+  supabase: ReturnType<typeof createScraperClient>,
+  playerName: string,
+  league: string,
+  season: string,
+  opts: ScraperOptions,
+  stats: ScrapeStats,
+): Promise<void> {
+  if (opts.similarityOnly) {
+    // similarity만 수집 (메트릭 스킵)
+    await scrapeSimilarity(
+      iframe,
+      page,
+      supabase,
+      playerName,
+      league,
+      season,
+      opts.dryRun,
+    );
+    stats.successCount++;
+  } else {
+    await scrapeAllCombinations(
+      iframe,
+      page,
+      supabase,
+      playerName,
+      league,
+      season,
+      opts,
+      stats,
+    );
+  }
+}
+
 /** 메인 실행 */
 async function main(): Promise<void> {
   const opts = parseCliArgs();
   logInfo("ScoutLab 스크래퍼 시작");
+  const modeStr = opts.similarityOnly
+    ? "similarity-only"
+    : `mode=${opts.mode ?? "all"}, adj=${opts.adjustment ?? "all"}, positions=${opts.positions?.join(",") ?? (opts.skipPositions ? "AM/W" : "all")}`;
   logInfo(
-    `설정: season=${opts.season}, league=${opts.league}, team=${opts.team ?? "전체"}, player=${opts.player ?? "전체"}, headless=${opts.headless}, dryRun=${opts.dryRun}`,
+    `설정: season=${opts.season}, league=${opts.league}, team=${opts.team ?? "전체"}, player=${opts.player ?? "전체"}, ${modeStr}, headless=${opts.headless}, dryRun=${opts.dryRun}`,
   );
 
   const supabase = createScraperClient();
@@ -239,7 +338,7 @@ async function main(): Promise<void> {
       try {
         await searchPlayer(iframe, page, opts.player);
         await selectSidebarTab(iframe, page, "Player Card");
-        await scrapeAllCombinations(
+        await scrapePlayer(
           iframe,
           page,
           supabase,
@@ -302,7 +401,7 @@ async function main(): Promise<void> {
 
               try {
                 await selectPlayer(iframe, page, playerName);
-                await scrapeAllCombinations(
+                await scrapePlayer(
                   iframe,
                   page,
                   supabase,
@@ -340,7 +439,7 @@ async function main(): Promise<void> {
     // 동기화 로그
     if (!opts.dryRun) {
       await writeSyncLog(supabase, {
-        scraper: "player-card",
+        scraper: opts.similarityOnly ? "similarity" : "player-card",
         season: opts.season,
         league: opts.league,
         status: stats.failCount === 0 ? "success" : "error",

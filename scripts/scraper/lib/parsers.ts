@@ -2,7 +2,7 @@
 
 import type { FrameLocator, Page } from "@playwright/test";
 
-import { logWarn } from "./logger";
+import { logInfo, logWarn } from "./logger";
 import type {
   ParsedMetric,
   ParsedPlayerInfo,
@@ -235,6 +235,111 @@ export async function parseSimilarPlayers(
     logWarn(
       `유사 선수 파싱 실패: ${e instanceof Error ? e.message.substring(0, 200) : "unknown"}`,
     );
+  }
+
+  return similar;
+}
+
+/** Similarity Score 탭에서 20명의 유사 선수 + 실제 점수 파싱 */
+export async function parseSimilarPlayersFromTab(
+  iframe: FrameLocator,
+  page: Page,
+): Promise<ParsedSimilarPlayer[]> {
+  const similar: ParsedSimilarPlayer[] = [];
+
+  try {
+    // 1. Similarity Score 탭 클릭
+    const tabBtn = iframe
+      .locator('button:has-text("Similarity Score")')
+      .first();
+    const tabExists = await tabBtn.count();
+    if (tabExists === 0) {
+      logWarn("Similarity Score 탭을 찾을 수 없습니다");
+      return similar;
+    }
+    await tabBtn.click();
+    // Streamlit 상태 위젯 대기 (데이터 로딩)
+    try {
+      await iframe
+        .locator('[data-testid="stStatusWidget"]')
+        .waitFor({ state: "visible", timeout: 3000 });
+      await iframe
+        .locator('[data-testid="stStatusWidget"]')
+        .waitFor({ state: "hidden", timeout: 30_000 });
+    } catch {
+      // 위젯이 나타나지 않으면 즉시 로딩 완료
+    }
+    await page.waitForTimeout(3000);
+
+    // 2. "20 Most Similar" 텍스트 대기
+    const header = iframe.locator("text=/20 Most Similar/").first();
+    await header.waitFor({ state: "visible", timeout: 15_000 });
+    logInfo("  Similarity Score 탭: 헤더 감지 완료");
+
+    // 3. stHorizontalBlock (2열) 에서 innerText 기반 파싱
+    // 구조: header → ancestor stVerticalBlock → stHorizontalBlock (좌/우 열)
+    // 각 열 innerText: "#\nPLAYER\nSCORE\n1\nName\ninfo\n91\n2\n..."
+    // → 헤더 3줄 스킵 후 4줄씩 (rank, name, info, score)
+
+    // header의 stElementContainer → following-sibling stHorizontalBlock
+    const hBlock = header.locator(
+      'xpath=ancestor::div[contains(@class, "stElementContainer")]/following-sibling::div[contains(@class, "stHorizontalBlock")][1]',
+    );
+    await hBlock.waitFor({ state: "visible", timeout: 10_000 });
+    const cols = hBlock.locator(":scope > *");
+    const colCount = await cols.count();
+    logInfo(`  Similarity Score 탭: ${colCount}개 열 발견`);
+
+    for (let c = 0; c < colCount; c++) {
+      const colText = await cols.nth(c).innerText();
+      const lines = colText
+        .split("\n")
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0);
+
+      // 첫 3줄은 헤더 (#, PLAYER, SCORE) — 스킵
+      // 헤더 라인 인덱스 찾기: "SCORE" 포함 줄
+      let headerEnd = 0;
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i] === "SCORE") {
+          headerEnd = i + 1;
+          break;
+        }
+      }
+      const dataLines = lines.slice(headerEnd);
+
+      // 4줄씩 묶어서 파싱: rank, name, info, score
+      for (let i = 0; i + 3 <= dataLines.length; i += 4) {
+        const rank = parseInt(dataLines[i], 10);
+        const name = dataLines[i + 1];
+        const info = dataLines[i + 2];
+        const scoreNum = parseFloat(dataLines[i + 3]);
+        const score = scoreNum > 1 ? scoreNum / 100 : scoreNum;
+
+        if (rank && name) {
+          similar.push({ rank, name, info, score });
+        }
+      }
+    }
+
+    logInfo(`  Similarity Score 탭: ${similar.length}명 파싱 완료`);
+  } catch (e) {
+    logWarn(
+      `Similarity Score 탭 파싱 실패: ${e instanceof Error ? e.message.substring(0, 200) : "unknown"}`,
+    );
+  } finally {
+    // 4. Player Card 탭으로 복귀
+    try {
+      const playerCardBtn = iframe
+        .locator('button:has-text("Player Card")')
+        .first();
+      if ((await playerCardBtn.count()) > 0) {
+        await playerCardBtn.click();
+        await page.waitForTimeout(2000);
+      }
+    } catch {
+      logWarn("Player Card 탭 복귀 실패");
+    }
   }
 
   return similar;
