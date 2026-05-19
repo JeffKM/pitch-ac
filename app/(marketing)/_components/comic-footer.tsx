@@ -8,7 +8,7 @@ const footerColumns: FooterColumn[] = [
   { title: "CONTACT", sub: "PITCH-AC.COM" },
   { title: "JOIN US", sub: "COMMUNITY" },
   { title: "SOCIAL", sub: "FOLLOW US" },
-  { title: "CITY!", sub: "EST. 1894", accent: true },
+  { title: "DATA", sub: "5 LEAGUES", accent: true },
 ];
 
 export function ComicFooter() {

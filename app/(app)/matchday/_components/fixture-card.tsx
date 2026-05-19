@@ -3,13 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { CompetitionBadge } from "@/components/football/competition-badge";
+import { FixtureStatusBadge } from "@/components/football/fixture-status-badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatKickoffTime } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import type { Fixture, Team, TeamStanding } from "@/types";
-
-import { CompetitionBadge } from "./competition-badge";
-import { FixtureStatusBadge } from "./fixture-status-badge";
 
 interface FixtureCardProps {
   fixture: Fixture;

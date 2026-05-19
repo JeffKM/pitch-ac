@@ -2,11 +2,10 @@
 
 import Image from "next/image";
 
+import { FixtureStatusBadge } from "@/components/football/fixture-status-badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatKickoffDate, formatKickoffTime } from "@/lib/date-utils";
 import type { Fixture, Team, TeamStanding } from "@/types";
-
-import { FixtureStatusBadge } from "../../_components/fixture-status-badge";
 
 interface MatchHeaderProps {
   fixture: Fixture;

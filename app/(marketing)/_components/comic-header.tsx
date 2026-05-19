@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 /* ── 네비게이션 항목 (피그마 SpeechBubbleNav) ── */
 const navItems = [
   { href: "/", label: "HOME", sub: null },
-  { href: "/matchday", label: "MATCHDAY", sub: "LIVE!" },
+  { href: "/matchday", label: "MATCHDAY", sub: "TODAY" },
   { href: "/ranking", label: "RANKING", sub: "TABLE" },
   { href: "/scouting", label: "SCOUTING", sub: "LAB" },
 ] as const;

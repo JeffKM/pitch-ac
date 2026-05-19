@@ -12,38 +12,43 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: {
-    default: "pitch-ac | Man City Fan Site",
+    default: "pitch-ac | 5-League Football Data Hub",
     template: "%s | pitch-ac",
   },
-  description: "A cartoon fan site where Manchester City players come alive",
+  description:
+    "유럽 5대 리그 축구 데이터 허브 — 경기 일정, 순위, 선수 스카우팅 분석을 한눈에",
   keywords: [
-    "Manchester City",
-    "Man City",
-    "cartoon",
-    "fan site",
     "Premier League",
-    "football",
+    "La Liga",
+    "Serie A",
+    "Bundesliga",
+    "Ligue 1",
+    "football data",
+    "축구 데이터",
+    "선수 분석",
   ],
   openGraph: {
     type: "website",
-    locale: "en_US",
+    locale: "ko_KR",
     url: defaultUrl,
     siteName: "pitch-ac",
-    title: "pitch-ac | Man City Fan Site",
-    description: "A cartoon fan site where Manchester City players come alive",
+    title: "pitch-ac | 5-League Football Data Hub",
+    description:
+      "유럽 5대 리그 축구 데이터 허브 — 경기 일정, 순위, 선수 스카우팅 분석을 한눈에",
     images: [
       {
         url: "/opengraph-image.png",
         width: 1200,
         height: 630,
-        alt: "pitch-ac Man City cartoon fan site",
+        alt: "pitch-ac 5-League Football Data Hub",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "pitch-ac | Man City Fan Site",
-    description: "A cartoon fan site where Manchester City players come alive",
+    title: "pitch-ac | 5-League Football Data Hub",
+    description:
+      "유럽 5대 리그 축구 데이터 허브 — 경기 일정, 순위, 선수 스카우팅 분석을 한눈에",
     images: ["/twitter-image.png"],
   },
 };
