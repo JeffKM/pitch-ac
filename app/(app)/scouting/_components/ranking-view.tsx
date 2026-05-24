@@ -17,6 +17,7 @@ import type {
 } from "@/types";
 
 import { formatMetricName } from "../_lib/format-metric";
+import { useScoutlabParams } from "../_lib/use-scoutlab-params";
 import { RankingFilterPanel } from "./ranking-filter-panel";
 import { RankingTable } from "./ranking-table";
 
@@ -54,6 +55,7 @@ export function RankingView({
   initialCategory,
   initialMetric,
 }: RankingViewProps) {
+  const { league } = useScoutlabParams();
   const [category, setCategory] = useState(initialCategory);
   const [metric, setMetric] = useState(initialMetric);
   const [entries, setEntries] = useState(initialEntries);
@@ -79,15 +81,19 @@ export function RankingView({
   // 메트릭 라벨
   const metricLabel = useMemo(() => formatMetricName(metric), [metric]);
 
-  // 카테고리/메트릭 변경 시 서버에서 랭킹 데이터 재조회
+  // 카테고리/메트릭/리그 변경 시 서버에서 랭킹 데이터 재조회
   useEffect(() => {
     if (!metric) return;
 
     startTransition(async () => {
       try {
-        const response = await fetch(
-          `/api/scoutlab/ranking?category=${encodeURIComponent(category)}&metric=${encodeURIComponent(metric)}`,
-        );
+        const params = new URLSearchParams({
+          category,
+          metric,
+        });
+        if (league) params.set("league", league);
+
+        const response = await fetch(`/api/scoutlab/ranking?${params}`);
         if (response.ok) {
           const data = await response.json();
           setEntries(data);
@@ -96,7 +102,7 @@ export function RankingView({
         // 에러 시 기존 데이터 유지
       }
     });
-  }, [category, metric]);
+  }, [category, metric, league]);
 
   return (
     <div className="space-y-4">

@@ -31,6 +31,7 @@ export default async function RankingPage({ searchParams }: PageProps) {
   const rankingData = firstMetricKey
     ? await getRankingData(firstMetricKey, initialCategory, {
         season: params.season,
+        league: params.league ?? undefined,
       })
     : [];
 

@@ -1,8 +1,17 @@
 // ScoutLab Ranking — 메트릭별 랭킹 테이블
 import { cn } from "@/lib/utils";
-import type { ScoutlabPlayer } from "@/types";
+import type { ScoutlabLeague, ScoutlabPlayer } from "@/types";
 
 import { formatMetricValue } from "../_lib/format-metric";
+
+/** 리그 약칭 매핑 */
+const LEAGUE_SHORT: Record<ScoutlabLeague, string> = {
+  "Premier League": "PL",
+  "La Liga": "LL",
+  "Serie A": "SA",
+  Bundesliga: "BL",
+  "Ligue 1": "L1",
+};
 
 interface RankingEntry {
   player: ScoutlabPlayer;
@@ -32,6 +41,7 @@ export function RankingTable({ entries, metricLabel }: RankingTableProps) {
             <th className="px-2 py-2 text-left">#</th>
             <th className="px-2 py-2 text-left">선수</th>
             <th className="px-2 py-2 text-left">팀</th>
+            <th className="px-2 py-2 text-left">리그</th>
             <th className="px-2 py-2 text-left">포지션</th>
             <th className="px-2 py-2 text-right">{metricLabel}</th>
             <th className="px-2 py-2 text-right">백분위</th>
@@ -57,6 +67,9 @@ export function RankingTable({ entries, metricLabel }: RankingTableProps) {
                 </td>
                 <td className="px-2 py-2 text-comic-black/60">
                   {entry.player.team}
+                </td>
+                <td className="px-2 py-2 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/40">
+                  {LEAGUE_SHORT[entry.player.league]}
                 </td>
                 <td className="px-2 py-2 text-comic-black/60">
                   {entry.player.position}

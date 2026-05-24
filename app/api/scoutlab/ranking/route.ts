@@ -23,6 +23,7 @@ export async function GET(request: Request) {
   const category = searchParams.get("category") as ScoutlabCategory | null;
   const metric = searchParams.get("metric");
   const season = searchParams.get("season") ?? "25/26";
+  const league = searchParams.get("league") ?? undefined;
 
   if (!category || !metric || !VALID_CATEGORIES.includes(category)) {
     return NextResponse.json(
@@ -32,7 +33,15 @@ export async function GET(request: Request) {
   }
 
   try {
-    const data = await getRankingData(metric, category, { season }, 50);
+    const data = await getRankingData(
+      metric,
+      category,
+      {
+        season,
+        league: league as Parameters<typeof getRankingData>[2]["league"],
+      },
+      50,
+    );
     return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json(

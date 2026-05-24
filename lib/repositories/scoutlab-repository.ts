@@ -276,7 +276,7 @@ export async function getRankingData(
     .select("*, scoutlab_players!inner(*)")
     .eq("mode", "per90")
     .eq("adjustment", "padj")
-    .limit(1000);
+    .limit(2000);
 
   if (filters.season) query = query.eq("season", filters.season);
   if (filters.league)

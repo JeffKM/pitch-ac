@@ -39,6 +39,7 @@ export default async function ScatterPage({ searchParams }: PageProps) {
           "creation",
           {
             season: params.season,
+            league: params.league ?? undefined,
           },
         )
       : [];
