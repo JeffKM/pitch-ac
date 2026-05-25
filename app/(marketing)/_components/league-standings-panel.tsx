@@ -1,4 +1,4 @@
-// 5대 리그 순위 미니 테이블 — 상위 7팀, 주요 정보만
+// 5대 리그 순위 컴팩트 테이블 — 상위 7팀, P·Pts(+GD)
 
 "use client";
 
@@ -47,7 +47,7 @@ export function LeagueStandingsPanel({
       {/* 리그 탭 */}
       <div className="mb-2 flex gap-1">
         {TOP5_LEAGUES.map((league) => {
-          const slug = league.slug;
+          const slug = league.slug as LeagueSlug;
           const isActive = slug === activeSlug;
           return (
             <button
@@ -83,15 +83,8 @@ export function LeagueStandingsPanel({
                 <th className="px-2 py-1.5">Team</th>
                 <th className="px-2 py-1.5 text-center">P</th>
                 <th className="hidden px-2 py-1.5 text-center sm:table-cell">
-                  W
+                  GD
                 </th>
-                <th className="hidden px-2 py-1.5 text-center sm:table-cell">
-                  D
-                </th>
-                <th className="hidden px-2 py-1.5 text-center sm:table-cell">
-                  L
-                </th>
-                <th className="px-2 py-1.5 text-center">GD</th>
                 <th className="px-2 py-1.5 text-center">Pts</th>
               </tr>
             </thead>
@@ -127,15 +120,6 @@ export function LeagueStandingsPanel({
                     </td>
                     <td className="px-2 py-1.5 text-center">{row.played}</td>
                     <td className="hidden px-2 py-1.5 text-center sm:table-cell">
-                      {row.won}
-                    </td>
-                    <td className="hidden px-2 py-1.5 text-center sm:table-cell">
-                      {row.drawn}
-                    </td>
-                    <td className="hidden px-2 py-1.5 text-center sm:table-cell">
-                      {row.lost}
-                    </td>
-                    <td className="px-2 py-1.5 text-center">
                       {row.goalDifference > 0
                         ? `+${row.goalDifference}`
                         : row.goalDifference}
