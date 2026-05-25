@@ -28,7 +28,7 @@ export function AppHeader({ authSlot }: AppHeaderProps) {
         </Link>
 
         {/* 메인 메뉴 링크 */}
-        <nav className="ml-6 flex items-center gap-1">
+        <nav className="ml-6 flex min-w-0 items-center gap-1">
           {mainNavItems.map((item) => {
             const isActive =
               item.href === "/"
@@ -55,11 +55,9 @@ export function AppHeader({ authSlot }: AppHeaderProps) {
           })}
         </nav>
 
-        {/* 우측 영역: 테마 토글(모바일만) + 인증 버튼 */}
-        <div className="ml-auto flex items-center gap-2">
-          <div className="md:hidden">
-            <ThemeSwitcher />
-          </div>
+        {/* 우측 영역: 테마 토글 + 인증 버튼 */}
+        <div className="ml-auto flex shrink-0 items-center gap-2">
+          <ThemeSwitcher />
           {authSlot}
         </div>
       </div>
