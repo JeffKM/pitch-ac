@@ -1,110 +1,155 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# pitch-ac
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+**THE ULTIMATE 5-LEAGUE DATA HUB**
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+유럽 5대 리그(EPL, La Liga, Serie A, Bundesliga, Ligue 1)의 경기, 순위, 선수 데이터를 코믹 스타일 UI로 시각화하는 축구 데이터 플랫폼. **ScoutLab 스카우팅 분석**이 사이트의 핵심 중심축이며, 복잡한 데이터를 쉽고 재밌게 전달하는 것이 목표입니다.
 
-## Features
+## 주요 기능
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Proxy
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+### Matchday (매치데이 대시보드)
 
-## Demo
+- 5대 리그 + UCL 날짜별 전 경기 목록
+- 경기 상태 배지 (NS/FT/POSTP)
+- 경기 상세: 프리매치(팀 폼, H2H, 부상자) / 포스트매치(골 이벤트, 순위 시뮬레이션)
+- 킥오프+2.5h 오프셋 기반 자동 동기화
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+### Ranking (순위표)
 
-## Deploy to Vercel
+- 5대 리그 + UCL Champions League 팀 순위표
+- 순위/팀/경기수/승무패/득실/승점/최근 폼
+- UCL/UEL/강등권 색상 하이라이트
 
-Vercel deployment will guide you through creating a Supabase account and project.
+### ScoutLab (스카우팅 분석)
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+- 60+ 고급 메트릭 기반 스카우팅 분석 (Big 5 리그)
+- 10개 분석 탭: Player Card, Summary, Radar, Progression, Action Maps, Scatter, Similarity, Ranking, Compare, Glossary
+- 한국어 맥락 부연 + 팝오버 상세 해설
+- 코믹 디자인 차트 (레이더, 산점도, 라인 차트)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+### 홈페이지
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+- ScoutLab 쇼케이스 중심 랜딩
+- 이번 라운드/오늘 경기 + 5대 리그 순위 한눈에
+- 종이 질감 배경 (SVG feTurbulence)
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+## 기술 스택
 
-## Clone and run locally
+| 카테고리        | 기술                                                               |
+| --------------- | ------------------------------------------------------------------ |
+| 프레임워크      | Next.js 16+ (App Router), React 19, TypeScript 5.6+ strict         |
+| 스타일링        | Tailwind CSS v4 (CSS-first, `@theme inline`), shadcn/ui (new-york) |
+| 폰트            | Geist Sans, Fredoka, Bangers, Permanent Marker                     |
+| 상태관리        | TanStack Query v5, Zustand v5                                      |
+| 차트            | Recharts                                                           |
+| 백엔드/DB       | Supabase (PostgreSQL, 인증, RLS), `@supabase/ssr`                  |
+| 데이터 소스     | football-data.org (무료 플랜, 10 요청/분)                          |
+| 스카우팅 데이터 | ScoutLab (Playwright 스크래퍼, Supabase DB 캐시)                   |
+| 모니터링        | Sentry (`@sentry/nextjs`)                                          |
+| 배포            | Vercel (Cron, Edge Functions)                                      |
+| 코드 품질       | ESLint, Prettier, Husky, lint-staged                               |
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+## 시작하기
 
-2. Create a Next.js app using the Supabase Starter template npx command
+### 환경 변수
 
-   ```bash
-   npx create-next-app --example with-supabase with-supabase-app
-   ```
-
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
-
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
-
-3. Use `cd` to change into the app's directory
-
-   ```bash
-   cd with-supabase-app
-   ```
-
-4. Rename `.env.example` to `.env.local` and update the following:
+`.env.local` 파일을 생성하고 다음 변수를 설정합니다:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=[INSERT SUPABASE PROJECT API PUBLISHABLE OR ANON KEY]
+NEXT_PUBLIC_SUPABASE_URL=<Supabase 프로젝트 URL>
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<Supabase API 퍼블리셔블 키>
+FOOTBALL_DATA_API_KEY=<football-data.org API 키>
 ```
 
-> [!NOTE]
-> This example uses `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, which refers to Supabase's new **publishable** key format.
-> Both legacy **anon** keys and new **publishable** keys can be used with this variable name during the transition period. Supabase's dashboard may show `NEXT_PUBLIC_SUPABASE_ANON_KEY`; its value can be used in this example.
-> See the [full announcement](https://github.com/orgs/supabase/discussions/29260) for more information.
+### 개발 서버 실행
 
-Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
+```bash
+npm install
+npm run dev
+```
 
-5. You can now run the Next.js local development server:
+[localhost:3000](http://localhost:3000/)에서 확인할 수 있습니다.
 
-   ```bash
-   npm run dev
-   ```
+## 개발 명령어
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+```bash
+npm run dev          # 개발 서버
+npm run build        # 프로덕션 빌드
+npm run lint         # ESLint 검사
+npm run lint:fix     # ESLint 자동 수정
+npm run format       # Prettier 포매팅
+npm run format:check # Prettier 검사
+npm run type-check   # TypeScript 타입 체크
+npm run validate     # type-check + lint + format:check 통합 검증
+```
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+## 프로젝트 구조
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+```
+app/
+├── (marketing)/        # 홈페이지 (랜딩)
+├── (app)/              # 앱 내부 페이지
+│   ├── matchday/       # 매치데이 대시보드 + 경기 상세
+│   ├── ranking/        # 5대 리그 + UCL 순위표
+│   ├── scouting/       # ScoutLab 10개 탭
+│   └── news/           # Coming Soon
+├── (auth)/             # 로그인/회원가입
+└── api/                # API 라우트 + Cron 동기화
 
-## Feedback and issues
+lib/
+├── api/football-data/  # football-data.org 클라이언트
+├── services/           # 비즈니스 로직 (동기화, 스케줄 등)
+├── supabase/           # Supabase 클라이언트 (client/server/proxy)
+└── constants/          # 리그 설정, 상수
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+components/
+├── nav/                # 헤더, 사이드바, 모바일 탭 바
+├── comic/              # 코믹 디자인 시스템 컴포넌트
+└── ui/                 # shadcn/ui 컴포넌트
 
-## More Supabase examples
+scripts/
+└── scraper/            # ScoutLab Playwright 스크래퍼
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+docs/
+├── PRD.md              # 제품 요구사항 문서
+└── ROADMAP.md          # 개발 로드맵
+```
+
+## 데이터 동기화
+
+| 데이터 유형 | 주기                                 | 방법                |
+| ----------- | ------------------------------------ | ------------------- |
+| 팀/순위     | 주 1회 (월요일 04:00 UTC)            | Vercel Cron         |
+| 경기 일정   | 매일 06:00 UTC                       | Vercel Cron         |
+| 경기 결과   | 킥오프+2.5h (13:00~23:00 UTC 매시간) | Vercel Cron         |
+| ScoutLab    | 수동                                 | Playwright 스크래퍼 |
+
+## 개발 진행 상태
+
+### 완료
+
+- 5대 리그 데이터 인프라 (football-data.org, Supabase DB)
+- 매치데이 대시보드 + 경기 상세 (프리매치/포스트매치)
+- Ranking 5대 리그 + UCL 순위표
+- ScoutLab 10개 분석 탭 (PL 데이터)
+- 코믹 디자인 시스템 전체 적용
+- ScoutLab 한국어 맥락 부연 + 팝오버 해설
+- ScoutLab 코믹 차트 디자인
+- 매치데이 자동 동기화 (킥오프+2.5h Cron)
+- 홈페이지 리뉴얼 (5대 리그 허브)
+- 접이식 사이드바 네비게이션
+- 인증 (이메일 + Google OAuth)
+
+### 예정
+
+- ScoutLab 5대 리그 데이터 확장 (La Liga, Serie A, Bundesliga, Ligue 1)
+- Action Maps 스크래퍼 구현
+- 멀티시즌 데이터 + Share as Image
+- Ranking 선수 순위
+- MATCHDAY 매치픽 (유저 경기 예측)
+- NEWS 이적뉴스/팀소식
+- CV 전술 시각화 (장기 목표)
+
+## 문서
+
+- [PRD](docs/PRD.md) — 제품 요구사항 문서
+- [ROADMAP](docs/ROADMAP.md) — 상세 개발 로드맵
