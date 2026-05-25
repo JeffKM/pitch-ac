@@ -55,9 +55,11 @@ export function AppHeader({ authSlot }: AppHeaderProps) {
           })}
         </nav>
 
-        {/* 우측 영역: 테마 토글 + 인증 버튼 */}
+        {/* 우측 영역: 테마 토글(모바일만) + 인증 버튼 */}
         <div className="ml-auto flex items-center gap-2">
-          <ThemeSwitcher />
+          <div className="md:hidden">
+            <ThemeSwitcher />
+          </div>
           {authSlot}
         </div>
       </div>

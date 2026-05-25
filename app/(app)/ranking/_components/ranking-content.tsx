@@ -1,8 +1,10 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TOP5_LEAGUES } from "@/lib/constants/football";
+import { type LeagueSlug, TOP5_LEAGUES } from "@/lib/constants/football";
 import type { Team, TeamStanding } from "@/types";
 
 import { StandingsTable } from "./standings-table";
@@ -12,12 +14,22 @@ type RankingContentProps = {
   teamRecord: Record<number, Team>;
 };
 
+/** 유효한 slug인지 확인 */
+const VALID_SLUGS = new Set<string>(TOP5_LEAGUES.map((l) => l.slug));
+
 export function RankingContent({
   standingsRecord,
   teamRecord,
 }: RankingContentProps) {
+  const searchParams = useSearchParams();
+  const leagueParam = searchParams.get("league");
+  const defaultTab: LeagueSlug =
+    leagueParam && VALID_SLUGS.has(leagueParam)
+      ? (leagueParam as LeagueSlug)
+      : "epl";
+
   return (
-    <Tabs defaultValue="epl">
+    <Tabs defaultValue={defaultTab} key={defaultTab}>
       <TabsList className="w-full justify-start rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-cream">
         {TOP5_LEAGUES.map((league) => (
           <TabsTrigger

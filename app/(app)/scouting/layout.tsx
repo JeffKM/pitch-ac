@@ -15,9 +15,12 @@ export default function ScoutingLayout({
 }) {
   return (
     <div>
-      <Suspense fallback={<TabNavSkeleton />}>
-        <ScoutingTabNav />
-      </Suspense>
+      {/* 수평 탭 바: 모바일 전용 (데스크탑은 사이드바 SCOUTING 그룹 사용) */}
+      <div className="md:hidden">
+        <Suspense fallback={<TabNavSkeleton />}>
+          <ScoutingTabNav />
+        </Suspense>
+      </div>
       {children}
     </div>
   );

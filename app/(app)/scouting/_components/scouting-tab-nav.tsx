@@ -1,36 +1,12 @@
 "use client";
 
-import {
-  BarChart3,
-  GitCompareArrows,
-  Grid3X3,
-  HelpCircle,
-  LineChart,
-  Map,
-  Radar,
-  Search,
-  TrendingUp,
-  Users,
-} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 
+import { scoutingTabs } from "@/components/nav/scouting-tabs-config";
 import { cn } from "@/lib/utils";
 
 import { buildContextQuery } from "../_lib/build-context-query";
-
-const scoutingTabs = [
-  { href: "/scouting", label: "Player Card", icon: Search },
-  { href: "/scouting/summary", label: "Summary", icon: Grid3X3 },
-  { href: "/scouting/progression", label: "Progression", icon: LineChart },
-  { href: "/scouting/action-maps", label: "Action Maps", icon: Map },
-  { href: "/scouting/compare", label: "Compare", icon: GitCompareArrows },
-  { href: "/scouting/radar", label: "Radar", icon: Radar },
-  { href: "/scouting/similarity", label: "Similarity", icon: Users },
-  { href: "/scouting/scatter", label: "Scatter", icon: TrendingUp },
-  { href: "/scouting/ranking", label: "Ranking", icon: BarChart3 },
-  { href: "/scouting/glossary", label: "Glossary", icon: HelpCircle },
-] as const;
 
 export function ScoutingTabNav() {
   const pathname = usePathname();
