@@ -45,7 +45,7 @@ export function LeagueStandingsPanel({
       <ComicPanelTitle title="LEAGUE TABLE" subtitle="TOP 7 AT A GLANCE" />
 
       {/* 리그 탭 */}
-      <div className="mb-3 flex gap-1">
+      <div className="mb-2 flex gap-1">
         {TOP5_LEAGUES.map((league) => {
           const slug = league.slug;
           const isActive = slug === activeSlug;
@@ -79,20 +79,20 @@ export function LeagueStandingsPanel({
           <table className="w-full text-left">
             <thead>
               <tr className="border-comic-black border-b-[var(--comic-border-width)] bg-comic-cream font-[family-name:var(--font-bangers)] text-[length:var(--comic-body-sm)] tracking-[var(--comic-tracking-normal)] text-comic-black/70">
-                <th className="px-3 py-2 text-center">#</th>
-                <th className="px-3 py-2">Team</th>
-                <th className="px-3 py-2 text-center">P</th>
-                <th className="hidden px-3 py-2 text-center sm:table-cell">
+                <th className="px-2 py-1.5 text-center">#</th>
+                <th className="px-2 py-1.5">Team</th>
+                <th className="px-2 py-1.5 text-center">P</th>
+                <th className="hidden px-2 py-1.5 text-center sm:table-cell">
                   W
                 </th>
-                <th className="hidden px-3 py-2 text-center sm:table-cell">
+                <th className="hidden px-2 py-1.5 text-center sm:table-cell">
                   D
                 </th>
-                <th className="hidden px-3 py-2 text-center sm:table-cell">
+                <th className="hidden px-2 py-1.5 text-center sm:table-cell">
                   L
                 </th>
-                <th className="px-3 py-2 text-center">GD</th>
-                <th className="px-3 py-2 text-center">Pts</th>
+                <th className="px-2 py-1.5 text-center">GD</th>
+                <th className="px-2 py-1.5 text-center">Pts</th>
               </tr>
             </thead>
             <tbody>
@@ -103,10 +103,10 @@ export function LeagueStandingsPanel({
                     key={row.teamId}
                     className="border-b border-comic-black/20 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] text-comic-black transition-colors hover:bg-comic-cream/50"
                   >
-                    <td className="px-3 py-2 text-center font-[family-name:var(--font-bangers)]">
+                    <td className="px-2 py-1.5 text-center font-[family-name:var(--font-bangers)]">
                       {row.position}
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-2 py-1.5">
                       <div className="flex items-center gap-2">
                         {team?.logoUrl && (
                           <Image
@@ -125,22 +125,22 @@ export function LeagueStandingsPanel({
                         </span>
                       </div>
                     </td>
-                    <td className="px-3 py-2 text-center">{row.played}</td>
-                    <td className="hidden px-3 py-2 text-center sm:table-cell">
+                    <td className="px-2 py-1.5 text-center">{row.played}</td>
+                    <td className="hidden px-2 py-1.5 text-center sm:table-cell">
                       {row.won}
                     </td>
-                    <td className="hidden px-3 py-2 text-center sm:table-cell">
+                    <td className="hidden px-2 py-1.5 text-center sm:table-cell">
                       {row.drawn}
                     </td>
-                    <td className="hidden px-3 py-2 text-center sm:table-cell">
+                    <td className="hidden px-2 py-1.5 text-center sm:table-cell">
                       {row.lost}
                     </td>
-                    <td className="px-3 py-2 text-center">
+                    <td className="px-2 py-1.5 text-center">
                       {row.goalDifference > 0
                         ? `+${row.goalDifference}`
                         : row.goalDifference}
                     </td>
-                    <td className="px-3 py-2 text-center font-[family-name:var(--font-bangers)] text-[length:var(--comic-body-base)]">
+                    <td className="px-2 py-1.5 text-center font-[family-name:var(--font-bangers)] text-[length:var(--comic-body-base)]">
                       {row.points}
                     </td>
                   </tr>
@@ -152,7 +152,7 @@ export function LeagueStandingsPanel({
       )}
 
       {/* FULL STANDINGS 링크 */}
-      <div className="mt-3 text-center">
+      <div className="mt-2 text-center">
         <Link
           href={`/ranking?league=${activeSlug}`}
           className="inline-block font-[family-name:var(--font-bangers)] text-comic-black/70 underline decoration-comic-black/30 underline-offset-4 transition-colors hover:text-comic-black"

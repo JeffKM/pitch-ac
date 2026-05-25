@@ -109,21 +109,21 @@
   --comic-panel-radius: var(--comic-radius);
 
   /* 타이포그라피 넘버 토큰 — Bangers */
-  --comic-text-xs: 12px;
-  --comic-text-sm: 14px;
-  --comic-text-base: 18px;
-  --comic-text-lg: 20px;
-  --comic-text-xl: 24px;
-  --comic-text-2xl: 30px;
-  --comic-text-3xl: 48px;
-  --comic-text-4xl: 60px;
-  --comic-text-5xl: 72px;
-  --comic-text-6xl: 96px;
+  --comic-text-xs: 11px;
+  --comic-text-sm: 13px;
+  --comic-text-base: 16px;
+  --comic-text-lg: 18px;
+  --comic-text-xl: 22px;
+  --comic-text-2xl: 26px;
+  --comic-text-3xl: 40px;
+  --comic-text-4xl: 52px;
+  --comic-text-5xl: 64px;
+  --comic-text-6xl: 80px;
   /* 타이포그라피 넘버 토큰 — Permanent Marker */
-  --comic-body-xs: 10px;
-  --comic-body-sm: 12px;
-  --comic-body-base: 14px;
-  --comic-body-lg: 16px;
+  --comic-body-xs: 9px;
+  --comic-body-sm: 11px;
+  --comic-body-base: 13px;
+  --comic-body-lg: 15px;
   /* 줄간격 비율 토큰 */
   --comic-leading-tight: 1;
   --comic-leading-snug: 1.2;
@@ -190,10 +190,10 @@
   --comic-cream: oklch(0.95 0.03 90);
   --comic-white: oklch(1 0 0);
   /* 코믹 넘버 토큰 */
-  --comic-border: 3px;
-  --comic-border-t: 2px;
-  --comic-gap: 16px;
-  --comic-pad: 24px;
+  --comic-border: 2px;
+  --comic-border-t: 1px;
+  --comic-gap: 10px;
+  --comic-pad: 14px;
   --comic-radius: 4px;
   /* 사이드바 (코믹 테마) */
   --sidebar: var(--comic-cream);
@@ -244,10 +244,10 @@
   --comic-black: oklch(0.95 0 0);
   --comic-cream: oklch(0.25 0.02 90);
   --comic-white: oklch(0.18 0.03 260);
-  --comic-border: 3px;
-  --comic-border-t: 2px;
-  --comic-gap: 16px;
-  --comic-pad: 24px;
+  --comic-border: 2px;
+  --comic-border-t: 1px;
+  --comic-gap: 10px;
+  --comic-pad: 14px;
   --comic-radius: 4px;
   /* 사이드바 (코믹 다크 테마) */
   --sidebar: oklch(0.22 0.03 260);

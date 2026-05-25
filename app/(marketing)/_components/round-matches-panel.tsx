@@ -34,7 +34,7 @@ export function RoundMatchesPanel({
           subtitle={`${todayFixtures.length} matches today`}
         />
 
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {displayFixtures.map((fixture) => {
             const homeTeam = teamsMap.get(fixture.homeTeamId);
             const awayTeam = teamsMap.get(fixture.awayTeamId);
@@ -51,7 +51,7 @@ export function RoundMatchesPanel({
           })}
         </div>
 
-        <div className="mt-3 text-center">
+        <div className="mt-2 text-center">
           <Link
             href="/matchday"
             className="inline-block font-[family-name:var(--font-bangers)] text-comic-black/70 underline decoration-comic-black/30 underline-offset-4 transition-colors hover:text-comic-black"
@@ -75,7 +75,7 @@ export function RoundMatchesPanel({
           subtitle={`GW ${currentGameweek} — Coming up`}
         />
 
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {displayFixtures.map((fixture) => {
             const homeTeam = teamsMap.get(fixture.homeTeamId);
             const awayTeam = teamsMap.get(fixture.awayTeamId);
@@ -83,7 +83,7 @@ export function RoundMatchesPanel({
             return (
               <div
                 key={fixture.id}
-                className="flex items-center gap-3 rounded-[var(--comic-panel-radius)] border-[var(--comic-border-thin)] border-comic-black/20 bg-comic-white px-3 py-2"
+                className="flex items-center gap-2 rounded-[var(--comic-panel-radius)] border-[var(--comic-border-thin)] border-comic-black/20 bg-comic-white px-2 py-1.5"
               >
                 {/* 홈팀 */}
                 <div className="flex flex-1 items-center gap-2">
@@ -135,7 +135,7 @@ export function RoundMatchesPanel({
           })}
         </div>
 
-        <div className="mt-3 text-center">
+        <div className="mt-2 text-center">
           <Link
             href="/matchday"
             className="inline-block font-[family-name:var(--font-bangers)] text-comic-black/70 underline decoration-comic-black/30 underline-offset-4 transition-colors hover:text-comic-black"

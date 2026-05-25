@@ -20,15 +20,15 @@ export function MiniFixtureCard({
   const kickoffTime = formatKickoffTime(fixture.date);
 
   return (
-    <div className="flex items-center gap-3 rounded-[var(--comic-panel-radius)] border-[var(--comic-border-thin)] border-comic-black/40 bg-comic-white px-3 py-2">
+    <div className="flex items-center gap-2 rounded-[var(--comic-panel-radius)] border-[var(--comic-border-thin)] border-comic-black/40 bg-comic-white px-2 py-1.5">
       {/* 홈팀 */}
-      <div className="flex flex-1 items-center gap-2">
+      <div className="flex flex-1 items-center gap-1.5">
         <Image
           src={homeTeam.logoUrl}
           alt={homeTeam.shortName}
-          width={24}
-          height={24}
-          className="size-6 object-contain"
+          width={20}
+          height={20}
+          className="size-5 object-contain"
         />
         <span
           className="font-[family-name:var(--font-bangers)] text-comic-black"
@@ -52,13 +52,13 @@ export function MiniFixtureCard({
       </div>
 
       {/* 어웨이팀 */}
-      <div className="flex flex-1 flex-row-reverse items-center gap-2">
+      <div className="flex flex-1 flex-row-reverse items-center gap-1.5">
         <Image
           src={awayTeam.logoUrl}
           alt={awayTeam.shortName}
-          width={24}
-          height={24}
-          className="size-6 object-contain"
+          width={20}
+          height={20}
+          className="size-5 object-contain"
         />
         <span
           className="font-[family-name:var(--font-bangers)] text-comic-black"

@@ -38,7 +38,7 @@ export function ComicPanelTitle({
   subtitle?: string;
 }) {
   return (
-    <div className="mb-3 border-comic-black/30 border-b-[var(--comic-border-thin)] pb-3">
+    <div className="mb-2 border-comic-black/30 border-b-[var(--comic-border-thin)] pb-2">
       <h3
         className="font-[family-name:var(--font-bangers)] text-comic-black"
         style={{
@@ -73,7 +73,7 @@ export function ComicPanelHeading({
   subtitle?: string;
 }) {
   return (
-    <div className="mb-4 border-comic-black/30 border-b-[var(--comic-border-thin)] pb-3">
+    <div className="mb-2 border-comic-black/30 border-b-[var(--comic-border-thin)] pb-2">
       <h2
         className="font-[family-name:var(--font-bangers)] text-comic-black"
         style={{
