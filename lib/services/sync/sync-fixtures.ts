@@ -70,11 +70,11 @@ export async function syncLeagueFixtures(
       if (teamError) throw teamError;
     }
 
-    // 경기 upsert
+    // 경기 upsert (gameweek 0 제외, null은 UCL 결승 등 허용)
     const fixtureRows = allMatches
       .map((raw: FdMatch) => {
         const fixture = mapFdMatchToFixture(raw);
-        if (fixture.gameweek === null || fixture.gameweek === 0) return null;
+        if (fixture.gameweek === 0) return null;
         const row = fixtureToDbRow(fixture);
         // DB에서 POSTP인 경기는 API가 NS를 반환해도 POSTP 유지
         if (postpIds.has(fixture.id) && fixture.status === "NS") {
