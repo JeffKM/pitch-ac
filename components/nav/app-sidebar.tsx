@@ -119,19 +119,33 @@ export function AppSidebar() {
             <SidebarMenu>
               {tournamentItems.map((item) => {
                 const Icon = item.icon;
+                const isDisabled = item.disabled ?? false;
                 return (
                   <SidebarMenuItem key={item.label}>
-                    <SidebarMenuButton
-                      disabled
-                      tooltip={`${item.label} (Coming Soon)`}
-                      className="h-9 gap-3 rounded-[var(--comic-panel-radius)] border-[2px] border-dashed border-sidebar-foreground/10 font-[family-name:var(--font-fredoka)] text-[13px] opacity-35"
-                    >
-                      <Icon className="size-4 shrink-0" />
-                      <span>{item.label}</span>
-                      <span className="ml-auto font-[family-name:var(--font-permanent-marker)] text-[9px] text-sidebar-foreground/40 uppercase group-data-[collapsible=icon]:hidden">
-                        Soon
-                      </span>
-                    </SidebarMenuButton>
+                    {isDisabled ? (
+                      <SidebarMenuButton
+                        disabled
+                        tooltip={`${item.label} (Coming Soon)`}
+                        className="h-9 gap-3 rounded-[var(--comic-panel-radius)] border-[2px] border-dashed border-sidebar-foreground/10 font-[family-name:var(--font-fredoka)] text-[13px] opacity-35"
+                      >
+                        <Icon className="size-4 shrink-0" />
+                        <span>{item.label}</span>
+                        <span className="ml-auto font-[family-name:var(--font-permanent-marker)] text-[9px] text-sidebar-foreground/40 uppercase group-data-[collapsible=icon]:hidden">
+                          Soon
+                        </span>
+                      </SidebarMenuButton>
+                    ) : (
+                      <SidebarMenuButton
+                        asChild
+                        tooltip={item.label}
+                        className="h-9 gap-3 rounded-[var(--comic-panel-radius)] border-[2px] border-sidebar-foreground/10 font-[family-name:var(--font-fredoka)] text-[13px] transition-colors hover:border-comic-yellow hover:bg-comic-yellow/10"
+                      >
+                        <a href={item.href}>
+                          <Icon className="size-4 shrink-0" />
+                          <span>{item.label}</span>
+                        </a>
+                      </SidebarMenuButton>
+                    )}
                   </SidebarMenuItem>
                 );
               })}

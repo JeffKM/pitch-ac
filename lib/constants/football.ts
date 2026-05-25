@@ -16,13 +16,16 @@ export const MCITY_TEAM_ID = 65;
 
 // ─── 5대 리그 설정 ───────────────────────────────────────────────
 
-/** 리그 슬러그 타입 */
+/** 리그 슬러그 타입 (5대 리그) */
 export type LeagueSlug = "epl" | "laliga" | "seriea" | "bundesliga" | "ligue1";
+
+/** 대회 슬러그 타입 (5대 리그 + UCL) */
+export type CompetitionSlug = LeagueSlug | "ucl";
 
 /** 리그 설정 인터페이스 */
 export interface LeagueConfig {
   id: number;
-  slug: LeagueSlug;
+  slug: CompetitionSlug;
   name: string;
   shortName: string;
   country: string;
@@ -106,6 +109,44 @@ export const TOP5_LEAGUE_IDS: Set<number> = new Set(
 /** 기본 리그 */
 export const DEFAULT_LEAGUE: LeagueSlug = "epl";
 
+// ─── UCL 설정 ─────────────────────────────────────────────────
+
+/** Champions League ID (football-data.org 기준) */
+export const UCL_COMPETITION_ID = 2001;
+
+/** UCL 설정 */
+export const UCL_CONFIG: LeagueConfig = {
+  id: UCL_COMPETITION_ID,
+  slug: "ucl",
+  name: "Champions League",
+  shortName: "UCL",
+  country: "Europe",
+  code: "CL",
+  maxRounds: 8, // 리그 페이즈 8라운드
+  teamsCount: 36,
+};
+
+// ─── 전체 대회 (5대 리그 + UCL) ────────────────────────────────
+
+/** 전체 대회 배열 (5대 리그 + UCL) */
+export const ALL_COMPETITIONS: LeagueConfig[] = [...TOP5_LEAGUES, UCL_CONFIG];
+
+/** 전체 대회 ID Set (필터링용) */
+export const ALL_COMPETITION_IDS: Set<number> = new Set(
+  ALL_COMPETITIONS.map((c) => c.id),
+);
+
+/** competition_id → LeagueConfig (5대 리그 + UCL) */
+export const COMPETITION_BY_ID: Record<number, LeagueConfig> =
+  Object.fromEntries(ALL_COMPETITIONS.map((c) => [c.id, c]));
+
+/** competition_slug → LeagueConfig (5대 리그 + UCL) */
+export const COMPETITION_BY_SLUG: Record<CompetitionSlug, LeagueConfig> =
+  Object.fromEntries(ALL_COMPETITIONS.map((c) => [c.slug, c])) as Record<
+    CompetitionSlug,
+    LeagueConfig
+  >;
+
 /** league_id → 대회 표시명 매핑 */
 export const LEAGUE_NAME_MAP: Record<number, string> = {
   [PL_LEAGUE_ID]: "Premier League",
@@ -113,6 +154,7 @@ export const LEAGUE_NAME_MAP: Record<number, string> = {
   2019: "Serie A",
   2002: "Bundesliga",
   2015: "Ligue 1",
+  [UCL_COMPETITION_ID]: "Champions League",
 };
 
 /** football-data.org 포지션 문자열 → 앱 포지션 (4분류) */

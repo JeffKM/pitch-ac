@@ -37,25 +37,29 @@ const LEAGUE_EMBLEMS: Record<LeagueSlug, string> = {
   ligue1: "https://crests.football-data.org/FL1.png",
 };
 
-export const leagueLinks: LeagueLinkItem[] = TOP5_LEAGUES.map((league) => ({
-  slug: league.slug,
-  name: league.name,
-  shortName: league.shortName,
-  href: `/ranking?league=${league.slug}`,
-  emblemUrl: LEAGUE_EMBLEMS[league.slug],
-  flag: LEAGUE_FLAGS[league.slug],
-}));
+export const leagueLinks: LeagueLinkItem[] = TOP5_LEAGUES.map((league) => {
+  const slug = league.slug as LeagueSlug;
+  return {
+    slug,
+    name: league.name,
+    shortName: league.shortName,
+    href: `/ranking?league=${slug}`,
+    emblemUrl: LEAGUE_EMBLEMS[slug],
+    flag: LEAGUE_FLAGS[slug],
+  };
+});
 
 // ─── 대회 (placeholder) ──────────────────────────────────────
 
 export type TournamentItem = {
   label: string;
   icon: LucideIcon;
-  disabled: true;
+  href?: string;
+  disabled?: boolean;
 };
 
 export const tournamentItems: TournamentItem[] = [
-  { label: "UCL", icon: Trophy, disabled: true },
+  { label: "UCL", icon: Trophy, href: "/ranking?league=ucl" },
   { label: "UEL", icon: Shield, disabled: true },
   { label: "UECL", icon: Star, disabled: true },
 ];

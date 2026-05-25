@@ -6,9 +6,9 @@ import {
 } from "@/lib/api/football-data";
 import type { FdMatch } from "@/lib/api/football-data/types";
 import {
+  ALL_COMPETITIONS,
   CURRENT_SEASON,
   PL_LEAGUE_ID,
-  TOP5_LEAGUES,
 } from "@/lib/constants/football";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -118,10 +118,10 @@ export async function syncFixtures(): Promise<SyncResult> {
   return syncLeagueFixtures("PL", PL_LEAGUE_ID);
 }
 
-/** 5대 리그 전체 동기화 (5 API 요청, 순차 실행 — 분당 10회 제한 준수) */
+/** 전체 대회 동기화 (6 API 요청, 순차 실행 — 분당 10회 제한 준수) */
 export async function syncAllLeagueFixtures(): Promise<SyncResult[]> {
   const results: SyncResult[] = [];
-  for (const league of TOP5_LEAGUES) {
+  for (const league of ALL_COMPETITIONS) {
     const result = await syncLeagueFixtures(league.code, league.id);
     results.push(result);
   }

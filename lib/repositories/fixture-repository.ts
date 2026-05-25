@@ -3,7 +3,7 @@ import "server-only";
 
 import { cache } from "react";
 
-import { PL_LEAGUE_ID, TOP5_LEAGUE_IDS } from "@/lib/constants/football";
+import { ALL_COMPETITION_IDS, PL_LEAGUE_ID } from "@/lib/constants/football";
 import { createClient } from "@/lib/supabase/server";
 import type { Fixture } from "@/types";
 
@@ -99,7 +99,7 @@ export async function getFixturesByGameweek(
   return (data as FixtureRow[]).map(fixtureRowToFixture);
 }
 
-/** KST 날짜 기준 5대 리그 경기 조회 */
+/** KST 날짜 기준 전체 대회 경기 조회 (5대 리그 + UCL) */
 export async function getFixturesByDate(dateStr: string): Promise<Fixture[]> {
   const supabase = await createClient();
 
@@ -107,7 +107,7 @@ export async function getFixturesByDate(dateStr: string): Promise<Fixture[]> {
   const startKST = new Date(`${dateStr}T00:00:00+09:00`);
   const endKST = new Date(`${dateStr}T23:59:59.999+09:00`);
 
-  const leagueIds = Array.from(TOP5_LEAGUE_IDS);
+  const leagueIds = Array.from(ALL_COMPETITION_IDS);
 
   const { data, error } = await supabase
     .from("fixtures")

@@ -4,7 +4,10 @@ import { useSearchParams } from "next/navigation";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { type LeagueSlug, TOP5_LEAGUES } from "@/lib/constants/football";
+import {
+  ALL_COMPETITIONS,
+  type CompetitionSlug,
+} from "@/lib/constants/football";
 import type { Team, TeamStanding } from "@/types";
 
 import { StandingsTable } from "./standings-table";
@@ -15,7 +18,7 @@ type RankingContentProps = {
 };
 
 /** 유효한 slug인지 확인 */
-const VALID_SLUGS = new Set<string>(TOP5_LEAGUES.map((l) => l.slug));
+const VALID_SLUGS = new Set<string>(ALL_COMPETITIONS.map((c) => c.slug));
 
 export function RankingContent({
   standingsRecord,
@@ -23,15 +26,15 @@ export function RankingContent({
 }: RankingContentProps) {
   const searchParams = useSearchParams();
   const leagueParam = searchParams.get("league");
-  const defaultTab: LeagueSlug =
+  const defaultTab: CompetitionSlug =
     leagueParam && VALID_SLUGS.has(leagueParam)
-      ? (leagueParam as LeagueSlug)
+      ? (leagueParam as CompetitionSlug)
       : "epl";
 
   return (
     <Tabs defaultValue={defaultTab} key={defaultTab}>
       <TabsList className="w-full justify-start rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-cream">
-        {TOP5_LEAGUES.map((league) => (
+        {ALL_COMPETITIONS.map((league) => (
           <TabsTrigger
             key={league.slug}
             value={league.slug}
@@ -42,7 +45,7 @@ export function RankingContent({
         ))}
       </TabsList>
 
-      {TOP5_LEAGUES.map((league) => {
+      {ALL_COMPETITIONS.map((league) => {
         const standings = standingsRecord[league.id] ?? [];
         return (
           <TabsContent key={league.slug} value={league.slug} className="mt-4">

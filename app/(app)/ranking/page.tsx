@@ -11,7 +11,7 @@ import { RankingContent } from "./_components/ranking-content";
 
 export const metadata: Metadata = {
   title: "Ranking",
-  description: "Top 5 European league standings",
+  description: "Top 5 European league & Champions League standings",
 };
 
 async function RankingData() {

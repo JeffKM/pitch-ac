@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-import { PL_LEAGUE_ID } from "@/lib/constants/football";
+import { PL_LEAGUE_ID, UCL_COMPETITION_ID } from "@/lib/constants/football";
 import { cn } from "@/lib/utils";
 import type { Team, TeamStanding } from "@/types";
 
@@ -20,7 +20,10 @@ type PositionZone =
   | "uel"
   | "uecl"
   | "relegation-po"
-  | "relegation";
+  | "relegation"
+  | "ucl-r16"
+  | "ucl-playoff"
+  | "eliminated";
 
 interface ZoneRule {
   zone: PositionZone;
@@ -74,6 +77,21 @@ const LEAGUE_ZONE_RULES: Record<number, ZoneRule[]> = {
     { zone: "relegation-po", positions: [17] },
     { zone: "relegation", positions: [18] },
   ],
+  // UCL 리그 페이즈: 1-8 R16 직행, 9-24 플레이오프, 25-36 탈락
+  [UCL_COMPETITION_ID]: [
+    {
+      zone: "ucl-r16",
+      positions: Array.from({ length: 8 }, (_, i) => i + 1),
+    },
+    {
+      zone: "ucl-playoff",
+      positions: Array.from({ length: 16 }, (_, i) => i + 9),
+    },
+    {
+      zone: "eliminated",
+      positions: Array.from({ length: 12 }, (_, i) => i + 25),
+    },
+  ],
 };
 
 const ZONE_STYLES: Record<PositionZone, string> = {
@@ -83,6 +101,9 @@ const ZONE_STYLES: Record<PositionZone, string> = {
   uecl: "border-l-2 border-l-green-500",
   "relegation-po": "border-l-2 border-l-red-300",
   relegation: "border-l-2 border-l-red-500",
+  "ucl-r16": "border-l-2 border-l-blue-500",
+  "ucl-playoff": "border-l-2 border-l-amber-400",
+  eliminated: "border-l-2 border-l-gray-400",
 };
 
 function getPositionClass(position: number, leagueId: number): string {
@@ -103,6 +124,15 @@ interface LegendItem {
 }
 
 function getLegendItems(leagueId: number): LegendItem[] {
+  // UCL 전용 범례
+  if (leagueId === UCL_COMPETITION_ID) {
+    return [
+      { label: "Round of 16", colorClass: "bg-blue-500" },
+      { label: "Playoff Round", colorClass: "bg-amber-400" },
+      { label: "Eliminated", colorClass: "bg-gray-400" },
+    ];
+  }
+
   const rules = LEAGUE_ZONE_RULES[leagueId] ?? LEAGUE_ZONE_RULES[PL_LEAGUE_ID];
   const zones = new Set(rules.map((r) => r.zone));
 

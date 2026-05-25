@@ -6,7 +6,7 @@ import {
   mapFdStandingToTeamStanding,
   mapFdTeamToTeam,
 } from "@/lib/api/football-data";
-import { CURRENT_SEASON, TOP5_LEAGUES } from "@/lib/constants/football";
+import { ALL_COMPETITIONS, CURRENT_SEASON } from "@/lib/constants/football";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 import { standingToDbRow, teamToDbRow } from "./db-mappers";
@@ -52,10 +52,10 @@ export async function syncTeams(
   }
 }
 
-/** 5대 리그 전체 팀 동기화 */
+/** 전체 대회 팀 동기화 (5대 리그 + UCL) */
 export async function syncAllLeagueTeams(): Promise<SyncResult[]> {
   const results: SyncResult[] = [];
-  for (const league of TOP5_LEAGUES) {
+  for (const league of ALL_COMPETITIONS) {
     const result = await syncTeams(league.code);
     results.push(result);
   }
@@ -85,7 +85,7 @@ export async function syncStandings(
 
     const { error } = await supabase
       .from("standings")
-      .upsert(standingRows, { onConflict: "team_id,season" });
+      .upsert(standingRows, { onConflict: "team_id,season,league_id" });
 
     if (error) throw error;
 
@@ -108,10 +108,10 @@ export async function syncStandings(
   }
 }
 
-/** 5대 리그 전체 순위표 동기화 */
+/** 전체 대회 순위표 동기화 (5대 리그 + UCL) */
 export async function syncAllLeagueStandings(): Promise<SyncResult[]> {
   const results: SyncResult[] = [];
-  for (const league of TOP5_LEAGUES) {
+  for (const league of ALL_COMPETITIONS) {
     const result = await syncStandings(league.code, league.id);
     results.push(result);
   }

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { LEAGUE_BY_ID, type LeagueConfig } from "@/lib/constants/football";
+import { COMPETITION_BY_ID, type LeagueConfig } from "@/lib/constants/football";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /** 킥오프 후 결과 반영까지 대기 시간 (2.5시간 = 150분) */
@@ -33,7 +33,9 @@ export async function getPendingResultLeagues(): Promise<LeagueConfig[]> {
 
   // 중복 제거 후 LeagueConfig로 변환
   const uniqueLeagueIds = [...new Set(data.map((row) => row.league_id))];
-  const leagues = uniqueLeagueIds.map((id) => LEAGUE_BY_ID[id]).filter(Boolean);
+  const leagues = uniqueLeagueIds
+    .map((id) => COMPETITION_BY_ID[id])
+    .filter(Boolean);
 
   return leagues;
 }

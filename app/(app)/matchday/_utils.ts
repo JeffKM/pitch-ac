@@ -1,9 +1,9 @@
 // 매치데이 공용 유틸 함수 — Server/Client Component 양쪽에서 사용
 
 import {
+  ALL_COMPETITIONS,
   type LeagueConfig,
   PL_LEAGUE_ID,
-  TOP5_LEAGUES,
 } from "@/lib/constants/football";
 import { formatDateLabel, formatShortDate, toDateKey } from "@/lib/date-utils";
 import type { Fixture } from "@/types";
@@ -14,7 +14,7 @@ export interface LeagueFixtureGroupData {
   fixtures: Fixture[];
 }
 
-/** 리그별 경기 그룹핑 — TOP5_LEAGUES 순서 유지, 경기 없는 리그 생략 */
+/** 리그별 경기 그룹핑 — ALL_COMPETITIONS 순서 유지, 경기 없는 리그 생략 */
 export function groupFixturesByLeague(
   fixtures: Fixture[],
 ): LeagueFixtureGroupData[] {
@@ -26,7 +26,7 @@ export function groupFixturesByLeague(
     byLeague.set(fixture.leagueId, group);
   }
 
-  return TOP5_LEAGUES.filter((league) => byLeague.has(league.id)).map(
+  return ALL_COMPETITIONS.filter((league) => byLeague.has(league.id)).map(
     (league) => ({
       league,
       fixtures: byLeague.get(league.id)!,

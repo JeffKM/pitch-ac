@@ -3,7 +3,7 @@ import "server-only";
 
 import { cache } from "react";
 
-import { TOP5_LEAGUES } from "@/lib/constants/football";
+import { ALL_COMPETITIONS, TOP5_LEAGUE_IDS } from "@/lib/constants/football";
 import { createClient } from "@/lib/supabase/server";
 import type { TeamStanding } from "@/types";
 
@@ -26,11 +26,11 @@ export const getAllStandings = cache(
   },
 );
 
-/** 5대 리그 전체 순위 조회 → Map<leagueId, TeamStanding[]> */
+/** 전체 대회 순위 조회 (5대 리그 + UCL) → Map<leagueId, TeamStanding[]> */
 export const getAllLeagueStandings = cache(
   async (season: string): Promise<Map<number, TeamStanding[]>> => {
     const supabase = await createClient();
-    const leagueIds = TOP5_LEAGUES.map((l) => l.id);
+    const leagueIds = ALL_COMPETITIONS.map((c) => c.id);
 
     const { data, error } = await supabase
       .from("standings")
@@ -40,7 +40,7 @@ export const getAllLeagueStandings = cache(
       .order("position", { ascending: true });
 
     if (error)
-      throw new Error(`standings 5대 리그 조회 실패: ${error.message}`);
+      throw new Error(`standings 전체 대회 조회 실패: ${error.message}`);
 
     const map = new Map<number, TeamStanding[]>();
     for (const row of data as StandingRow[]) {
@@ -53,7 +53,8 @@ export const getAllLeagueStandings = cache(
   },
 );
 
-/** 여러 팀 ID의 순위를 한 번에 조회 → Map<teamId, TeamStanding> */
+/** 여러 팀 ID의 국내 리그 순위를 한 번에 조회 → Map<teamId, TeamStanding>
+ *  UCL standings가 덮어쓰지 않도록 TOP5_LEAGUE_IDS로 필터 */
 export const getStandingsByTeamIds = cache(
   async (
     teamIds: number[],
@@ -67,6 +68,7 @@ export const getStandingsByTeamIds = cache(
       .from("standings")
       .select("*")
       .in("team_id", teamIds)
+      .in("league_id", Array.from(TOP5_LEAGUE_IDS))
       .eq("season", season);
 
     if (error) throw new Error(`standings 조회 실패: ${error.message}`);
