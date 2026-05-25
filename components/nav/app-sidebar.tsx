@@ -18,7 +18,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
@@ -26,18 +25,25 @@ import { cn } from "@/lib/utils";
 import { scoutingTabs } from "./scouting-tabs-config";
 import { leagueLinks, tournamentItems } from "./sidebar-config";
 
-/** 사이드바 접기/펼치기 토글 버튼 (커스텀) */
+/** 그라데이션 페이드 구분선 — 양 끝이 투명하게 사라지는 자연스러운 구분 */
+function FadeDivider() {
+  return (
+    <div className="mx-3 my-2 h-px bg-gradient-to-r from-transparent via-sidebar-foreground/15 to-transparent" />
+  );
+}
+
+/** 사이드바 접기/펼치기 토글 버튼 */
 function SidebarCollapseButton() {
   const { toggleSidebar, state } = useSidebar();
   return (
     <button
       onClick={toggleSidebar}
-      className="flex size-8 items-center justify-center rounded-[var(--comic-panel-radius)] border-[2px] border-comic-black bg-comic-white text-comic-black transition-colors hover:bg-comic-yellow"
+      className="flex size-7 items-center justify-center rounded-[var(--comic-panel-radius)] border-[2px] border-comic-black bg-comic-white text-comic-black transition-colors hover:bg-comic-yellow"
     >
       {state === "expanded" ? (
-        <ChevronsLeft className="size-4" />
+        <ChevronsLeft className="size-3.5" />
       ) : (
-        <ChevronsRight className="size-4" />
+        <ChevronsRight className="size-3.5" />
       )}
     </button>
   );
@@ -54,20 +60,12 @@ export function AppSidebar() {
       collapsible="icon"
       className="hidden border-sidebar-border border-r-[var(--comic-border-width)] md:flex"
     >
-      {/* ── 헤더: 브랜드 + 접기 토글 ── */}
-      <SidebarHeader className="px-3 py-3">
-        <div className="flex items-center justify-between">
-          <Link
-            href="/"
-            className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-lg)] tracking-[var(--comic-tracking-wide)] text-sidebar-foreground group-data-[collapsible=icon]:hidden"
-          >
-            pitch-ac
-          </Link>
-          <SidebarCollapseButton />
-        </div>
+      {/* ── 헤더: 접기 토글만 ── */}
+      <SidebarHeader className="flex items-center px-3 py-2.5">
+        <SidebarCollapseButton />
       </SidebarHeader>
 
-      <SidebarSeparator className="border-sidebar-border" />
+      <FadeDivider />
 
       <SidebarContent className="px-1">
         {/* ── LEAGUES ── */}
@@ -112,7 +110,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarSeparator className="mx-3 border-sidebar-foreground/10" />
+        <FadeDivider />
 
         {/* ── TOURNAMENTS (placeholder) ── */}
         <SidebarGroup>
@@ -146,7 +144,7 @@ export function AppSidebar() {
         {/* ── SCOUTING (scouting 페이지에서만) ── */}
         {isScouting && (
           <>
-            <SidebarSeparator className="mx-3 border-sidebar-foreground/10" />
+            <FadeDivider />
             <SidebarGroup>
               <SidebarGroupLabel className="mb-1 font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-xs)] tracking-[var(--comic-tracking-widest)] text-sidebar-foreground/50 uppercase">
                 Scouting
@@ -190,8 +188,9 @@ export function AppSidebar() {
       </SidebarContent>
 
       {/* ── 푸터: 테마 전환 ── */}
-      <SidebarFooter className="px-3 py-3">
-        <div className="flex items-center justify-center group-data-[collapsible=icon]:justify-center">
+      <FadeDivider />
+      <SidebarFooter className="px-3 py-2.5">
+        <div className="flex items-center justify-center">
           <ThemeSwitcher />
         </div>
       </SidebarFooter>
