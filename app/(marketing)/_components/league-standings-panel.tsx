@@ -1,4 +1,4 @@
-// 5대 리그 순위 한눈에 — 탭 전환, 리그별 상위 7팀 + 승점 바
+// 5대 리그 순위 미니 테이블 — 상위 7팀, 주요 정보만
 
 "use client";
 
@@ -11,7 +11,7 @@ import type { Team, TeamStanding } from "@/types";
 
 import { ComicPanel, ComicPanelTitle } from "./comic-panel";
 
-/** 표시할 팀 수 */
+/** 홈에서 표시할 팀 수 */
 const TOP_N = 7;
 
 /** 탭 축약 라벨 */
@@ -36,8 +36,9 @@ export function LeagueStandingsPanel({
 
   const activeLeague = TOP5_LEAGUES.find((l) => l.slug === activeSlug)!;
   const standings = standingsMap.get(activeLeague.id) ?? [];
-  const topTeams = standings.slice(0, TOP_N);
-  const maxPoints = topTeams[0]?.points ?? 0;
+  const topTeams = standings
+    .sort((a, b) => a.position - b.position)
+    .slice(0, TOP_N);
 
   return (
     <ComicPanel bg="cream" className="p-[var(--comic-panel-padding)]">
@@ -65,7 +66,7 @@ export function LeagueStandingsPanel({
         })}
       </div>
 
-      {/* 순위 목록 */}
+      {/* 미니 순위 테이블 */}
       {topTeams.length === 0 ? (
         <p
           className="py-6 text-center font-[family-name:var(--font-bangers)] text-comic-black/40"
@@ -74,77 +75,79 @@ export function LeagueStandingsPanel({
           NO DATA YET
         </p>
       ) : (
-        <div className="space-y-1.5">
-          {topTeams.map((standing) => {
-            const team = teamsMap.get(standing.teamId);
-            if (!team) return null;
-
-            const barWidth =
-              maxPoints > 0 ? (standing.points / maxPoints) * 100 : 0;
-            const diff = standing.points - maxPoints; // 1위는 0, 나머지는 음수
-
-            return (
-              <div
-                key={standing.teamId}
-                className="flex items-center gap-2 rounded-[var(--comic-panel-radius)] border-[var(--comic-border-thin)] border-comic-black/20 bg-comic-white px-2.5 py-1.5"
-              >
-                {/* 순위 */}
-                <span
-                  className="w-5 shrink-0 text-right font-[family-name:var(--font-bangers)] text-comic-black/50"
-                  style={{ fontSize: "var(--comic-body-xs)" }}
-                >
-                  {standing.position}
-                </span>
-
-                {/* 팀 로고 + 이름 */}
-                <Image
-                  src={team.logoUrl}
-                  alt={team.shortName}
-                  width={20}
-                  height={20}
-                  className="size-5 shrink-0 object-contain"
-                />
-                <span
-                  className="w-16 shrink-0 truncate font-[family-name:var(--font-bangers)] text-comic-black"
-                  style={{ fontSize: "var(--comic-text-xs)" }}
-                >
-                  {team.shortName}
-                </span>
-
-                {/* 승점 바 */}
-                <div className="relative flex-1">
-                  <div
-                    className="h-3 rounded-sm bg-comic-black/80 transition-all"
-                    style={{
-                      width: `${barWidth}%`,
-                      opacity:
-                        standing.position === 1
-                          ? 1
-                          : 0.4 + 0.6 * (barWidth / 100),
-                    }}
-                  />
-                </div>
-
-                {/* 승점 + 차이 */}
-                <div className="flex shrink-0 items-baseline gap-1">
-                  <span
-                    className="font-[family-name:var(--font-bangers)] text-comic-black tabular-nums"
-                    style={{ fontSize: "var(--comic-text-xs)" }}
+        <div className="overflow-x-auto rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-comic-black border-b-[var(--comic-border-width)] bg-comic-cream font-[family-name:var(--font-bangers)] text-[length:var(--comic-body-sm)] tracking-[var(--comic-tracking-normal)] text-comic-black/70">
+                <th className="px-3 py-2 text-center">#</th>
+                <th className="px-3 py-2">Team</th>
+                <th className="px-3 py-2 text-center">P</th>
+                <th className="hidden px-3 py-2 text-center sm:table-cell">
+                  W
+                </th>
+                <th className="hidden px-3 py-2 text-center sm:table-cell">
+                  D
+                </th>
+                <th className="hidden px-3 py-2 text-center sm:table-cell">
+                  L
+                </th>
+                <th className="px-3 py-2 text-center">GD</th>
+                <th className="px-3 py-2 text-center">Pts</th>
+              </tr>
+            </thead>
+            <tbody>
+              {topTeams.map((row) => {
+                const team = teamsMap.get(row.teamId);
+                return (
+                  <tr
+                    key={row.teamId}
+                    className="border-b border-comic-black/20 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] text-comic-black transition-colors hover:bg-comic-cream/50"
                   >
-                    {standing.points}
-                  </span>
-                  {diff < 0 && (
-                    <span
-                      className="font-[family-name:var(--font-permanent-marker)] text-comic-black/40 tabular-nums"
-                      style={{ fontSize: "var(--comic-body-xs)" }}
-                    >
-                      {diff}
-                    </span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+                    <td className="px-3 py-2 text-center font-[family-name:var(--font-bangers)]">
+                      {row.position}
+                    </td>
+                    <td className="px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        {team?.logoUrl && (
+                          <Image
+                            src={team.logoUrl}
+                            alt={team.name}
+                            width={20}
+                            height={20}
+                            className="size-5"
+                          />
+                        )}
+                        <span className="hidden sm:inline">
+                          {team?.name ?? `Team ${row.teamId}`}
+                        </span>
+                        <span className="sm:hidden">
+                          {team?.shortName ?? team?.name ?? `${row.teamId}`}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2 text-center">{row.played}</td>
+                    <td className="hidden px-3 py-2 text-center sm:table-cell">
+                      {row.won}
+                    </td>
+                    <td className="hidden px-3 py-2 text-center sm:table-cell">
+                      {row.drawn}
+                    </td>
+                    <td className="hidden px-3 py-2 text-center sm:table-cell">
+                      {row.lost}
+                    </td>
+                    <td className="px-3 py-2 text-center">
+                      {row.goalDifference > 0
+                        ? `+${row.goalDifference}`
+                        : row.goalDifference}
+                    </td>
+                    <td className="px-3 py-2 text-center font-[family-name:var(--font-bangers)] text-[length:var(--comic-body-base)]">
+                      {row.points}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
 

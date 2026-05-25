@@ -1,11 +1,10 @@
-// 홈 화면 메인 콘텐츠 — 4패널 구성
+// 홈 화면 메인 콘텐츠 — [경기|뉴스] + 리그 순위 + 베스트 XI
 
 import type { Fixture, Team, TeamStanding } from "@/types";
 
-import { CtaBanner } from "./cta-banner";
-import { HeroBanner } from "./hero-banner";
+import { BestElevenPlaceholder } from "./best-eleven-placeholder";
 import { LeagueStandingsPanel } from "./league-standings-panel";
-import { QuickLinksPanel } from "./quick-links-panel";
+import { NewsPlaceholder } from "./news-placeholder";
 import { RoundMatchesPanel } from "./round-matches-panel";
 
 interface ComicHomeContentProps {
@@ -25,28 +24,25 @@ export function ComicHomeContent({
 }: ComicHomeContentProps) {
   return (
     <main className="mx-auto max-w-5xl p-[var(--comic-panel-padding)]">
-      {/* 히어로 배너 — 풀폭 */}
-      <HeroBanner matchCount={todayFixtures.length} />
-
-      {/* 2패널 그리드: 경기 | 순위 */}
-      <div className="mt-[var(--comic-panel-gap)] grid gap-[var(--comic-panel-gap)] md:grid-cols-2">
+      {/* 2패널 그리드: 경기 | 뉴스 */}
+      <div className="grid gap-[var(--comic-panel-gap)] md:grid-cols-2">
         <RoundMatchesPanel
           todayFixtures={todayFixtures}
           nextRoundFixtures={nextRoundFixtures}
           teamsMap={teamsMap}
           currentGameweek={currentGameweek}
         />
+        <NewsPlaceholder />
+      </div>
+
+      {/* 리그 순위 테이블 — 풀폭 */}
+      <div className="mt-[var(--comic-panel-gap)]">
         <LeagueStandingsPanel standingsMap={standingsMap} teamsMap={teamsMap} />
       </div>
 
-      {/* 퀵 링크 — 풀폭, 가로 3열 */}
+      {/* 베스트 XI — 풀폭 */}
       <div className="mt-[var(--comic-panel-gap)]">
-        <QuickLinksPanel />
-      </div>
-
-      {/* CTA 배너 — 풀폭 */}
-      <div className="mt-[var(--comic-panel-gap)]">
-        <CtaBanner matchCount={todayFixtures.length} />
+        <BestElevenPlaceholder />
       </div>
     </main>
   );

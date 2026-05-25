@@ -15,7 +15,7 @@ import type { Fixture, TeamStanding } from "@/types";
 
 import { ComicHomeContent } from "./comic-home-content";
 
-/** 순위 상위 7팀 수 */
+/** 홈에서 표시할 순위 상위 팀 수 */
 const STANDINGS_TOP_N = 7;
 
 /** fixtures + standings에서 필요한 팀 ID를 수집 */
@@ -30,7 +30,7 @@ function collectTeamIds(
     ids.add(f.awayTeamId);
   }
 
-  // 각 리그의 상위 7팀 ID 수집
+  // 각 리그의 상위 7팀 ID만 수집
   for (const standings of standingsMap.values()) {
     for (const s of standings.slice(0, STANDINGS_TOP_N)) {
       ids.add(s.teamId);
