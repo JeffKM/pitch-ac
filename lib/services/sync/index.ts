@@ -12,6 +12,7 @@ export {
 } from "./db-mappers";
 export { type SyncResult, writeSyncLog } from "./log";
 export { withRetry } from "./retry";
+export { getPendingResultLeagues } from "./schedule-calculator";
 export {
   syncAllLeagueFixtures,
   syncFixtures,
