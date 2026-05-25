@@ -58,10 +58,10 @@ export function AppSidebar() {
   return (
     <Sidebar
       collapsible="icon"
-      className="hidden border-sidebar-border border-r-[var(--comic-border-width)] md:flex"
+      className="hidden !border-r-0 after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-px after:bg-gradient-to-b after:from-transparent after:via-sidebar-foreground/15 after:to-transparent md:flex"
     >
-      {/* ── 헤더: 접기 토글만 ── */}
-      <SidebarHeader className="flex items-center px-3 py-2.5">
+      {/* ── 헤더: 접기 토글 (오른쪽 정렬) ── */}
+      <SidebarHeader className="!flex-row items-center justify-end px-3 py-2.5">
         <SidebarCollapseButton />
       </SidebarHeader>
 
