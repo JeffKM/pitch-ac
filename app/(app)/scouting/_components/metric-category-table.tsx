@@ -1,5 +1,4 @@
 // ScoutLab 카테고리별 메트릭 테이블 + 백분위 바
-import { PercentileBar } from "@/components/percentile-bar";
 import {
   Accordion,
   AccordionContent,
@@ -14,6 +13,8 @@ import type {
 import { SCOUTLAB_CATEGORY_LABELS } from "@/types";
 
 import { formatMetricName, formatMetricValue } from "../_lib/format-metric";
+import { SCOUTLAB_GLOSSARY_MAP } from "../_lib/scoutlab-glossary-data";
+import { MetricRow } from "./metric-row";
 
 interface MetricCategoryTableProps {
   metrics: ScoutlabMetrics;
@@ -91,7 +92,9 @@ export function MetricCategoryTable({ metrics }: MetricCategoryTableProps) {
                 {entries.map(([metricKey, metricVal]) => (
                   <MetricRow
                     key={metricKey}
+                    metricKey={metricKey}
                     name={formatMetricName(metricKey)}
+                    brief={SCOUTLAB_GLOSSARY_MAP[metricKey]?.brief ?? null}
                     value={formatMetricValue(metricVal.value)}
                     percentile={metricVal.percentile}
                   />
@@ -102,28 +105,5 @@ export function MetricCategoryTable({ metrics }: MetricCategoryTableProps) {
         );
       })}
     </Accordion>
-  );
-}
-
-/** 개별 메트릭 행 */
-function MetricRow({
-  name,
-  value,
-  percentile,
-}: {
-  name: string;
-  value: string;
-  percentile: number;
-}) {
-  return (
-    <div className="grid grid-cols-[1fr_60px_1fr] items-center gap-2">
-      <span className="truncate font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] text-comic-black/70">
-        {name}
-      </span>
-      <span className="text-right font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] text-comic-black tabular-nums">
-        {value}
-      </span>
-      <PercentileBar percentile={percentile} />
-    </div>
   );
 }

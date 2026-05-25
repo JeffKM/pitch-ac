@@ -10,7 +10,7 @@ import type {
   ScoutlabScatterPoint,
 } from "@/types";
 
-import { formatMetricName } from "../_lib/format-metric";
+import { formatMetricLabel } from "../_lib/format-metric";
 import { ScatterFilterPanel } from "./scatter-filter-panel";
 import { DynamicScatterPlot } from "./scoutlab-charts";
 
@@ -85,8 +85,8 @@ export function ScatterView({ initialData, sampleMetrics }: ScatterViewProps) {
 
       <DynamicScatterPlot
         data={initialData}
-        xLabel={formatMetricName(xMetric)}
-        yLabel={formatMetricName(yMetric)}
+        xLabel={formatMetricLabel(xMetric)}
+        yLabel={formatMetricLabel(yMetric)}
       />
     </div>
   );

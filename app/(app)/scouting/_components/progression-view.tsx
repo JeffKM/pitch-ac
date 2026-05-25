@@ -9,7 +9,7 @@ import type {
   ScoutlabMetrics,
 } from "@/types";
 
-import { formatMetricName } from "../_lib/format-metric";
+import { formatMetricLabel } from "../_lib/format-metric";
 import { ProgressionMetricSelect } from "./progression-metric-select";
 import { DynamicProgressionChart } from "./scoutlab-charts";
 
@@ -93,7 +93,7 @@ export function ProgressionView({ progressionData }: ProgressionViewProps) {
 
       <DynamicProgressionChart
         data={chartData}
-        metricLabel={formatMetricName(metric)}
+        metricLabel={formatMetricLabel(metric)}
       />
     </div>
   );

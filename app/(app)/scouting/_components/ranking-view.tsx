@@ -16,7 +16,7 @@ import type {
   ScoutlabPlayer,
 } from "@/types";
 
-import { formatMetricName } from "../_lib/format-metric";
+import { formatMetricLabel } from "../_lib/format-metric";
 import { useScoutlabParams } from "../_lib/use-scoutlab-params";
 import { RankingFilterPanel } from "./ranking-filter-panel";
 import { RankingTable } from "./ranking-table";
@@ -79,7 +79,7 @@ export function RankingView({
   };
 
   // 메트릭 라벨
-  const metricLabel = useMemo(() => formatMetricName(metric), [metric]);
+  const metricLabel = useMemo(() => formatMetricLabel(metric), [metric]);
 
   // 카테고리/메트릭/리그 변경 시 서버에서 랭킹 데이터 재조회
   useEffect(() => {
@@ -115,7 +115,11 @@ export function RankingView({
       />
 
       <div className={isPending ? "opacity-50 transition-opacity" : ""}>
-        <RankingTable entries={entries} metricLabel={metricLabel} />
+        <RankingTable
+          entries={entries}
+          metricLabel={metricLabel}
+          metricKey={metric}
+        />
       </div>
     </div>
   );

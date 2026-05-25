@@ -17,7 +17,7 @@ import type {
 } from "@/types";
 import { SCOUTLAB_CATEGORY_LABELS } from "@/types";
 
-import { formatMetricName } from "../_lib/format-metric";
+import { formatMetricLabel } from "../_lib/format-metric";
 
 const CATEGORIES: Array<{
   key: ScoutlabCategory;
@@ -83,7 +83,7 @@ export function RankingFilterPanel({
         <SelectContent>
           {metricKeys.map((key) => (
             <SelectItem key={key} value={key}>
-              {formatMetricName(key)}
+              {formatMetricLabel(key)}
             </SelectItem>
           ))}
         </SelectContent>

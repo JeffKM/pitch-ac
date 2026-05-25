@@ -1,8 +1,11 @@
+"use client";
+
 // ScoutLab Ranking — 메트릭별 랭킹 테이블
 import { cn } from "@/lib/utils";
 import type { ScoutlabLeague, ScoutlabPlayer } from "@/types";
 
 import { formatMetricValue } from "../_lib/format-metric";
+import { MetricPopover } from "./metric-popover";
 
 /** 리그 약칭 매핑 */
 const LEAGUE_SHORT: Record<ScoutlabLeague, string> = {
@@ -22,9 +25,14 @@ interface RankingEntry {
 interface RankingTableProps {
   entries: RankingEntry[];
   metricLabel: string;
+  metricKey?: string;
 }
 
-export function RankingTable({ entries, metricLabel }: RankingTableProps) {
+export function RankingTable({
+  entries,
+  metricLabel,
+  metricKey,
+}: RankingTableProps) {
   if (entries.length === 0) {
     return (
       <p className="py-10 text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-lg)] text-comic-black/50">
@@ -43,7 +51,12 @@ export function RankingTable({ entries, metricLabel }: RankingTableProps) {
             <th className="px-2 py-2 text-left">팀</th>
             <th className="px-2 py-2 text-left">리그</th>
             <th className="px-2 py-2 text-left">포지션</th>
-            <th className="px-2 py-2 text-right">{metricLabel}</th>
+            <th className="px-2 py-2 text-right">
+              <span className="inline-flex items-center gap-0.5">
+                {metricLabel}
+                {metricKey && <MetricPopover metricKey={metricKey} />}
+              </span>
+            </th>
             <th className="px-2 py-2 text-right">백분위</th>
           </tr>
         </thead>

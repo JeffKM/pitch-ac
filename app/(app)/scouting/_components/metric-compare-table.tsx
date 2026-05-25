@@ -1,3 +1,5 @@
+"use client";
+
 // ScoutLab Compare — 메트릭 나란히 비교 테이블
 import { cn } from "@/lib/utils";
 import type {
@@ -7,7 +9,8 @@ import type {
 } from "@/types";
 import { SCOUTLAB_CATEGORY_LABELS } from "@/types";
 
-import { formatMetricName, formatMetricValue } from "../_lib/format-metric";
+import { formatMetricLabel, formatMetricValue } from "../_lib/format-metric";
+import { MetricPopover } from "./metric-popover";
 
 interface MetricCompareTableProps {
   metricsA: ScoutlabMetrics;
@@ -94,7 +97,10 @@ export function MetricCompareTable({
                           : "–"}
                       </td>
                       <td className="px-2 py-1.5 text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
-                        {formatMetricName(metricKey)}
+                        <span className="inline-flex items-center gap-0.5">
+                          {formatMetricLabel(metricKey)}
+                          <MetricPopover metricKey={metricKey} />
+                        </span>
                       </td>
                       <td
                         className={cn(

@@ -11,7 +11,7 @@ import {
 import type { ScoutlabCategory } from "@/types";
 import { SCOUTLAB_CATEGORY_LABELS } from "@/types";
 
-import { formatMetricName } from "../_lib/format-metric";
+import { formatMetricLabel } from "../_lib/format-metric";
 
 /** 카테고리 목록 (misc 제외) */
 const CATEGORIES: ScoutlabCategory[] = [
@@ -82,7 +82,7 @@ export function ScatterFilterPanel({
             <SelectContent>
               {(metricKeysByCategory[xCategory] ?? []).map((k) => (
                 <SelectItem key={k} value={k}>
-                  {formatMetricName(k)}
+                  {formatMetricLabel(k)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -116,7 +116,7 @@ export function ScatterFilterPanel({
             <SelectContent>
               {(metricKeysByCategory[yCategory] ?? []).map((k) => (
                 <SelectItem key={k} value={k}>
-                  {formatMetricName(k)}
+                  {formatMetricLabel(k)}
                 </SelectItem>
               ))}
             </SelectContent>
