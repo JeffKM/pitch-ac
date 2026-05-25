@@ -13,12 +13,44 @@ import {
 
 import type { ScoutlabRadarAxis } from "@/types";
 
+import { COMIC_FONTS, COMIC_TICK_STYLE } from "../_lib/chart-theme";
+import { ChartComicTooltipShell } from "./chart-comic-tooltip";
+
 interface ScoutlabRadarChartProps {
   axes: ScoutlabRadarAxis[];
   /** 비교 모드: 두 번째 선수 축 데이터 */
   compareAxes?: ScoutlabRadarAxis[];
   compareName?: string;
   playerName?: string;
+}
+
+/** 커스텀 Tooltip content */
+function RadarTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  payload?: any[];
+}) {
+  if (!active || !payload?.length) return null;
+
+  const label = payload[0]?.payload?.label as string | undefined;
+
+  return (
+    <ChartComicTooltipShell>
+      {label && (
+        <p className="mb-0.5 font-[family-name:var(--font-bangers)] text-[length:var(--comic-body-lg)]">
+          {label}
+        </p>
+      )}
+      {payload.map((entry, i) => (
+        <p key={i} className="text-comic-black/70">
+          {entry.name}: {entry.value}%
+        </p>
+      ))}
+    </ChartComicTooltipShell>
+  );
 }
 
 export function ScoutlabRadarChart({
@@ -35,17 +67,27 @@ export function ScoutlabRadarChart({
   }));
 
   return (
-    <div data-testid="scoutlab-radar-chart">
+    <div
+      data-testid="scoutlab-radar-chart"
+      className="rounded-[var(--comic-panel-radius)] paper-texture p-2"
+    >
       <ResponsiveContainer width="100%" height={400}>
         <RadarChart data={data} cx="50%" cy="50%" outerRadius="75%">
           <PolarGrid stroke="var(--color-comic-black)" strokeOpacity={0.15} />
           <PolarAngleAxis
             dataKey="label"
-            tick={{ fontSize: 11, fill: "var(--color-comic-black)" }}
+            tick={{
+              ...COMIC_TICK_STYLE,
+              fontFamily: COMIC_FONTS.heading,
+            }}
           />
           <PolarRadiusAxis
             domain={[0, 100]}
-            tick={{ fontSize: 10, fill: "var(--color-comic-black)" }}
+            tick={{
+              ...COMIC_TICK_STYLE,
+              fontSize: 10,
+              fontFamily: COMIC_FONTS.ui,
+            }}
             tickCount={5}
             axisLine={false}
           />
@@ -72,15 +114,7 @@ export function ScoutlabRadarChart({
             strokeWidth={2}
           />
 
-          <Tooltip
-            contentStyle={{
-              backgroundColor: "var(--color-comic-white)",
-              border: "1px solid var(--color-comic-black)",
-              borderRadius: 8,
-              fontSize: 12,
-            }}
-            formatter={(val) => [`${val}%`, "백분위"]}
-          />
+          <Tooltip content={<RadarTooltip />} />
         </RadarChart>
       </ResponsiveContainer>
     </div>

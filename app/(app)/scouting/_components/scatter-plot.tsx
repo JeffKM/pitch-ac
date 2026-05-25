@@ -14,6 +14,13 @@ import {
 
 import type { ScoutlabLeague, ScoutlabScatterPoint } from "@/types";
 
+import {
+  COMIC_AXIS_LABEL_STYLE,
+  COMIC_GRID_PROPS,
+  COMIC_TICK_STYLE,
+} from "../_lib/chart-theme";
+import { ChartComicTooltipShell } from "./chart-comic-tooltip";
+
 interface ScatterPlotProps {
   data: ScoutlabScatterPoint[];
   xLabel: string;
@@ -50,13 +57,15 @@ function ScatterTooltip({
   const point = payload[0].payload as ScoutlabScatterPoint;
 
   return (
-    <div className="rounded-lg border border-comic-black/20 bg-comic-white p-2 text-xs shadow-sm">
-      <p className="font-bold text-comic-black">{point.name}</p>
+    <ChartComicTooltipShell>
+      <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-body-lg)] text-comic-black">
+        {point.name}
+      </p>
       <p className="text-comic-black/60">{point.team}</p>
       <p className="text-comic-black/60">
         x: {point.x.toFixed(2)} / y: {point.y.toFixed(2)}
       </p>
-    </div>
+    </ChartComicTooltipShell>
   );
 }
 
@@ -71,39 +80,36 @@ export function ScatterPlot({ data, xLabel, yLabel }: ScatterPlotProps) {
   );
 
   return (
-    <div data-testid="scatter-plot">
+    <div
+      data-testid="scatter-plot"
+      className="rounded-[var(--comic-panel-radius)] paper-texture p-2"
+    >
       <ResponsiveContainer width="100%" height={450}>
         <ScatterChart margin={{ top: 10, right: 20, bottom: 30, left: 10 }}>
-          <CartesianGrid
-            strokeDasharray="3 3"
-            stroke="var(--color-comic-black)"
-            strokeOpacity={0.1}
-          />
+          <CartesianGrid {...COMIC_GRID_PROPS} />
           <XAxis
             dataKey="x"
             type="number"
             name={xLabel}
-            tick={{ fontSize: 11, fill: "var(--color-comic-black)" }}
+            tick={COMIC_TICK_STYLE}
             label={{
               value: xLabel,
               position: "bottom",
               offset: 10,
-              fontSize: 12,
-              fill: "var(--color-comic-black)",
+              ...COMIC_AXIS_LABEL_STYLE,
             }}
           />
           <YAxis
             dataKey="y"
             type="number"
             name={yLabel}
-            tick={{ fontSize: 11, fill: "var(--color-comic-black)" }}
+            tick={COMIC_TICK_STYLE}
             label={{
               value: yLabel,
               angle: -90,
               position: "insideLeft",
               offset: 0,
-              fontSize: 12,
-              fill: "var(--color-comic-black)",
+              ...COMIC_AXIS_LABEL_STYLE,
             }}
           />
           <ZAxis range={[30, 30]} />
@@ -128,7 +134,7 @@ export function ScatterPlot({ data, xLabel, yLabel }: ScatterPlotProps) {
         {LEAGUE_KEYS.map((league) => (
           <span
             key={league}
-            className="flex items-center gap-1.5 text-xs text-comic-black/70"
+            className="flex items-center gap-1.5 font-[family-name:var(--font-permanent-marker)] text-xs text-comic-black/70"
           >
             <span
               className="inline-block size-2.5 rounded-full"
