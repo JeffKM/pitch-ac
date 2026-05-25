@@ -2,14 +2,21 @@
 
 import { connection } from "next/server";
 
-import { CURRENT_SEASON_LABEL } from "@/lib/constants/football";
+import { CURRENT_SEASON_LABEL, PL_LEAGUE_ID } from "@/lib/constants/football";
 import { getTodayDateKey } from "@/lib/date-utils";
-import { getFixturesByDate } from "@/lib/repositories/fixture-repository";
+import {
+  getCurrentGameweek,
+  getFixturesByDate,
+  getFixturesByGameweek,
+} from "@/lib/repositories/fixture-repository";
 import { getAllLeagueStandings } from "@/lib/repositories/standing-repository";
 import { getTeamsByIds } from "@/lib/repositories/team-repository";
 import type { Fixture, TeamStanding } from "@/types";
 
 import { ComicHomeContent } from "./comic-home-content";
+
+/** 순위 상위 7팀 수 */
+const STANDINGS_TOP_N = 7;
 
 /** fixtures + standings에서 필요한 팀 ID를 수집 */
 function collectTeamIds(
@@ -23,9 +30,10 @@ function collectTeamIds(
     ids.add(f.awayTeamId);
   }
 
+  // 각 리그의 상위 7팀 ID 수집
   for (const standings of standingsMap.values()) {
-    if (standings[0]) {
-      ids.add(standings[0].teamId);
+    for (const s of standings.slice(0, STANDINGS_TOP_N)) {
+      ids.add(s.teamId);
     }
   }
 
@@ -36,19 +44,33 @@ export async function HomeContent() {
   await connection();
   const todayDate = getTodayDateKey();
 
-  const [fixtures, standingsMap] = await Promise.all([
+  const [todayFixtures, standingsMap, currentGameweek] = await Promise.all([
     getFixturesByDate(todayDate),
     getAllLeagueStandings(CURRENT_SEASON_LABEL),
+    getCurrentGameweek(PL_LEAGUE_ID),
   ]);
 
-  const teamIds = collectTeamIds(fixtures, standingsMap);
+  // 오늘 경기가 없으면 다음 라운드 경기 조회
+  let nextRoundFixtures: Fixture[] = [];
+  if (todayFixtures.length === 0) {
+    nextRoundFixtures = await getFixturesByGameweek(
+      currentGameweek,
+      PL_LEAGUE_ID,
+    );
+  }
+
+  // 다음 라운드 경기의 팀 ID도 포함
+  const allFixtures = [...todayFixtures, ...nextRoundFixtures];
+  const teamIds = collectTeamIds(allFixtures, standingsMap);
   const teamsMap = await getTeamsByIds(teamIds);
 
   return (
     <ComicHomeContent
-      fixtures={fixtures}
+      todayFixtures={todayFixtures}
+      nextRoundFixtures={nextRoundFixtures}
       standingsMap={standingsMap}
       teamsMap={teamsMap}
+      currentGameweek={currentGameweek}
     />
   );
 }

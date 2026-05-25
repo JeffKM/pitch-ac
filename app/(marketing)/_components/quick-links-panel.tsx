@@ -30,12 +30,12 @@ export function QuickLinksPanel() {
     <ComicPanel bg="white" className="p-[var(--comic-panel-padding)]">
       <ComicPanelTitle title="QUICK LINKS" />
 
-      <div className="space-y-2">
+      <div className="grid gap-2 sm:grid-cols-3">
         {links.map((link) => (
           <Link
             key={link.href}
             href={link.href}
-            className={`flex items-center justify-between rounded-[var(--comic-panel-radius)] border-[var(--comic-border-thin)] border-comic-black/30 px-3 py-2 transition-transform hover:scale-[1.02] ${link.bg}`}
+            className={`flex flex-col gap-1 rounded-[var(--comic-panel-radius)] border-[var(--comic-border-thin)] border-comic-black/30 px-3 py-3 text-center transition-transform hover:scale-[1.02] ${link.bg}`}
           >
             <span
               className="font-[family-name:var(--font-bangers)] text-comic-black"
