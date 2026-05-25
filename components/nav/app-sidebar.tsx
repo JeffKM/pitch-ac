@@ -6,7 +6,6 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 
 import { buildContextQuery } from "@/app/(app)/scouting/_lib/build-context-query";
-import { ThemeSwitcher } from "@/components/theme-switcher";
 import {
   Sidebar,
   SidebarContent,
@@ -52,7 +51,6 @@ function SidebarCollapseButton() {
 export function AppSidebar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const isScouting = pathname.startsWith("/scouting");
   const currentLeague = searchParams.get("league");
 
   return (
@@ -141,59 +139,50 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* ── SCOUTING (scouting 페이지에서만) ── */}
-        {isScouting && (
-          <>
-            <FadeDivider />
-            <SidebarGroup>
-              <SidebarGroupLabel className="mb-1 font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-xs)] tracking-[var(--comic-tracking-widest)] text-sidebar-foreground/50 uppercase">
-                Scouting
-              </SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {scoutingTabs.map((tab) => {
-                    const Icon = tab.icon;
-                    const isActive =
-                      tab.href === "/scouting"
-                        ? pathname === "/scouting"
-                        : pathname.startsWith(tab.href);
-                    const contextQuery = buildContextQuery(searchParams);
+        {/* ── SCOUTING ── */}
+        <FadeDivider />
+        <SidebarGroup>
+          <SidebarGroupLabel className="mb-1 font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-xs)] tracking-[var(--comic-tracking-widest)] text-sidebar-foreground/50 uppercase">
+            Scouting
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {scoutingTabs.map((tab) => {
+                const Icon = tab.icon;
+                const isActive =
+                  tab.href === "/scouting"
+                    ? pathname === "/scouting"
+                    : pathname.startsWith(tab.href);
+                const contextQuery = buildContextQuery(searchParams);
 
-                    return (
-                      <SidebarMenuItem key={tab.href}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={isActive}
-                          tooltip={tab.label}
-                          className={cn(
-                            "h-8 gap-3 rounded-[var(--comic-panel-radius)] font-[family-name:var(--font-fredoka)] text-[13px] font-medium transition-all",
-                            isActive
-                              ? "border-[2px] border-comic-black bg-comic-yellow text-comic-black shadow-[2px_2px_0px_var(--comic-black)]"
-                              : "border-[2px] border-transparent hover:border-comic-black/20 hover:bg-sidebar-accent/30",
-                          )}
-                        >
-                          <Link href={`${tab.href}${contextQuery}`}>
-                            <Icon className="size-4 shrink-0" />
-                            <span>{tab.label}</span>
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    );
-                  })}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </>
-        )}
+                return (
+                  <SidebarMenuItem key={tab.href}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      tooltip={tab.label}
+                      className={cn(
+                        "h-8 gap-3 rounded-[var(--comic-panel-radius)] font-[family-name:var(--font-fredoka)] text-[13px] font-medium transition-all",
+                        isActive
+                          ? "border-[2px] border-comic-black bg-comic-yellow text-comic-black shadow-[2px_2px_0px_var(--comic-black)]"
+                          : "border-[2px] border-transparent hover:border-comic-black/20 hover:bg-sidebar-accent/30",
+                      )}
+                    >
+                      <Link href={`${tab.href}${contextQuery}`}>
+                        <Icon className="size-4 shrink-0" />
+                        <span>{tab.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
 
-      {/* ── 푸터: 테마 전환 ── */}
-      <FadeDivider />
-      <SidebarFooter className="px-3 py-2.5">
-        <div className="flex items-center justify-center">
-          <ThemeSwitcher />
-        </div>
-      </SidebarFooter>
+      {/* ── 푸터 ── */}
+      <SidebarFooter className="px-3 py-2.5" />
     </Sidebar>
   );
 }

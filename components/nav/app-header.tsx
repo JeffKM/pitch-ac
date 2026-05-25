@@ -22,7 +22,7 @@ export function AppHeader({ authSlot }: AppHeaderProps) {
         {/* 로고 */}
         <Link
           href="/"
-          className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-2xl)] tracking-[var(--comic-tracking-wide)] text-comic-black hover:opacity-80"
+          className="shrink-0 font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-2xl)] tracking-[var(--comic-tracking-wide)] whitespace-nowrap text-comic-black hover:opacity-80"
         >
           pitch-ac
         </Link>
