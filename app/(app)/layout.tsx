@@ -4,6 +4,7 @@ import { AuthButton } from "@/components/auth-button";
 import { AppHeader } from "@/components/nav/app-header";
 import { AppSidebar } from "@/components/nav/app-sidebar";
 import { MobileTabBar } from "@/components/nav/mobile-tab-bar";
+import { MobileTopBar } from "@/components/nav/mobile-top-bar";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
@@ -29,6 +30,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 }
               />
             </Suspense>
+
+            {/* 모바일 상단 바: 로고 + 테마 + 인증 */}
+            <MobileTopBar
+              authSlot={
+                <Suspense>
+                  <AuthButton />
+                </Suspense>
+              }
+            />
 
             {/* 메인 콘텐츠 */}
             <main className="flex-1">
