@@ -78,6 +78,7 @@ function parseCliArgs(): ScraperOptions {
       mode: { type: "string" },
       adjustment: { type: "string" },
       "skip-positions": { type: "boolean", default: false },
+      "match-position": { type: "boolean", default: false },
       positions: { type: "string" },
       "similarity-only": { type: "boolean", default: false },
     },
@@ -104,6 +105,7 @@ function parseCliArgs(): ScraperOptions {
         ? (adjVal as "padj" | "raw")
         : undefined,
     skipPositions: Boolean(values["skip-positions"]),
+    matchPosition: Boolean(values["match-position"]),
     positions: parsePositionsArg(values.positions as string | undefined),
     similarityOnly: Boolean(values["similarity-only"]),
   };
@@ -225,12 +227,27 @@ async function scrapeAllCombinations(
   const adjustments = opts.adjustment
     ? [opts.adjustment]
     : [...ALL_ADJUSTMENTS];
-  // 우선순위: --positions > --skip-positions > 전체
-  const positions = opts.positions?.length
-    ? opts.positions
-    : opts.skipPositions
-      ? ["AM/W"]
-      : [...ALL_COMPARISON_POSITIONS];
+
+  // 포지션 결정: --match-position > --positions > --skip-positions > 전체
+  let positions: string[];
+  if (opts.matchPosition) {
+    // 선수 본인 포지션 감지 후 해당 포지션만 사용
+    const playerInfo = await parsePlayerInfo(iframe);
+    const ownPosition = playerInfo.position;
+    if ((ALL_COMPARISON_POSITIONS as readonly string[]).includes(ownPosition)) {
+      positions = [ownPosition];
+      logInfo(`  → 본인 포지션 감지: ${ownPosition}`);
+    } else {
+      logWarn(`  → 포지션 "${ownPosition}" 매핑 불가, AM/W 폴백`);
+      positions = ["AM/W"];
+    }
+  } else if (opts.positions?.length) {
+    positions = opts.positions;
+  } else if (opts.skipPositions) {
+    positions = ["AM/W"];
+  } else {
+    positions = [...ALL_COMPARISON_POSITIONS];
+  }
 
   for (const mode of modes) {
     await toggleMode(iframe, page, mode);
@@ -307,9 +324,12 @@ async function scrapePlayer(
 async function main(): Promise<void> {
   const opts = parseCliArgs();
   logInfo("ScoutLab 스크래퍼 시작");
+  const posStr = opts.matchPosition
+    ? "match-position"
+    : (opts.positions?.join(",") ?? (opts.skipPositions ? "AM/W" : "all"));
   const modeStr = opts.similarityOnly
     ? "similarity-only"
-    : `mode=${opts.mode ?? "all"}, adj=${opts.adjustment ?? "all"}, positions=${opts.positions?.join(",") ?? (opts.skipPositions ? "AM/W" : "all")}`;
+    : `mode=${opts.mode ?? "all"}, adj=${opts.adjustment ?? "all"}, positions=${posStr}`;
   logInfo(
     `설정: season=${opts.season}, league=${opts.league}, team=${opts.team ?? "전체"}, player=${opts.player ?? "전체"}, ${modeStr}, headless=${opts.headless}, dryRun=${opts.dryRun}`,
   );

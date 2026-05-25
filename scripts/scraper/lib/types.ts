@@ -17,6 +17,8 @@ export interface ScraperOptions {
   skipPositions: boolean;
   /** 특정 포지션만 스크래핑 (e.g., ["CB", "FB", "MF", "FW"]) */
   positions?: string[];
+  /** 선수 본인 포지션으로만 비교 그룹 스크래핑 (CB→CB, FW→FW) */
+  matchPosition: boolean;
   /** similarity만 수집 (메트릭 스크래핑 스킵) */
   similarityOnly: boolean;
 }

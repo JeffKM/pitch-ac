@@ -79,7 +79,7 @@ export const getScoutlabPlayerById = cache(
   },
 );
 
-/** 선수 메트릭 조회 */
+/** 선수 메트릭 조회 (요청된 comparison_position 우선, 없으면 폴백) */
 export const getScoutlabMetrics = cache(
   async (
     playerId: number,
@@ -90,6 +90,7 @@ export const getScoutlabMetrics = cache(
   ): Promise<ScoutlabMetrics | null> => {
     const supabase = await createClient();
 
+    // 1차: 요청된 comparison_position으로 조회
     const { data, error } = await supabase
       .from("scoutlab_metrics")
       .select("*")
@@ -101,9 +102,24 @@ export const getScoutlabMetrics = cache(
       .maybeSingle();
 
     if (error) throw new Error(`scoutlab_metrics 조회 실패: ${error.message}`);
-    if (!data) return null;
+    if (data) return scoutlabMetricsRowToMetrics(data as ScoutlabMetricsRow);
 
-    return scoutlabMetricsRowToMetrics(data as ScoutlabMetricsRow);
+    // 2차 폴백: comparison_position 무관하게 아무 행이든 조회
+    const { data: fallback, error: fbError } = await supabase
+      .from("scoutlab_metrics")
+      .select("*")
+      .eq("player_id", playerId)
+      .eq("season", season)
+      .eq("mode", mode)
+      .eq("adjustment", adjustment)
+      .limit(1)
+      .maybeSingle();
+
+    if (fbError)
+      throw new Error(`scoutlab_metrics 폴백 조회 실패: ${fbError.message}`);
+    if (!fallback) return null;
+
+    return scoutlabMetricsRowToMetrics(fallback as ScoutlabMetricsRow);
   },
 );
 
