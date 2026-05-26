@@ -10,6 +10,7 @@ import { RoundMatchesPanel } from "./round-matches-panel";
 interface ComicHomeContentProps {
   todayFixtures: Fixture[];
   nextRoundFixtures: Fixture[];
+  upcomingFixtures: Fixture[];
   standingsMap: Map<number, TeamStanding[]>;
   teamsMap: Map<number, Team>;
   currentGameweek: number;
@@ -19,6 +20,7 @@ interface ComicHomeContentProps {
 export function ComicHomeContent({
   todayFixtures,
   nextRoundFixtures,
+  upcomingFixtures,
   standingsMap,
   teamsMap,
   currentGameweek,
@@ -31,6 +33,7 @@ export function ComicHomeContent({
         <RoundMatchesPanel
           todayFixtures={todayFixtures}
           nextRoundFixtures={nextRoundFixtures}
+          upcomingFixtures={upcomingFixtures}
           teamsMap={teamsMap}
           currentGameweek={currentGameweek}
         />

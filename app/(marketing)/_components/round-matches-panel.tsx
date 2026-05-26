@@ -4,6 +4,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { COMPETITION_BY_ID } from "@/lib/constants/football";
+import { formatKickoffDate } from "@/lib/date-utils";
 import type { Fixture, Team } from "@/types";
 
 import { ComicPanel, ComicPanelTitle } from "./comic-panel";
@@ -12,6 +14,7 @@ import { MiniFixtureCard } from "./mini-fixture-card";
 interface RoundMatchesPanelProps {
   todayFixtures: Fixture[];
   nextRoundFixtures: Fixture[];
+  upcomingFixtures: Fixture[];
   teamsMap: Map<number, Team>;
   currentGameweek: number;
 }
@@ -19,6 +22,7 @@ interface RoundMatchesPanelProps {
 export function RoundMatchesPanel({
   todayFixtures,
   nextRoundFixtures,
+  upcomingFixtures,
   teamsMap,
   currentGameweek,
 }: RoundMatchesPanelProps) {
@@ -148,22 +152,67 @@ export function RoundMatchesPanel({
     );
   }
 
-  // 데이터 없음 (fallback)
+  // 리그 시즌 종료 — 다음 예정 경기 (UCL 결승 등)
+  if (upcomingFixtures.length > 0) {
+    // 대회명 추출 (첫 경기 기준)
+    const firstFixture = upcomingFixtures[0];
+    const competition = COMPETITION_BY_ID[firstFixture.leagueId];
+    const competitionName = competition?.shortName ?? "MATCH";
+    const dateLabel = formatKickoffDate(firstFixture.date);
+
+    return (
+      <ComicPanel bg="white" className="p-[var(--comic-panel-padding)]">
+        <ComicPanelTitle
+          title="COMING UP"
+          subtitle={`${competitionName} — ${dateLabel}`}
+        />
+
+        <div className="space-y-1.5">
+          {upcomingFixtures.map((fixture) => {
+            const homeTeam = teamsMap.get(fixture.homeTeamId);
+            const awayTeam = teamsMap.get(fixture.awayTeamId);
+            if (!homeTeam || !awayTeam) return null;
+
+            return (
+              <MiniFixtureCard
+                key={fixture.id}
+                fixture={fixture}
+                homeTeam={homeTeam}
+                awayTeam={awayTeam}
+              />
+            );
+          })}
+        </div>
+
+        <div className="mt-2 text-center">
+          <Link
+            href="/matchday"
+            className="inline-block font-[family-name:var(--font-bangers)] text-comic-black/70 underline decoration-comic-black/30 underline-offset-4 transition-colors hover:text-comic-black"
+            style={{ fontSize: "var(--comic-text-sm)" }}
+          >
+            SEE MATCHDAY →
+          </Link>
+        </div>
+      </ComicPanel>
+    );
+  }
+
+  // 예정 경기 없음 — 오프시즌 (월드컵 등 차기 대회 예고)
   return (
     <ComicPanel bg="white" className="p-[var(--comic-panel-padding)]">
-      <ComicPanelTitle title="MATCHES" />
+      <ComicPanelTitle title="OFF-SEASON" subtitle="Season Complete" />
       <div className="py-6 text-center">
         <p
-          className="font-[family-name:var(--font-bangers)] text-comic-black/60"
-          style={{ fontSize: "var(--comic-text-base)" }}
+          className="font-[family-name:var(--font-bangers)] text-comic-black"
+          style={{ fontSize: "var(--comic-text-lg)" }}
         >
-          REST DAY!
+          WORLD CUP 2026
         </p>
         <p
-          className="mt-1 font-[family-name:var(--font-permanent-marker)] text-comic-black/40"
+          className="mt-1 font-[family-name:var(--font-permanent-marker)] text-comic-black/50"
           style={{ fontSize: "var(--comic-body-sm)" }}
         >
-          Check out the standings instead
+          is coming soon!
         </p>
         <Link
           href="/matchday"

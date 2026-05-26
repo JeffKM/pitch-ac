@@ -8,6 +8,7 @@ import {
   getCurrentGameweek,
   getFixturesByDate,
   getFixturesByGameweek,
+  getUpcomingFixtures,
 } from "@/lib/repositories/fixture-repository";
 import { getLatestNews } from "@/lib/repositories/news-repository";
 import { getAllLeagueStandings } from "@/lib/repositories/standing-repository";
@@ -55,15 +56,30 @@ export async function HomeContent() {
 
   // 오늘 경기가 없으면 다음 라운드 경기 조회
   let nextRoundFixtures: Fixture[] = [];
+  let upcomingFixtures: Fixture[] = [];
   if (todayFixtures.length === 0) {
     nextRoundFixtures = await getFixturesByGameweek(
       currentGameweek,
       PL_LEAGUE_ID,
     );
+
+    // PL 라운드 경기가 모두 종료됐으면 전체 대회에서 다음 예정 경기 조회
+    const hasUpcomingInRound = nextRoundFixtures.some((f) => f.status === "NS");
+    if (!hasUpcomingInRound) {
+      upcomingFixtures = await getUpcomingFixtures(6);
+      // 예정 경기가 있으면 종료된 PL 라운드 대신 표시
+      if (upcomingFixtures.length > 0) {
+        nextRoundFixtures = [];
+      }
+    }
   }
 
   // 다음 라운드 경기의 팀 ID도 포함
-  const allFixtures = [...todayFixtures, ...nextRoundFixtures];
+  const allFixtures = [
+    ...todayFixtures,
+    ...nextRoundFixtures,
+    ...upcomingFixtures,
+  ];
   const teamIds = collectTeamIds(allFixtures, standingsMap);
   const teamsMap = await getTeamsByIds(teamIds);
 
@@ -71,6 +87,7 @@ export async function HomeContent() {
     <ComicHomeContent
       todayFixtures={todayFixtures}
       nextRoundFixtures={nextRoundFixtures}
+      upcomingFixtures={upcomingFixtures}
       standingsMap={standingsMap}
       teamsMap={teamsMap}
       currentGameweek={currentGameweek}

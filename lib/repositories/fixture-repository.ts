@@ -99,6 +99,28 @@ export async function getFixturesByGameweek(
   return (data as FixtureRow[]).map(fixtureRowToFixture);
 }
 
+/** 전체 대회에서 다음 예정(NS) 경기 조회 (시즌 종료 시 UCL 결승 등 표시용) */
+export async function getUpcomingFixtures(
+  limit: number = 6,
+): Promise<Fixture[]> {
+  const supabase = await createClient();
+
+  const leagueIds = Array.from(ALL_COMPETITION_IDS);
+
+  const { data, error } = await supabase
+    .from("fixtures")
+    .select("*")
+    .in("league_id", leagueIds)
+    .eq("status", "NS")
+    .gte("date", new Date().toISOString())
+    .order("date", { ascending: true })
+    .limit(limit);
+
+  if (error) throw new Error(`upcoming fixtures 조회 실패: ${error.message}`);
+
+  return (data as FixtureRow[]).map(fixtureRowToFixture);
+}
+
 /** KST 날짜 기준 전체 대회 경기 조회 (5대 리그 + UCL) */
 export async function getFixturesByDate(dateStr: string): Promise<Fixture[]> {
   const supabase = await createClient();
