@@ -42,7 +42,7 @@ export function ComicPanelTitle({
       <h3
         className="font-[family-name:var(--font-bangers)] text-comic-black"
         style={{
-          fontSize: "var(--comic-text-lg)",
+          fontSize: "var(--comic-text-xl)",
           lineHeight: "var(--comic-leading-relaxed)",
           letterSpacing: "var(--comic-tracking-wide)",
         }}
@@ -53,7 +53,7 @@ export function ComicPanelTitle({
         <p
           className="mt-0.5 font-[family-name:var(--font-permanent-marker)] text-comic-black/60"
           style={{
-            fontSize: "var(--comic-body-base)",
+            fontSize: "var(--comic-body-lg)",
             letterSpacing: "var(--comic-tracking-wide)",
           }}
         >
