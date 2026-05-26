@@ -56,13 +56,21 @@ async function main() {
   let updated = 0;
 
   // Playwright 브라우저 launch (봇 감지 우회 설정)
-  const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({
+  const browser = await chromium.launch({
+    headless: true,
+    args: ["--disable-blink-features=AutomationControlled", "--no-sandbox"],
+  });
+  const context = await browser.newContext({
     userAgent:
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
     viewport: { width: 1280, height: 800 },
     locale: "ko-KR",
   });
+  // WebDriver 속성 제거 (봇 감지 우회)
+  await context.addInitScript(() => {
+    Object.defineProperty(navigator, "webdriver", { get: () => false });
+  });
+  const page = await context.newPage();
 
   try {
     // 1) 리스트 페이지 크롤링
@@ -177,6 +185,15 @@ async function main() {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error(`\n❌ 크롤링 실패: ${msg}`);
+
+    // 디버깅용 스크린샷 + 페이지 URL 로그
+    try {
+      console.error(`  현재 URL: ${page.url()}`);
+      await page.screenshot({ path: "debug-screenshot.png", fullPage: true });
+      console.error("  → debug-screenshot.png 저장 완료");
+    } catch {
+      // 스크린샷 실패는 무시
+    }
 
     await supabase.from("sync_logs").insert({
       entity: "transfer-news",
