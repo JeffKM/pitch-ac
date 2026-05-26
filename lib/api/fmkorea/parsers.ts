@@ -83,8 +83,26 @@ export function parseArticleUrls(html: string): string[] {
 
     try {
       const url = new URL(href);
+
+      // FMKorea 리다이렉트 래퍼 언랩 (link.fmkorea.org/link.php?url=...)
+      if (url.hostname === "link.fmkorea.org" && url.pathname === "/link.php") {
+        const inner = url.searchParams.get("url");
+        if (inner) {
+          try {
+            const realUrl = new URL(inner);
+            if (realUrl.protocol === "http:" || realUrl.protocol === "https:") {
+              urls.add(realUrl.href);
+            }
+          } catch {
+            // 내부 URL 파싱 실패 무시
+          }
+        }
+        return;
+      }
+
       // 에펨코리아 내부 링크 제외
       if (url.hostname.includes("fmkorea.com")) return;
+      if (url.hostname.includes("fmkorea.org")) return;
       // http/https만 허용
       if (url.protocol === "http:" || url.protocol === "https:") {
         urls.add(url.href);

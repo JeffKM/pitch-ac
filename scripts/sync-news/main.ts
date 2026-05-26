@@ -1,4 +1,4 @@
-// 이적뉴스 크롤링 스크립트
+// 이적뉴스 크롤링 스크립트 (Playwright 기반)
 //
 // 사용법:
 //   npm run sync:news
@@ -7,6 +7,7 @@ import path from "node:path";
 
 import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
+import { chromium } from "playwright";
 
 // .env.local → .env 순서로 로드
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
@@ -14,14 +15,22 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 import {
   classifySourceType,
-  fmkoreaFetch,
   isBannedPost,
   parseArticleUrls,
   parsePostList,
   rawPostToDbRow,
   rawPostToMetaUpdate,
 } from "@/lib/api/fmkorea";
-import { FMKOREA_BOARD } from "@/lib/constants/fmkorea";
+import { FMKOREA_BASE_URL, FMKOREA_BOARD } from "@/lib/constants/fmkorea";
+
+// ── 랜덤 대기 (봇 감지 회피) ──
+
+const MIN_WAIT_MS = 5000;
+const MAX_JITTER_MS = 3000;
+
+function randomDelay(): number {
+  return MIN_WAIT_MS + Math.floor(Math.random() * MAX_JITTER_MS);
+}
 
 // ── Supabase admin 클라이언트 (스크립트용, server-only 우회) ──
 
@@ -39,18 +48,28 @@ function createAdminClient() {
 // ── 메인 크롤링 로직 ──
 
 async function main() {
-  console.log("=== 이적뉴스 크롤링 시작 ===\n");
+  console.log("=== 이적뉴스 크롤링 시작 (Playwright) ===\n");
 
   const supabase = createAdminClient();
   let synced = 0;
   let skipped = 0;
   let updated = 0;
 
+  // Playwright 브라우저 launch
+  const browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage();
+
   try {
     // 1) 리스트 페이지 크롤링
-    const listUrl = `/${FMKOREA_BOARD}`;
-    console.log(`[1/4] 리스트 페이지 요청: ${listUrl}`);
-    const listHtml = await fmkoreaFetch(listUrl);
+    const listUrl = `${FMKOREA_BASE_URL}/${FMKOREA_BOARD}`;
+    console.log(`[1/4] 리스트 페이지 접속: ${listUrl}`);
+    await page.goto(listUrl, {
+      waitUntil: "domcontentloaded",
+      timeout: 30_000,
+    });
+    // 게시판 테이블 로딩 대기
+    await page.waitForSelector("table.bd_lst tbody tr", { timeout: 10_000 });
+    const listHtml = await page.content();
     const posts = parsePostList(listHtml);
     console.log(`  → ${posts.length}개 게시글 파싱 완료\n`);
 
@@ -98,13 +117,19 @@ async function main() {
       console.log(`  📰 [${post.id}] ${post.title}`);
 
       try {
-        const bodyHtml = await fmkoreaFetch(`/${post.id}`);
+        const postUrl = `${FMKOREA_BASE_URL}/${post.id}`;
+        await page.goto(postUrl, {
+          waitUntil: "domcontentloaded",
+          timeout: 30_000,
+        });
+        const bodyHtml = await page.content();
         const urls = parseArticleUrls(bodyHtml);
 
         if (urls.length === 0) {
-          // 소스 링크 없는 글은 스킵
           console.log(`    ⏭  소스 링크 없음 — 스킵`);
           skipped++;
+          // 다음 요청 전 대기
+          await page.waitForTimeout(randomDelay());
           continue;
         }
 
@@ -126,6 +151,9 @@ async function main() {
           `    ❌ 본문 크롤링 실패: ${err instanceof Error ? err.message : String(err)}`,
         );
       }
+
+      // 다음 요청 전 랜덤 대기 (5~8초)
+      await page.waitForTimeout(randomDelay());
     }
 
     // 5) sync_logs 기록
@@ -153,6 +181,8 @@ async function main() {
     });
 
     process.exit(1);
+  } finally {
+    await browser.close();
   }
 }
 

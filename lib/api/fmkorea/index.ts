@@ -1,5 +1,4 @@
 export { classifySourceType } from "./classifiers";
-export { fmkoreaFetch, FmkoreaFetchError } from "./client";
 export { isBannedPost } from "./filters";
 export {
   dbRowToTransferNewsItem,
