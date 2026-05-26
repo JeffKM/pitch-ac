@@ -31,6 +31,8 @@ export interface ScoutlabPageParams {
   mode: ScoutlabMode;
   adjustment: ScoutlabAdjustment;
   comparisonPosition: ScoutlabComparisonPosition;
+  /** URL에 comparisonPosition이 명시적으로 지정되었는지 여부 */
+  isComparisonPositionExplicit: boolean;
 }
 
 /** searchParams를 파싱하여 타입 안전한 객체로 변환 */
@@ -75,11 +77,12 @@ export function parseScoutlabParams(
       : DEFAULT_ADJUSTMENT;
 
   const cpStr = raw("comparisonPosition");
-  const comparisonPosition =
-    cpStr &&
-    VALID_COMPARISON_POSITIONS.includes(cpStr as ScoutlabComparisonPosition)
-      ? (cpStr as ScoutlabComparisonPosition)
-      : DEFAULT_COMPARISON_POSITION;
+  const isComparisonPositionExplicit =
+    !!cpStr &&
+    VALID_COMPARISON_POSITIONS.includes(cpStr as ScoutlabComparisonPosition);
+  const comparisonPosition = isComparisonPositionExplicit
+    ? (cpStr as ScoutlabComparisonPosition)
+    : DEFAULT_COMPARISON_POSITION;
 
   return {
     playerId: playerId && !isNaN(playerId) ? playerId : null,
@@ -90,5 +93,6 @@ export function parseScoutlabParams(
     mode,
     adjustment,
     comparisonPosition,
+    isComparisonPositionExplicit,
   };
 }

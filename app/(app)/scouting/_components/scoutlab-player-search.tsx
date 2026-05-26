@@ -22,6 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { ScoutlabPlayer } from "@/types";
 
+import { positionToComparisonPosition } from "../_lib/scoutlab-constants";
 import { useScoutlabParams } from "../_lib/use-scoutlab-params";
 
 interface ScoutlabPlayerSearchProps {
@@ -39,12 +40,16 @@ export function ScoutlabPlayerSearch({
 
   const handleSelect = useCallback(
     (id: number) => {
+      const player = players.find((p) => p.id === id);
+      const comparisonPosition = player
+        ? positionToComparisonPosition(player.position)
+        : undefined;
       startTransition(() => {
-        setParams({ playerId: id });
+        setParams({ playerId: id, comparisonPosition });
       });
       setOpen(false);
     },
-    [setParams],
+    [players, setParams],
   );
 
   return (

@@ -8,6 +8,7 @@ import {
 
 import { PlayerCardHeader } from "../_components/player-card-header";
 import { ProgressionView } from "../_components/progression-view";
+import { positionToComparisonPosition } from "../_lib/scoutlab-constants";
 import { parseScoutlabParams } from "../_lib/scoutlab-search-params";
 
 interface PageProps {
@@ -17,17 +18,23 @@ interface PageProps {
 export default async function ProgressionPage({ searchParams }: PageProps) {
   const params = parseScoutlabParams(await searchParams);
 
-  const [selectedPlayer, progressionData] = await Promise.all([
-    params.playerId ? getScoutlabPlayerById(params.playerId) : null,
-    params.playerId
-      ? getScoutlabProgression(
-          params.playerId,
-          params.mode,
-          params.adjustment,
-          params.comparisonPosition,
-        )
-      : [],
-  ]);
+  const selectedPlayer = params.playerId
+    ? await getScoutlabPlayerById(params.playerId)
+    : null;
+
+  const effectiveComparisonPosition =
+    params.isComparisonPositionExplicit || !selectedPlayer
+      ? params.comparisonPosition
+      : positionToComparisonPosition(selectedPlayer.position);
+
+  const progressionData = params.playerId
+    ? await getScoutlabProgression(
+        params.playerId,
+        params.mode,
+        params.adjustment,
+        effectiveComparisonPosition,
+      )
+    : [];
 
   if (!selectedPlayer) {
     return (

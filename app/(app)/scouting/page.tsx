@@ -15,6 +15,7 @@ import { ScoutlabFilterBar } from "./_components/scoutlab-filter-bar";
 import { ScoutlabModeToggle } from "./_components/scoutlab-mode-toggle";
 import { ScoutlabPlayerSearch } from "./_components/scoutlab-player-search";
 import { ScoutlabPositionFilter } from "./_components/scoutlab-position-filter";
+import { positionToComparisonPosition } from "./_lib/scoutlab-constants";
 import { parseScoutlabParams } from "./_lib/scoutlab-search-params";
 
 interface PageProps {
@@ -35,6 +36,13 @@ export default async function ScoutingPage({ searchParams }: PageProps) {
     params.playerId ? getScoutlabPlayerById(params.playerId) : null,
   ]);
 
+  // 선수 포지션 기반 comparisonPosition 결정
+  // URL에 명시적으로 지정되지 않았으면 선수의 실제 포지션으로 자동 매핑
+  const effectiveComparisonPosition =
+    params.isComparisonPositionExplicit || !selectedPlayer
+      ? params.comparisonPosition
+      : positionToComparisonPosition(selectedPlayer.position);
+
   // 선수가 선택된 경우 메트릭 조회
   const metrics = selectedPlayer
     ? await getScoutlabMetrics(
@@ -42,7 +50,7 @@ export default async function ScoutingPage({ searchParams }: PageProps) {
         params.season,
         params.mode,
         params.adjustment,
-        params.comparisonPosition,
+        effectiveComparisonPosition,
       )
     : null;
 
@@ -68,7 +76,7 @@ export default async function ScoutingPage({ searchParams }: PageProps) {
         <div className="space-y-4">
           <PlayerCardHeader player={selectedPlayer} />
           <MetricContextSubtitle
-            comparisonPosition={params.comparisonPosition}
+            comparisonPosition={effectiveComparisonPosition}
             mode={params.mode}
             adjustment={params.adjustment}
           />

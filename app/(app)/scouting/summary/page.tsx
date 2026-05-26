@@ -9,6 +9,7 @@ import {
 import { CategoryPercentileBars } from "../_components/category-percentile-bars";
 import { MetricContextSubtitle } from "../_components/metric-context-subtitle";
 import { PlayerCardHeader } from "../_components/player-card-header";
+import { positionToComparisonPosition } from "../_lib/scoutlab-constants";
 import { parseScoutlabParams } from "../_lib/scoutlab-search-params";
 
 interface PageProps {
@@ -18,19 +19,25 @@ interface PageProps {
 export default async function SummaryPage({ searchParams }: PageProps) {
   const params = parseScoutlabParams(await searchParams);
 
-  // 선수 + 메트릭 병렬 조회
-  const [selectedPlayer, metrics] = await Promise.all([
-    params.playerId ? getScoutlabPlayerById(params.playerId) : null,
-    params.playerId
-      ? getScoutlabMetrics(
-          params.playerId,
-          params.season,
-          params.mode,
-          params.adjustment,
-          params.comparisonPosition,
-        )
-      : null,
-  ]);
+  // 선수 조회 → 포지션 기반 comparisonPosition 결정 → 메트릭 조회
+  const selectedPlayer = params.playerId
+    ? await getScoutlabPlayerById(params.playerId)
+    : null;
+
+  const effectiveComparisonPosition =
+    params.isComparisonPositionExplicit || !selectedPlayer
+      ? params.comparisonPosition
+      : positionToComparisonPosition(selectedPlayer.position);
+
+  const metrics = selectedPlayer
+    ? await getScoutlabMetrics(
+        selectedPlayer.id,
+        params.season,
+        params.mode,
+        params.adjustment,
+        effectiveComparisonPosition,
+      )
+    : null;
 
   if (!selectedPlayer || !metrics) {
     return (
@@ -56,7 +63,7 @@ export default async function SummaryPage({ searchParams }: PageProps) {
       <div className="space-y-2">
         <PlayerCardHeader player={selectedPlayer} />
         <MetricContextSubtitle
-          comparisonPosition={params.comparisonPosition}
+          comparisonPosition={effectiveComparisonPosition}
           mode={params.mode}
           adjustment={params.adjustment}
         />

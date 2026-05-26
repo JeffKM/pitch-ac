@@ -13,6 +13,7 @@ import { MetricContextSubtitle } from "../_components/metric-context-subtitle";
 import { PlayerCardHeader } from "../_components/player-card-header";
 import { DynamicRadarChart } from "../_components/scoutlab-charts";
 import { ScoutlabCompareSearch } from "../_components/scoutlab-compare-search";
+import { positionToComparisonPosition } from "../_lib/scoutlab-constants";
 import { parseScoutlabParams } from "../_lib/scoutlab-search-params";
 
 interface PageProps {
@@ -36,6 +37,12 @@ export default async function ScoutingComparePage({ searchParams }: PageProps) {
     compareId && !isNaN(compareId) ? getScoutlabPlayerById(compareId) : null,
   ]);
 
+  // playerA 포지션 기반 comparisonPosition 결정
+  const effectiveComparisonPosition =
+    params.isComparisonPositionExplicit || !playerA
+      ? params.comparisonPosition
+      : positionToComparisonPosition(playerA.position);
+
   // 두 선수 모두 선택 시 메트릭 + 레이더 조회
   const [metricsA, metricsB, radarA, radarB] = await Promise.all([
     playerA
@@ -44,7 +51,7 @@ export default async function ScoutingComparePage({ searchParams }: PageProps) {
           params.season,
           params.mode,
           params.adjustment,
-          params.comparisonPosition,
+          effectiveComparisonPosition,
         )
       : null,
     playerB
@@ -53,7 +60,7 @@ export default async function ScoutingComparePage({ searchParams }: PageProps) {
           params.season,
           params.mode,
           params.adjustment,
-          params.comparisonPosition,
+          effectiveComparisonPosition,
         )
       : null,
     playerA ? getScoutlabRadar(playerA.id, params.season) : null,
@@ -77,7 +84,7 @@ export default async function ScoutingComparePage({ searchParams }: PageProps) {
   return (
     <div className="space-y-4">
       <MetricContextSubtitle
-        comparisonPosition={params.comparisonPosition}
+        comparisonPosition={effectiveComparisonPosition}
         mode={params.mode}
         adjustment={params.adjustment}
       />

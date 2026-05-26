@@ -53,3 +53,20 @@ export const DEFAULT_SEASON = "25/26";
 export const DEFAULT_MODE: ScoutlabMode = "per90";
 export const DEFAULT_ADJUSTMENT: ScoutlabAdjustment = "padj";
 export const DEFAULT_COMPARISON_POSITION: ScoutlabComparisonPosition = "AM/W";
+
+/** 선수 포지션 → 비교 포지션 그룹 매핑 */
+export function positionToComparisonPosition(
+  position: ScoutlabPosition,
+): ScoutlabComparisonPosition {
+  switch (position) {
+    case "AM":
+    case "W":
+    case "AM/W":
+      return "AM/W";
+    case "CB":
+    case "FB":
+    case "MF":
+    case "FW":
+      return position;
+  }
+}
