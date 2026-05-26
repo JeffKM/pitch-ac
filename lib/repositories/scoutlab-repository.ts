@@ -378,17 +378,30 @@ export const getScoutlabFilterOptions = cache(
     const teams = new Set<string>();
     const positions = new Set<ScoutlabPosition>();
     const seasons = new Set<string>();
+    const teamsByLeagueMap = new Map<string, Set<string>>();
 
     for (const row of data ?? []) {
-      leagues.add(row.league as ScoutlabLeague);
-      teams.add(row.team as string);
+      const l = row.league as string;
+      const t = row.team as string;
+      leagues.add(l as ScoutlabLeague);
+      teams.add(t);
       positions.add(row.position as ScoutlabPosition);
       seasons.add(row.season as string);
+
+      if (!teamsByLeagueMap.has(l)) teamsByLeagueMap.set(l, new Set());
+      teamsByLeagueMap.get(l)!.add(t);
+    }
+
+    // Map<string, Set> → Record<string, string[]>
+    const teamsByLeague: Record<string, string[]> = {};
+    for (const [league, teamSet] of teamsByLeagueMap) {
+      teamsByLeague[league] = [...teamSet].sort();
     }
 
     return {
       leagues: [...leagues].sort(),
       teams: [...teams].sort(),
+      teamsByLeague,
       positions: [...positions].sort(),
       seasons: [...seasons].sort().reverse(),
     };

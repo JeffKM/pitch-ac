@@ -20,8 +20,10 @@ interface ScoutlabFilterBarProps {
 export function ScoutlabFilterBar({ options }: ScoutlabFilterBarProps) {
   const { season, league, team, setParams } = useScoutlabParams();
 
-  // 팀 목록은 서버에서 시즌+리그 기반으로 이미 필터된 상태로 전달됨
-  const filteredTeams = options.teams;
+  // 리그 선택 시 해당 리그 팀만, 미선택 시 전체
+  const filteredTeams = league
+    ? (options.teamsByLeague?.[league] ?? [])
+    : options.teams;
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -39,11 +41,14 @@ export function ScoutlabFilterBar({ options }: ScoutlabFilterBarProps) {
         </SelectContent>
       </Select>
 
-      {/* 리그 */}
+      {/* 리그 — 변경 시 팀 선택 초기화 */}
       <Select
         value={league ?? "all"}
         onValueChange={(v) =>
-          setParams({ league: v === "all" ? null : (v as ScoutlabLeague) })
+          setParams({
+            league: v === "all" ? null : (v as ScoutlabLeague),
+            team: null,
+          })
         }
       >
         <SelectTrigger className="w-[160px]">

@@ -168,6 +168,8 @@ export interface ScoutlabScatterPoint {
 export interface ScoutlabFilterOptions {
   leagues: ScoutlabLeague[];
   teams: string[];
+  /** 리그별 팀 목록 (클라이언트 필터링용) */
+  teamsByLeague: Record<string, string[]>;
   positions: ScoutlabPosition[];
   seasons: string[];
 }
