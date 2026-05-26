@@ -17,6 +17,7 @@ export type {
   StandingRow,
   TeamRow,
 } from "./mappers";
+export { getLatestNews } from "./news-repository";
 export {
   getAllPlayers,
   getMatchStatsByPlayerId,

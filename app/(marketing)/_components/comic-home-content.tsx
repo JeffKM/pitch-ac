@@ -1,10 +1,10 @@
 // 홈 화면 메인 콘텐츠 — [경기|리그 순위] + 뉴스 + 베스트 XI
 
-import type { Fixture, Team, TeamStanding } from "@/types";
+import type { Fixture, Team, TeamStanding, TransferNewsItem } from "@/types";
 
 import { BestElevenPlaceholder } from "./best-eleven-placeholder";
+import { HomeNewsPanel } from "./home-news-panel";
 import { LeagueStandingsPanel } from "./league-standings-panel";
-import { NewsPlaceholder } from "./news-placeholder";
 import { RoundMatchesPanel } from "./round-matches-panel";
 
 interface ComicHomeContentProps {
@@ -13,6 +13,7 @@ interface ComicHomeContentProps {
   standingsMap: Map<number, TeamStanding[]>;
   teamsMap: Map<number, Team>;
   currentGameweek: number;
+  latestNews: TransferNewsItem[];
 }
 
 export function ComicHomeContent({
@@ -21,6 +22,7 @@ export function ComicHomeContent({
   standingsMap,
   teamsMap,
   currentGameweek,
+  latestNews,
 }: ComicHomeContentProps) {
   return (
     <main className="mx-auto max-w-5xl p-[var(--comic-panel-padding)]">
@@ -37,7 +39,7 @@ export function ComicHomeContent({
 
       {/* 뉴스 — 풀폭 */}
       <div className="mt-[var(--comic-panel-gap)]">
-        <NewsPlaceholder />
+        <HomeNewsPanel items={latestNews} />
       </div>
 
       {/* 베스트 XI — 풀폭 */}

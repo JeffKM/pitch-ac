@@ -9,6 +9,7 @@ import {
   getFixturesByDate,
   getFixturesByGameweek,
 } from "@/lib/repositories/fixture-repository";
+import { getLatestNews } from "@/lib/repositories/news-repository";
 import { getAllLeagueStandings } from "@/lib/repositories/standing-repository";
 import { getTeamsByIds } from "@/lib/repositories/team-repository";
 import type { Fixture, TeamStanding } from "@/types";
@@ -44,11 +45,13 @@ export async function HomeContent() {
   await connection();
   const todayDate = getTodayDateKey();
 
-  const [todayFixtures, standingsMap, currentGameweek] = await Promise.all([
-    getFixturesByDate(todayDate),
-    getAllLeagueStandings(CURRENT_SEASON_LABEL),
-    getCurrentGameweek(PL_LEAGUE_ID),
-  ]);
+  const [todayFixtures, standingsMap, currentGameweek, latestNews] =
+    await Promise.all([
+      getFixturesByDate(todayDate),
+      getAllLeagueStandings(CURRENT_SEASON_LABEL),
+      getCurrentGameweek(PL_LEAGUE_ID),
+      getLatestNews(3),
+    ]);
 
   // 오늘 경기가 없으면 다음 라운드 경기 조회
   let nextRoundFixtures: Fixture[] = [];
@@ -71,6 +74,7 @@ export async function HomeContent() {
       standingsMap={standingsMap}
       teamsMap={teamsMap}
       currentGameweek={currentGameweek}
+      latestNews={latestNews}
     />
   );
 }
