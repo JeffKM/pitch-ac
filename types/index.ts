@@ -8,3 +8,4 @@ export * from "./player";
 export * from "./radar";
 export * from "./scoutlab";
 export * from "./team";
+export * from "./transfer-news";
