@@ -55,9 +55,14 @@ async function main() {
   let skipped = 0;
   let updated = 0;
 
-  // Playwright 브라우저 launch
+  // Playwright 브라우저 launch (봇 감지 우회 설정)
   const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage();
+  const page = await browser.newPage({
+    userAgent:
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    viewport: { width: 1280, height: 800 },
+    locale: "ko-KR",
+  });
 
   try {
     // 1) 리스트 페이지 크롤링
