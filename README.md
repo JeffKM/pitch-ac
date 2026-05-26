@@ -2,6 +2,8 @@
 
 **THE ULTIMATE 5-LEAGUE DATA HUB**
 
+> **Live Demo: [pitch-ac.vercel.app](https://pitch-ac.vercel.app/)**
+
 유럽 5대 리그(EPL, La Liga, Serie A, Bundesliga, Ligue 1)의 경기·순위·선수 데이터를 맥락과 함께 시각화하는 축구 데이터 플랫폼. 60+ 고급 메트릭 기반 **ScoutLab 스카우팅 분석**을 핵심으로, 중계 영상에서 선수 움직임과 전술 패턴을 추출하는 **CV 전술 시각화**까지 확장할 계획입니다.
 
 ## 주요 기능
