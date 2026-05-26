@@ -54,6 +54,9 @@ export const DEFAULT_MODE: ScoutlabMode = "per90";
 export const DEFAULT_ADJUSTMENT: ScoutlabAdjustment = "padj";
 export const DEFAULT_COMPARISON_POSITION: ScoutlabComparisonPosition = "AM/W";
 
+/** playerId 미지정 시 기본으로 표시할 선수 이름 */
+export const DEFAULT_PLAYER_NAME = "Erling Haaland";
+
 /** 선수 포지션 → 비교 포지션 그룹 매핑 */
 export function positionToComparisonPosition(
   position: ScoutlabPosition,

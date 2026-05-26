@@ -2,6 +2,7 @@
 import { SearchX } from "lucide-react";
 
 import {
+  getDefaultScoutlabPlayer,
   getScoutlabMetrics,
   getScoutlabPlayerById,
 } from "@/lib/repositories/scoutlab-repository";
@@ -19,10 +20,10 @@ interface PageProps {
 export default async function SummaryPage({ searchParams }: PageProps) {
   const params = parseScoutlabParams(await searchParams);
 
-  // 선수 조회 → 포지션 기반 comparisonPosition 결정 → 메트릭 조회
+  // 선수 조회 (기본: Haaland) → 포지션 기반 comparisonPosition 결정 → 메트릭 조회
   const selectedPlayer = params.playerId
     ? await getScoutlabPlayerById(params.playerId)
-    : null;
+    : await getDefaultScoutlabPlayer(params.season);
 
   const effectiveComparisonPosition =
     params.isComparisonPositionExplicit || !selectedPlayer
@@ -45,7 +46,7 @@ export default async function SummaryPage({ searchParams }: PageProps) {
         <div className="text-center">
           <SearchX className="mx-auto size-10 text-comic-black/20" />
           <p className="mt-3 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-lg)] text-comic-black/50">
-            {!params.playerId
+            {!selectedPlayer
               ? "Player Card 탭에서 선수를 선택하세요."
               : "해당 시즌/모드에 대한 메트릭 데이터가 없습니다."}
           </p>

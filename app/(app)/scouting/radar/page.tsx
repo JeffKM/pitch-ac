@@ -2,6 +2,7 @@
 import { SearchX } from "lucide-react";
 
 import {
+  getDefaultScoutlabPlayer,
   getScoutlabPlayerById,
   getScoutlabRadar,
 } from "@/lib/repositories/scoutlab-repository";
@@ -17,10 +18,14 @@ interface PageProps {
 export default async function RadarPage({ searchParams }: PageProps) {
   const params = parseScoutlabParams(await searchParams);
 
-  const [selectedPlayer, radar] = await Promise.all([
-    params.playerId ? getScoutlabPlayerById(params.playerId) : null,
-    params.playerId ? getScoutlabRadar(params.playerId, params.season) : null,
-  ]);
+  // 선수 조회 (기본: Haaland)
+  const selectedPlayer = params.playerId
+    ? await getScoutlabPlayerById(params.playerId)
+    : await getDefaultScoutlabPlayer(params.season);
+
+  const radar = selectedPlayer
+    ? await getScoutlabRadar(selectedPlayer.id, params.season)
+    : null;
 
   if (!selectedPlayer || !radar) {
     return (
@@ -28,7 +33,7 @@ export default async function RadarPage({ searchParams }: PageProps) {
         <div className="text-center">
           <SearchX className="mx-auto size-10 text-comic-black/20" />
           <p className="mt-3 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-lg)] text-comic-black/50">
-            {!params.playerId
+            {!selectedPlayer
               ? "Player Card 탭에서 선수를 선택하세요."
               : "해당 시즌의 레이더 데이터가 없습니다."}
           </p>

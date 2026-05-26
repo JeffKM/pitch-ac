@@ -3,6 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Bangers, Fredoka, Geist, Permanent_Marker } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "sonner";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -95,6 +96,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <NextTopLoader color="oklch(0.58 0.22 25)" showSpinner={false} />
           {children}
           <Toaster richColors position="top-center" />
         </ThemeProvider>

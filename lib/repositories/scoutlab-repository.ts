@@ -61,6 +61,24 @@ export async function searchScoutlabPlayers(
   return (data as ScoutlabPlayerRow[]).map(scoutlabPlayerRowToPlayer);
 }
 
+/** 기본 선수 조회 (playerId 미지정 시 Haaland 표시용) */
+export const getDefaultScoutlabPlayer = cache(
+  async (season: string): Promise<ScoutlabPlayer | null> => {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from("scoutlab_players")
+      .select("*")
+      .eq("name", "Erling Haaland")
+      .eq("season", season)
+      .maybeSingle();
+
+    if (error || !data) return null;
+
+    return scoutlabPlayerRowToPlayer(data as ScoutlabPlayerRow);
+  },
+);
+
 /** ScoutLab 선수 단건 조회 */
 export const getScoutlabPlayerById = cache(
   async (id: number): Promise<ScoutlabPlayer | null> => {

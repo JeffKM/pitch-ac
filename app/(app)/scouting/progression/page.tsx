@@ -2,6 +2,7 @@
 import { SearchX } from "lucide-react";
 
 import {
+  getDefaultScoutlabPlayer,
   getScoutlabPlayerById,
   getScoutlabProgression,
 } from "@/lib/repositories/scoutlab-repository";
@@ -20,16 +21,16 @@ export default async function ProgressionPage({ searchParams }: PageProps) {
 
   const selectedPlayer = params.playerId
     ? await getScoutlabPlayerById(params.playerId)
-    : null;
+    : await getDefaultScoutlabPlayer(params.season);
 
   const effectiveComparisonPosition =
     params.isComparisonPositionExplicit || !selectedPlayer
       ? params.comparisonPosition
       : positionToComparisonPosition(selectedPlayer.position);
 
-  const progressionData = params.playerId
+  const progressionData = selectedPlayer
     ? await getScoutlabProgression(
-        params.playerId,
+        selectedPlayer.id,
         params.mode,
         params.adjustment,
         effectiveComparisonPosition,

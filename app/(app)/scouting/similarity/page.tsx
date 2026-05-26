@@ -2,6 +2,7 @@
 import { SearchX } from "lucide-react";
 
 import {
+  getDefaultScoutlabPlayer,
   getScoutlabPlayerById,
   getScoutlabSimilarity,
 } from "@/lib/repositories/scoutlab-repository";
@@ -17,12 +18,14 @@ interface PageProps {
 export default async function SimilarityPage({ searchParams }: PageProps) {
   const params = parseScoutlabParams(await searchParams);
 
-  const [selectedPlayer, similarity] = await Promise.all([
-    params.playerId ? getScoutlabPlayerById(params.playerId) : null,
-    params.playerId
-      ? getScoutlabSimilarity(params.playerId, params.season)
-      : null,
-  ]);
+  // 선수 조회 (기본: Haaland)
+  const selectedPlayer = params.playerId
+    ? await getScoutlabPlayerById(params.playerId)
+    : await getDefaultScoutlabPlayer(params.season);
+
+  const similarity = selectedPlayer
+    ? await getScoutlabSimilarity(selectedPlayer.id, params.season)
+    : null;
 
   if (!selectedPlayer) {
     return (

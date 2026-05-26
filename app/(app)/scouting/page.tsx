@@ -2,6 +2,7 @@
 import { SearchX } from "lucide-react";
 
 import {
+  getDefaultScoutlabPlayer,
   getScoutlabFilterOptions,
   getScoutlabMetrics,
   getScoutlabPlayerById,
@@ -33,7 +34,9 @@ export default async function ScoutingPage({ searchParams }: PageProps) {
       league: params.league ?? undefined,
       team: params.team ?? undefined,
     }),
-    params.playerId ? getScoutlabPlayerById(params.playerId) : null,
+    params.playerId
+      ? getScoutlabPlayerById(params.playerId)
+      : getDefaultScoutlabPlayer(params.season),
   ]);
 
   // 선수 포지션 기반 comparisonPosition 결정

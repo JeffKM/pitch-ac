@@ -2,6 +2,7 @@
 import { GitCompareArrows, SearchX } from "lucide-react";
 
 import {
+  getDefaultScoutlabPlayer,
   getScoutlabMetrics,
   getScoutlabPlayerById,
   getScoutlabRadar,
@@ -30,10 +31,12 @@ export default async function ScoutingComparePage({ searchParams }: PageProps) {
     : raw.compareId;
   const compareId = compareIdStr ? parseInt(compareIdStr, 10) : null;
 
-  // 선수 목록 + 두 선수 데이터 병렬 조회
+  // 선수 목록 + 두 선수 데이터 병렬 조회 (기본: Haaland)
   const [players, playerA, playerB] = await Promise.all([
     searchScoutlabPlayers({ season: params.season }),
-    params.playerId ? getScoutlabPlayerById(params.playerId) : null,
+    params.playerId
+      ? getScoutlabPlayerById(params.playerId)
+      : getDefaultScoutlabPlayer(params.season),
     compareId && !isNaN(compareId) ? getScoutlabPlayerById(compareId) : null,
   ]);
 
