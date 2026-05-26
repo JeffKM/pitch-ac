@@ -10,7 +10,7 @@ on:
 
 jobs:
   sync:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     timeout-minutes: 10
 
     steps:
@@ -23,7 +23,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npx playwright install chromium --with-deps
+      - run: npx playwright install chromium
 
       - run: npx tsx scripts/sync-news/main.ts
         env:
