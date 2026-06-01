@@ -63,6 +63,11 @@ import {
 } from "./lib/parsers";
 import { createScraperClient } from "./lib/supabase";
 import type { ScraperOptions, ScrapeStats } from "./lib/types";
+import {
+  downloadImage,
+  extractActionLinesFromImage,
+  logExtractionSummary,
+} from "./lib/vision-extractor";
 
 /** 유효한 mode/adjustment 조합 */
 const ALL_MODES = ["per90", "total"] as const;
@@ -88,6 +93,7 @@ function parseCliArgs(): ScraperOptions {
       "similarity-only": { type: "boolean", default: false },
       "action-maps-only": { type: "boolean", default: false },
       "dump-action-maps-dom": { type: "boolean", default: false },
+      "extract-lines": { type: "boolean", default: false },
     },
     strict: false,
   });
@@ -117,6 +123,7 @@ function parseCliArgs(): ScraperOptions {
     similarityOnly: Boolean(values["similarity-only"]),
     actionMapsOnly: Boolean(values["action-maps-only"]),
     dumpDom: Boolean(values["dump-action-maps-dom"]),
+    extractLines: Boolean(values["extract-lines"]),
   };
 }
 
@@ -219,6 +226,7 @@ async function scrapeActionMaps(
   league: string,
   season: string,
   dryRun: boolean,
+  extractLines: boolean = false,
 ): Promise<void> {
   try {
     // 선수 기본 정보에서 playerId 확보
@@ -232,6 +240,22 @@ async function scrapeActionMaps(
 
     try {
       const actionMaps = await parseActionMaps(iframe, page);
+
+      // --extract-lines: Vision API로 이미지에서 라인 좌표 추출
+      if (extractLines) {
+        for (const map of actionMaps) {
+          if (!map.imageUrl) continue;
+          const imgBuf = await downloadImage(map.imageUrl);
+          if (!imgBuf) continue;
+
+          const lines = await extractActionLinesFromImage(
+            imgBuf,
+            map.actionType,
+          );
+          map.lines = lines;
+          logExtractionSummary(map.actionType, lines.length, map.totalCount);
+        }
+      }
 
       if (actionMaps.length > 0 && !dryRun) {
         await upsertActionMaps(supabase, playerId, season, actionMaps);
@@ -291,6 +315,7 @@ async function scrapeAllCombinations(
     league,
     season,
     opts.dryRun,
+    opts.extractLines,
   );
 
   const modes = opts.mode ? [opts.mode] : [...ALL_MODES];
@@ -374,6 +399,7 @@ async function scrapePlayer(
       league,
       season,
       opts.dryRun,
+      opts.extractLines,
     );
     stats.successCount++;
   } else if (opts.similarityOnly) {

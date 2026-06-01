@@ -25,6 +25,8 @@ export interface ScraperOptions {
   actionMapsOnly: boolean;
   /** Action Maps 탭 DOM 구조 덤프 (탐색용) */
   dumpDom: boolean;
+  /** Vision API로 액션 라인 좌표 추출 활성화 */
+  extractLines: boolean;
 }
 
 /** 파싱된 선수 정보 */
@@ -63,6 +65,8 @@ export interface ParsedActionLine {
   y2: number;
   progressive: boolean;
   threatening: boolean;
+  /** 기대 위협 값 (원 크기 비례) */
+  xt?: number;
 }
 
 /** 파싱된 액션 맵 (1개 섹션) */

@@ -121,6 +121,8 @@ export interface ScoutlabActionLine {
   y2: number;
   progressive: boolean;
   threatening: boolean;
+  /** 기대 위협 값 (원 크기 비례) */
+  xt?: number;
 }
 
 /** 액션맵 데이터 */
