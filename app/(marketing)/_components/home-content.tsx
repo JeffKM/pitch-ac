@@ -66,11 +66,8 @@ export async function HomeContent() {
     // PL 라운드 경기가 모두 종료됐으면 전체 대회에서 다음 예정 경기 조회
     const hasUpcomingInRound = nextRoundFixtures.some((f) => f.status === "NS");
     if (!hasUpcomingInRound) {
+      nextRoundFixtures = []; // 종료된 라운드는 표시하지 않음
       upcomingFixtures = await getUpcomingFixtures(6);
-      // 예정 경기가 있으면 종료된 PL 라운드 대신 표시
-      if (upcomingFixtures.length > 0) {
-        nextRoundFixtures = [];
-      }
     }
   }
 
