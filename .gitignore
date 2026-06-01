@@ -45,3 +45,11 @@ next-env.d.ts
 .mcp.json
 shrimp_data/
 .playwright-mcp/
+
+# 개발 중 임시 파일 (스크린샷, 로그 등)
+/*.png
+/*.jpg
+/*.log
+/*.yml
+/test-results/
+/scripts/retry-*.sh
