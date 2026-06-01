@@ -70,6 +70,7 @@ export interface ScoutlabActionMapRow {
   lines: ScoutlabActionLine[];
   total_count: number;
   per90: number;
+  image_url: string | null;
 }
 
 export interface ScoutlabSimilarityRow {
@@ -143,6 +144,7 @@ export function scoutlabActionMapRowToActionMap(
     lines: row.lines,
     totalCount: row.total_count,
     per90: row.per90,
+    imageUrl: row.image_url,
   };
 }
 

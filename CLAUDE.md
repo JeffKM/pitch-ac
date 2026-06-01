@@ -64,6 +64,7 @@ npm run validate     # type-check + lint + format:check 통합 검증
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - `FOOTBALL_DATA_API_KEY`
+- `GOOGLE_AI_API_KEY` (Action Maps Vision 추출용, Google AI Studio에서 발급)
 
 ## Summary Instructions
 

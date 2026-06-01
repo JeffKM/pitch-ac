@@ -65,7 +65,7 @@ import { createScraperClient } from "./lib/supabase";
 import type { ScraperOptions, ScrapeStats } from "./lib/types";
 import {
   downloadImage,
-  extractActionLinesFromImage,
+  extractAllActionLinesFromImage,
   logExtractionSummary,
 } from "./lib/vision-extractor";
 
@@ -242,18 +242,23 @@ async function scrapeActionMaps(
       const actionMaps = await parseActionMaps(iframe, page);
 
       // --extract-lines: Vision API로 이미지에서 라인 좌표 추출
+      // 이미지 1회 다운로드 → 1회 API 호출로 3개 타입 동시 추출
       if (extractLines) {
-        for (const map of actionMaps) {
-          if (!map.imageUrl) continue;
-          const imgBuf = await downloadImage(map.imageUrl);
-          if (!imgBuf) continue;
-
-          const lines = await extractActionLinesFromImage(
-            imgBuf,
-            map.actionType,
-          );
-          map.lines = lines;
-          logExtractionSummary(map.actionType, lines.length, map.totalCount);
+        // 이미지 URL 찾기 (3개 타입 모두 같은 이미지)
+        const imageUrl = actionMaps.find((m) => m.imageUrl)?.imageUrl;
+        if (imageUrl) {
+          const imgBuf = await downloadImage(imageUrl);
+          if (imgBuf) {
+            const allLines = await extractAllActionLinesFromImage(imgBuf);
+            for (const map of actionMaps) {
+              map.lines = allLines[map.actionType] ?? [];
+              logExtractionSummary(
+                map.actionType,
+                map.lines.length,
+                map.totalCount,
+              );
+            }
+          }
         }
       }
 

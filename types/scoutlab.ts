@@ -134,6 +134,8 @@ export interface ScoutlabActionMap {
   lines: ScoutlabActionLine[];
   totalCount: number;
   per90: number;
+  /** ScoutLab 원본 이미지 URL (3개 타입이 가로로 나란히 배치된 1장) */
+  imageUrl: string | null;
 }
 
 /** 유사 선수 항목 */

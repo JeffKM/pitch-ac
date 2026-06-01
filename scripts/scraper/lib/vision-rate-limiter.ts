@@ -1,6 +1,6 @@
-// Claude Vision API 분당 50회 슬라이딩 윈도우 레이트 리미터
+// Gemini Vision API 분당 15회 슬라이딩 윈도우 레이트 리미터 (무료 티어)
 
-const RATE_LIMIT = 50; // 분당 최대 요청 수
+const RATE_LIMIT = 15; // 분당 최대 요청 수 (Gemini 2.0 Flash 무료 티어)
 const WINDOW_MS = 60_000; // 1분
 
 /** 요청 타임스탬프 배열 (슬라이딩 윈도우) */
@@ -24,7 +24,7 @@ export function canMakeVisionRequest(): boolean {
 export function recordVisionRequest(): void {
   pruneExpired();
   timestamps.push(Date.now());
-  if (timestamps.length >= RATE_LIMIT - 5) {
+  if (timestamps.length >= RATE_LIMIT - 3) {
     console.warn(`[vision] 분당 요청 ${timestamps.length}/${RATE_LIMIT}`);
   }
 }

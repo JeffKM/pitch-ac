@@ -17,9 +17,10 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 import { createClient } from "@supabase/supabase-js";
 
+import type { AllActionLines } from "./scraper/lib/vision-extractor";
 import {
   downloadImage,
-  extractActionLinesFromImage,
+  extractAllActionLinesFromImage,
   logExtractionSummary,
 } from "./scraper/lib/vision-extractor";
 
@@ -82,8 +83,6 @@ interface ActionMapRow {
   scoutlab_players: { name: string } | null;
 }
 
-const MAX_RETRIES = 3;
-
 async function main(): Promise<void> {
   console.log(
     `${C.cyan}[INFO]${C.reset} 액션 라인 배치 추출 시작 (dryRun=${dryRun}, force=${force})`,
@@ -135,76 +134,78 @@ async function main(): Promise<void> {
   let totalLinesExtracted = 0;
   const startTime = Date.now();
 
-  for (let i = 0; i < actionMaps.length; i++) {
-    const row = actionMaps[i]!;
-    const playerName = row.scoutlab_players?.name ?? `player_${row.player_id}`;
-    const label = `${playerName} / ${row.action_type} / ${row.season}`;
-
-    // 프로그레스 표시
-    const pct = Math.round(((i + 1) / actionMaps.length) * 100);
-    process.stdout.write(
-      `\r${C.cyan}[${pct}%]${C.reset} (${i + 1}/${actionMaps.length}) ${label}`,
-    );
-
+  // 같은 이미지 URL을 공유하는 레코드 그룹핑 (이미지 1회 다운로드 + 1회 API 호출)
+  const imageGroups = new Map<string, ActionMapRow[]>();
+  for (const row of actionMaps) {
     if (!row.image_url) {
       failCount++;
       continue;
     }
+    const key = row.image_url;
+    if (!imageGroups.has(key)) imageGroups.set(key, []);
+    imageGroups.get(key)!.push(row);
+  }
 
-    let lines: Awaited<ReturnType<typeof extractActionLinesFromImage>> = [];
-    let lastError: unknown = null;
+  let groupIdx = 0;
+  const totalGroups = imageGroups.size;
 
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-      try {
-        const imgBuf = await downloadImage(row.image_url);
-        if (!imgBuf) {
-          lastError = new Error("이미지 다운로드 실패");
-          continue;
-        }
+  for (const [imageUrl, rows] of imageGroups) {
+    groupIdx++;
+    const firstRow = rows[0]!;
+    const playerName =
+      firstRow.scoutlab_players?.name ?? `player_${firstRow.player_id}`;
+    const label = `${playerName} / ${firstRow.season}`;
 
-        lines = await extractActionLinesFromImage(imgBuf, row.action_type);
-        lastError = null;
-        break;
-      } catch (e) {
-        lastError = e;
-        if (attempt < MAX_RETRIES) {
-          await new Promise((r) => setTimeout(r, 2000 * attempt));
-        }
-      }
-    }
+    const pct = Math.round((groupIdx / totalGroups) * 100);
+    process.stdout.write(
+      `\r${C.cyan}[${pct}%]${C.reset} (${groupIdx}/${totalGroups}) ${label}`,
+    );
 
-    if (lastError) {
+    const imgBuf = await downloadImage(imageUrl);
+    if (!imgBuf) {
       process.stdout.write("\n");
-      console.error(
-        `${C.red}[ERROR]${C.reset} ${label}: ${lastError instanceof Error ? lastError.message : "unknown"}`,
-      );
-      failCount++;
+      console.error(`${C.red}[ERROR]${C.reset} ${label}: 이미지 다운로드 실패`);
+      failCount += rows.length;
       continue;
     }
 
-    // 결과 요약
-    process.stdout.write("\n");
-    logExtractionSummary(row.action_type, lines.length, row.total_count);
-
-    totalLinesExtracted += lines.length;
-
-    // DB 업데이트
-    if (!dryRun && lines.length > 0) {
-      const { error: updateError } = await supabase
-        .from("scoutlab_action_maps")
-        .update({ lines })
-        .eq("id", row.id);
-
-      if (updateError) {
-        console.error(
-          `${C.red}[ERROR]${C.reset} DB 업데이트 실패 (id=${row.id}): ${updateError.message}`,
-        );
-        failCount++;
-        continue;
-      }
+    let allLines: AllActionLines | null = null;
+    try {
+      allLines = await extractAllActionLinesFromImage(imgBuf);
+    } catch (e) {
+      process.stdout.write("\n");
+      console.error(
+        `${C.red}[ERROR]${C.reset} ${label}: ${e instanceof Error ? e.message : "unknown"}`,
+      );
+      failCount += rows.length;
+      continue;
     }
 
-    successCount++;
+    process.stdout.write("\n");
+
+    for (const row of rows) {
+      const lines = allLines[row.action_type] ?? [];
+      logExtractionSummary(row.action_type, lines.length, row.total_count);
+      totalLinesExtracted += lines.length;
+
+      // DB 업데이트
+      if (!dryRun && lines.length > 0) {
+        const { error: updateError } = await supabase
+          .from("scoutlab_action_maps")
+          .update({ lines })
+          .eq("id", row.id);
+
+        if (updateError) {
+          console.error(
+            `${C.red}[ERROR]${C.reset} DB 업데이트 실패 (id=${row.id}): ${updateError.message}`,
+          );
+          failCount++;
+          continue;
+        }
+      }
+
+      successCount++;
+    }
   }
 
   // 요약
