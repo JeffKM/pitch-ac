@@ -1,10 +1,13 @@
 // 매치데이 페이지 로딩 스켈레톤
 
+import { PageLoadingIndicator } from "@/components/page-loading-indicator";
+
 import { FixtureCardSkeleton } from "./_components/fixture-card-skeleton";
 
 export default function MatchdayLoading() {
   return (
     <div className="space-y-8">
+      <PageLoadingIndicator />
       {/* 날짜 스트립 스켈레톤 */}
       <div className="flex items-center gap-1">
         <div className="size-8 shrink-0 animate-pulse rounded-md bg-comic-cream" />

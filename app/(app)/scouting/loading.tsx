@@ -1,8 +1,11 @@
 // Scouting 페이지 로딩 스켈레톤
 
+import { PageLoadingIndicator } from "@/components/page-loading-indicator";
+
 export default function ScoutingLoading() {
   return (
     <div className="space-y-6">
+      <PageLoadingIndicator />
       {/* 필터 바 스켈레톤 */}
       <div className="flex flex-wrap gap-3">
         {[0, 1, 2, 3].map((i) => (

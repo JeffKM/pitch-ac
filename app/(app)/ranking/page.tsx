@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
+import { PageLoadingIndicator } from "@/components/page-loading-indicator";
 import { CURRENT_SEASON_LABEL } from "@/lib/constants/football";
 import { getAllLeagueStandings, getAllTeams } from "@/lib/repositories";
 import type { Team, TeamStanding } from "@/types";
@@ -39,6 +40,7 @@ async function RankingData() {
 function RankingFallback() {
   return (
     <div className="space-y-3">
+      <PageLoadingIndicator />
       <div className="h-10 w-full animate-pulse rounded-[var(--comic-panel-radius)] bg-comic-cream" />
       {Array.from({ length: 20 }).map((_, i) => (
         <div

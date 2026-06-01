@@ -1,8 +1,11 @@
 // 경기 상세 페이지 로딩 스켈레톤
 
+import { PageLoadingIndicator } from "@/components/page-loading-indicator";
+
 export default function FixtureDetailLoading() {
   return (
     <div className="space-y-4">
+      <PageLoadingIndicator />
       {/* 헤더 스켈레톤 */}
       <div className="rounded-xl bg-comic-white p-6">
         {/* GW + 날짜 */}

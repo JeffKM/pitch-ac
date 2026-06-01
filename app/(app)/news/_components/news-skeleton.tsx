@@ -1,10 +1,12 @@
 // 뉴스 카드 로딩 스켈레톤
 
+import { PageLoadingIndicator } from "@/components/page-loading-indicator";
 import { Card, CardContent } from "@/components/ui/card";
 
 export function NewsSkeleton() {
   return (
     <div className="space-y-3">
+      <PageLoadingIndicator />
       {Array.from({ length: 5 }).map((_, i) => (
         <Card key={i} className="animate-pulse">
           <CardContent className="p-4">
