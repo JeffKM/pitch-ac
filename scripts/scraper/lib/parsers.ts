@@ -4,6 +4,7 @@ import type { FrameLocator, Page } from "@playwright/test";
 
 import { logInfo, logWarn } from "./logger";
 import type {
+  ParsedActionMap,
   ParsedMetric,
   ParsedPlayerInfo,
   ParsedSimilarPlayer,
@@ -386,4 +387,215 @@ export function parseSimilarPlayerInfo(info: string): {
     position: parts[1] ?? "",
     team: parts.slice(2).join(", ").trim(),
   };
+}
+
+// ─── Action Maps 파서 ───
+// ScoutLab Action Maps는 서버사이드 렌더링 PNG 이미지로 제공됨
+// SVG 라인 좌표 추출 불가 → 텍스트 메타데이터 + 이미지 URL 수집
+
+/**
+ * Action Maps 헤더 텍스트에서 total_count, per90 추출
+ * 패턴: "Carries (89 | 3.7 P90)" / "Passes (107 | 4.5 P90)"
+ */
+function parseActionHeader(text: string): {
+  actionType: ParsedActionMap["actionType"] | null;
+  totalCount: number;
+  per90: number;
+} {
+  // "Carries (89 | 3.7 P90)" 패턴
+  const match = text.match(
+    /(carries|passes|crosses)\s*\(\s*(\d+)\s*\|\s*([\d.]+)\s*P90\s*\)/i,
+  );
+  if (!match) return { actionType: null, totalCount: 0, per90: 0 };
+
+  const typeMap: Record<string, ParsedActionMap["actionType"]> = {
+    carries: "carries",
+    passes: "passes",
+    crosses: "crosses",
+  };
+
+  return {
+    actionType: typeMap[match[1]!.toLowerCase()] ?? null,
+    totalCount: parseInt(match[2]!, 10),
+    per90: parseFloat(match[3]!),
+  };
+}
+
+/**
+ * Action Maps 탭에서 메타데이터 + 이미지 URL 파싱
+ * ScoutLab은 matplotlib 차트를 서버사이드 PNG로 렌더링 (st.image)
+ * 전제: 이미 Action Maps 탭으로 이동한 상태
+ */
+export async function parseActionMaps(
+  iframe: FrameLocator,
+  page: Page,
+): Promise<ParsedActionMap[]> {
+  const results: ParsedActionMap[] = [];
+
+  try {
+    // 콘텐츠 렌더링 대기 (서버사이드 PNG 생성 시간)
+    await page.waitForTimeout(3000);
+
+    // 메인 영역 스크롤하여 lazy-loaded 콘텐츠 로딩
+    try {
+      const mainArea = iframe
+        .locator('[data-testid="stAppViewContainer"]')
+        .first();
+      for (let i = 0; i < 3; i++) {
+        await mainArea.evaluate((el) => {
+          el.scrollTop += 500;
+        });
+        await page.waitForTimeout(500);
+      }
+      // 다시 위로 스크롤
+      await mainArea.evaluate((el) => {
+        el.scrollTop = 0;
+      });
+      await page.waitForTimeout(500);
+    } catch {
+      // 스크롤 실패 무시
+    }
+
+    // 1. stImage에서 이미지 URL 추출
+    let imageUrl: string | undefined;
+    const stImageCount = await iframe
+      .locator('[data-testid="stImage"]')
+      .count();
+    if (stImageCount > 0) {
+      const stImg = iframe.locator('[data-testid="stImage"]').first();
+      const innerImg = stImg.locator("img");
+      if ((await innerImg.count()) > 0) {
+        const src = await innerImg.first().getAttribute("src");
+        if (src && !src.startsWith("data:")) {
+          imageUrl = src;
+          logInfo(`  Action Maps 이미지 URL: ${src.substring(0, 80)}...`);
+        }
+      }
+    }
+
+    // stImage가 없으면 큰 img 요소에서 찾기 (width > 500px)
+    if (!imageUrl) {
+      const allImgs = iframe.locator("img");
+      const imgCount = await allImgs.count();
+      for (let i = 0; i < imgCount; i++) {
+        const img = allImgs.nth(i);
+        const style = (await img.getAttribute("style")) ?? "";
+        const widthMatch = style.match(/width:\s*(\d+)px/);
+        if (widthMatch && parseInt(widthMatch[1]!, 10) > 500) {
+          const src = await img.getAttribute("src");
+          if (src && !src.startsWith("data:image/gif")) {
+            imageUrl = src;
+            logInfo(
+              `  Action Maps 이미지 URL (img fallback): ${src.substring(0, 80)}...`,
+            );
+            break;
+          }
+        }
+      }
+    }
+
+    // 2. 텍스트에서 액션 타입별 통계 추출
+    // 2. 텍스트에서 액션 타입별 통계 추출
+    const actionTypes: ParsedActionMap["actionType"][] = [
+      "carries",
+      "passes",
+      "crosses",
+    ];
+
+    // 전략 A: evaluate로 전체 DOM 텍스트(innerHTML 포함) 추출
+    const allHtml = await iframe
+      .locator("body")
+      .first()
+      .evaluate((el) => el.innerHTML)
+      .catch(() => "");
+
+    const headerRegex =
+      /(carries|passes|crosses)\s*\(\s*(\d+)\s*\|\s*([\d.]+)\s*P90\s*\)/gi;
+    const htmlMatches = [...allHtml.matchAll(headerRegex)];
+
+    if (htmlMatches.length > 0) {
+      for (const match of htmlMatches) {
+        const parsed = parseActionHeader(match[0]);
+        if (
+          parsed.actionType &&
+          !results.some((r) => r.actionType === parsed.actionType)
+        ) {
+          results.push({
+            actionType: parsed.actionType,
+            lines: [],
+            totalCount: parsed.totalCount,
+            per90: parsed.per90,
+            imageUrl,
+          });
+          logInfo(
+            `  ${parsed.actionType}: total=${parsed.totalCount}, per90=${parsed.per90}`,
+          );
+        }
+      }
+    }
+
+    // 전략 B: Playwright text 로케이터로 개별 탐색
+    if (results.length === 0) {
+      logInfo("  innerHTML 매칭 실패, text 로케이터 시도");
+      for (const type of actionTypes) {
+        const regex = new RegExp(
+          `${type}\\s*\\(\\s*(\\d+)\\s*\\|\\s*([\\d.]+)\\s*P90\\s*\\)`,
+          "i",
+        );
+        const elements = iframe.locator(`text=/${type}/i`);
+        const count = await elements.count();
+
+        for (let i = 0; i < Math.min(count, 5); i++) {
+          const text = await elements
+            .nth(i)
+            .textContent()
+            .catch(() => "");
+          if (!text) continue;
+
+          const match = text.match(regex);
+          if (match && !results.some((r) => r.actionType === type)) {
+            results.push({
+              actionType: type,
+              lines: [],
+              totalCount: parseInt(match[1]!, 10),
+              per90: parseFloat(match[2]!),
+              imageUrl,
+            });
+            logInfo(`  ${type}: total=${match[1]}, per90=${match[2]}`);
+            break;
+          }
+        }
+      }
+    }
+
+    // 전략 C: 이미지만 있고 텍스트 없는 경우 — 이미지 URL만으로 결과 생성
+    if (results.length === 0 && imageUrl) {
+      logInfo("  텍스트 메타데이터 추출 실패, 이미지 URL만으로 결과 생성");
+      for (const type of actionTypes) {
+        results.push({
+          actionType: type,
+          lines: [],
+          totalCount: 0,
+          per90: 0,
+          imageUrl,
+        });
+      }
+    }
+
+    if (results.length === 0) {
+      logWarn(
+        "  Action Maps 데이터를 찾을 수 없습니다 (--dump-action-maps-dom으로 DOM 확인 필요)",
+      );
+    } else {
+      logInfo(
+        `  Action Maps ${results.length}개 타입 파싱 완료 (이미지: ${imageUrl ? "있음" : "없음"})`,
+      );
+    }
+  } catch (e) {
+    logWarn(
+      `Action Maps 파싱 실패: ${e instanceof Error ? e.message.substring(0, 200) : "unknown"}`,
+    );
+  }
+
+  return results;
 }

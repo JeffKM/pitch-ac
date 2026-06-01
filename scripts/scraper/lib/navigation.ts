@@ -252,6 +252,44 @@ export async function toggleComparisonPosition(
   await selectSegmentedControl(iframe, page, position);
 }
 
+/** Action Maps 탭으로 이동 + Streamlit 로딩 대기 */
+export async function navigateToActionMapsTab(
+  iframe: FrameLocator,
+  page: Page,
+): Promise<void> {
+  logInfo("Action Maps 탭 이동");
+  const tabBtn = iframe.locator('button:has-text("Action Maps")').first();
+  const exists = await tabBtn.count();
+  if (exists === 0) {
+    throw new Error("Action Maps 탭을 찾을 수 없습니다");
+  }
+  await tabBtn.click();
+  try {
+    await iframe
+      .locator('[data-testid="stStatusWidget"]')
+      .waitFor({ state: "visible", timeout: 3000 });
+    await iframe
+      .locator('[data-testid="stStatusWidget"]')
+      .waitFor({ state: "hidden", timeout: 30_000 });
+  } catch {
+    // 즉시 로딩 완료
+  }
+  await page.waitForTimeout(3000);
+}
+
+/** Player Card 탭으로 복귀 */
+export async function navigateBackToPlayerCard(
+  iframe: FrameLocator,
+  page: Page,
+): Promise<void> {
+  logInfo("Player Card 탭 복귀");
+  const btn = iframe.locator('button:has-text("Player Card")').first();
+  if ((await btn.count()) > 0) {
+    await btn.click();
+    await page.waitForTimeout(2000);
+  }
+}
+
 /** Streamlit 데이터 업데이트 대기 */
 async function waitForStreamlitUpdate(
   iframe: FrameLocator,

@@ -24,11 +24,13 @@ import {
 } from "./lib/browser";
 import { DEFAULT_DELAY, DEFAULT_LEAGUE, DEFAULT_SEASON } from "./lib/constants";
 import {
+  upsertActionMaps,
   upsertMetrics,
   upsertPlayer,
   upsertSimilarity,
   writeSyncLog,
 } from "./lib/db";
+import { dumpActionMapsDom } from "./lib/dom-inspector";
 import {
   logError,
   logInfo,
@@ -40,6 +42,8 @@ import {
 import {
   extractPlayerList,
   extractTeamList,
+  navigateBackToPlayerCard,
+  navigateToActionMapsTab,
   searchPlayer,
   selectLeague,
   selectPlayer,
@@ -52,6 +56,7 @@ import {
 } from "./lib/navigation";
 import {
   groupMetricsByCategory,
+  parseActionMaps,
   parseMetrics,
   parsePlayerInfo,
   parseSimilarPlayersFromTab,
@@ -81,6 +86,8 @@ function parseCliArgs(): ScraperOptions {
       "match-position": { type: "boolean", default: false },
       positions: { type: "string" },
       "similarity-only": { type: "boolean", default: false },
+      "action-maps-only": { type: "boolean", default: false },
+      "dump-action-maps-dom": { type: "boolean", default: false },
     },
     strict: false,
   });
@@ -108,6 +115,8 @@ function parseCliArgs(): ScraperOptions {
     matchPosition: Boolean(values["match-position"]),
     positions: parsePositionsArg(values.positions as string | undefined),
     similarityOnly: Boolean(values["similarity-only"]),
+    actionMapsOnly: Boolean(values["action-maps-only"]),
+    dumpDom: Boolean(values["dump-action-maps-dom"]),
   };
 }
 
@@ -201,6 +210,56 @@ async function scrapeSimilarity(
   }
 }
 
+/** 현재 선수에 대해 Action Maps 탭 파싱 → DB 저장 */
+async function scrapeActionMaps(
+  iframe: FrameLocator,
+  page: Page,
+  supabase: ReturnType<typeof createScraperClient>,
+  playerName: string,
+  league: string,
+  season: string,
+  dryRun: boolean,
+): Promise<void> {
+  try {
+    // 선수 기본 정보에서 playerId 확보
+    const playerInfo = await parsePlayerInfo(iframe);
+    const playerId = dryRun
+      ? 0
+      : await upsertPlayer(supabase, playerInfo, league);
+
+    // Action Maps 탭 이동 → 파싱 → Player Card 복귀
+    await navigateToActionMapsTab(iframe, page);
+
+    try {
+      const actionMaps = await parseActionMaps(iframe, page);
+
+      if (actionMaps.length > 0 && !dryRun) {
+        await upsertActionMaps(supabase, playerId, season, actionMaps);
+        const totalLines = actionMaps.reduce(
+          (sum, m) => sum + m.lines.length,
+          0,
+        );
+        logSuccess(
+          `  ${playerName} action maps 저장 완료 (${actionMaps.length}개 타입, ${totalLines}개 라인, id: ${playerId})`,
+        );
+      } else if (dryRun) {
+        const totalLines = actionMaps.reduce(
+          (sum, m) => sum + m.lines.length,
+          0,
+        );
+        logWarn(
+          `  [DRY-RUN] action maps ${actionMaps.length}개 타입, ${totalLines}개 라인 파싱됨, DB 쓰기 스킵`,
+        );
+      }
+    } finally {
+      // 항상 Player Card 복귀 보장
+      await navigateBackToPlayerCard(iframe, page);
+    }
+  } catch (error) {
+    logError(`  ${playerName} action maps 수집 실패`, error);
+  }
+}
+
 /** 현재 선수에 대해 mode×adjustment×position 조합 순회 스크래핑 */
 async function scrapeAllCombinations(
   iframe: FrameLocator,
@@ -214,6 +273,17 @@ async function scrapeAllCombinations(
 ): Promise<void> {
   // Similarity Score 탭에서 1회 수집 (메트릭 루프 전)
   await scrapeSimilarity(
+    iframe,
+    page,
+    supabase,
+    playerName,
+    league,
+    season,
+    opts.dryRun,
+  );
+
+  // Action Maps 탭에서 1회 수집 (메트릭 루프 전)
+  await scrapeActionMaps(
     iframe,
     page,
     supabase,
@@ -294,7 +364,19 @@ async function scrapePlayer(
   opts: ScraperOptions,
   stats: ScrapeStats,
 ): Promise<void> {
-  if (opts.similarityOnly) {
+  if (opts.actionMapsOnly) {
+    // action maps만 수집
+    await scrapeActionMaps(
+      iframe,
+      page,
+      supabase,
+      playerName,
+      league,
+      season,
+      opts.dryRun,
+    );
+    stats.successCount++;
+  } else if (opts.similarityOnly) {
     // similarity만 수집 (메트릭 스킵)
     await scrapeSimilarity(
       iframe,
@@ -327,9 +409,13 @@ async function main(): Promise<void> {
   const posStr = opts.matchPosition
     ? "match-position"
     : (opts.positions?.join(",") ?? (opts.skipPositions ? "AM/W" : "all"));
-  const modeStr = opts.similarityOnly
-    ? "similarity-only"
-    : `mode=${opts.mode ?? "all"}, adj=${opts.adjustment ?? "all"}, positions=${posStr}`;
+  const modeStr = opts.dumpDom
+    ? "dump-action-maps-dom"
+    : opts.actionMapsOnly
+      ? "action-maps-only"
+      : opts.similarityOnly
+        ? "similarity-only"
+        : `mode=${opts.mode ?? "all"}, adj=${opts.adjustment ?? "all"}, positions=${posStr}`;
   logInfo(
     `설정: season=${opts.season}, league=${opts.league}, team=${opts.team ?? "전체"}, player=${opts.player ?? "전체"}, ${modeStr}, headless=${opts.headless}, dryRun=${opts.dryRun}`,
   );
@@ -351,6 +437,17 @@ async function main(): Promise<void> {
     // Player Card 탭 + 시즌 선택
     await selectSidebarTab(iframe, page, "Player Card");
     await selectSeason(iframe, page, opts.season);
+
+    // dumpDom 모드: DOM 탐색 후 즉시 종료
+    if (opts.dumpDom) {
+      if (opts.player) {
+        await searchPlayer(iframe, page, opts.player);
+        await selectSidebarTab(iframe, page, "Player Card");
+      }
+      await dumpActionMapsDom(iframe, page);
+      logInfo("DOM 탐색 완료, 종료합니다");
+      return;
+    }
 
     if (opts.player && !opts.team) {
       // 모드 A: 글로벌 검색 (--player만 지정)
@@ -383,7 +480,7 @@ async function main(): Promise<void> {
         stats.totalPlayers = 1;
         try {
           await selectPlayer(iframe, page, opts.player);
-          await scrapeAllCombinations(
+          await scrapePlayer(
             iframe,
             page,
             supabase,
@@ -459,7 +556,11 @@ async function main(): Promise<void> {
     // 동기화 로그
     if (!opts.dryRun) {
       await writeSyncLog(supabase, {
-        scraper: opts.similarityOnly ? "similarity" : "player-card",
+        scraper: opts.actionMapsOnly
+          ? "action-maps"
+          : opts.similarityOnly
+            ? "similarity"
+            : "player-card",
         season: opts.season,
         league: opts.league,
         status: stats.failCount === 0 ? "success" : "error",

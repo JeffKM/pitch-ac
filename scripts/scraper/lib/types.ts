@@ -21,6 +21,10 @@ export interface ScraperOptions {
   matchPosition: boolean;
   /** similarity만 수집 (메트릭 스크래핑 스킵) */
   similarityOnly: boolean;
+  /** action maps만 수집 */
+  actionMapsOnly: boolean;
+  /** Action Maps 탭 DOM 구조 덤프 (탐색용) */
+  dumpDom: boolean;
 }
 
 /** 파싱된 선수 정보 */
@@ -49,6 +53,26 @@ export interface ParsedSimilarPlayer {
   name: string;
   info: string; // "18, AM/W, Barcelona"
   score?: number; // 0~1 소수 (Similarity Score 탭에서 수집 시)
+}
+
+/** 파싱된 액션 라인 (carries/passes/crosses 좌표) */
+export interface ParsedActionLine {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  progressive: boolean;
+  threatening: boolean;
+}
+
+/** 파싱된 액션 맵 (1개 섹션) */
+export interface ParsedActionMap {
+  actionType: "carries" | "passes" | "crosses";
+  lines: ParsedActionLine[];
+  totalCount: number;
+  per90: number;
+  /** 서버사이드 렌더링 PNG 이미지 URL (ScoutLab 원본) */
+  imageUrl?: string;
 }
 
 /** 스크래핑 결과 통계 */
