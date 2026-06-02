@@ -16,6 +16,7 @@
     "scrape:scoutlab": "tsx scripts/scraper/main.ts",
     "sync:news": "npx tsx scripts/sync-news/main.ts",
     "extract:action-lines": "tsx scripts/extract-action-lines.ts",
+    "extract:action-text": "tsx scripts/extract-action-text.ts",
     "seed:fixtures": "curl -sf http://localhost:3000/api/debug/football-data/sync && curl -sf http://localhost:3000/api/cron/sync-teams",
     "prepare": "husky"
   },

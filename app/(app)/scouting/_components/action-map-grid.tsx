@@ -1,5 +1,6 @@
 // ScoutLab Action Maps — 원본 이미지 3등분 crop + 피치 라인 SVG 오버레이
 // 이미지: 1460×747 RGBA, 3개 피치 가로 나란히 (LEFT=carries, MIDDLE=passes, RIGHT=crosses)
+// 텍스트 헤더 ("Carries (19 | 2.0 P90)")는 이미지 상단에 포함됨
 // 피치 경계 (좌측 섹션 기준, 픽셀): x=54~458, y=53~678, 섹션 너비=487
 import type { ScoutlabActionMap, ScoutlabActionType } from "@/types";
 
@@ -9,12 +10,6 @@ interface ActionMapGridProps {
   actionMaps: ScoutlabActionMap[];
 }
 
-const ACTION_TYPE_LABELS: Record<ScoutlabActionType, string> = {
-  carries: "Carries",
-  passes: "Passes",
-  crosses: "Crosses",
-};
-
 /** 각 타입의 이미지 위치 (CSS background-position percentage) */
 const SECTION_POSITION: Record<ScoutlabActionType, string> = {
   carries: "0%",
@@ -23,6 +18,12 @@ const SECTION_POSITION: Record<ScoutlabActionType, string> = {
 };
 
 const ACTION_TYPES: ScoutlabActionType[] = ["carries", "passes", "crosses"];
+
+const ACTION_TYPE_LABELS: Record<ScoutlabActionType, string> = {
+  carries: "Carries",
+  passes: "Passes",
+  crosses: "Crosses",
+};
 
 /**
  * 피치 오버레이 위치 상수 (이미지 픽셀 분석 기반)
@@ -45,42 +46,35 @@ export function ActionMapGrid({ actionMaps }: ActionMapGridProps) {
   const imageUrl = actionMaps.find((m) => m.imageUrl)?.imageUrl ?? null;
 
   return (
-    <div
-      className="grid grid-cols-1 gap-4 md:grid-cols-3"
-      data-testid="action-map-grid"
-    >
-      {ACTION_TYPES.map((type) => {
-        const mapData = actionMaps.find((m) => m.actionType === type);
-
-        return (
-          <div key={type} className="space-y-2">
-            {/* 헤더: "Carries (165 | 6.9 P90)" 형식 */}
-            <h4 className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-body-lg)] text-comic-black">
-              {ACTION_TYPE_LABELS[type]}
-              {mapData && mapData.totalCount > 0 && (
-                <span className="ml-1.5 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] text-comic-black/50">
-                  ({mapData.totalCount} | {mapData.per90.toFixed(1)} P90)
-                </span>
-              )}
-            </h4>
-
-            {/* 피치: 원본 이미지 + 검은 피치 라인 SVG 오버레이 */}
-            <div className="overflow-hidden rounded-lg border border-comic-black/10">
-              {imageUrl ? (
-                <ActionMapImage imageUrl={imageUrl} actionType={type} />
-              ) : (
-                <PitchSvg vertical />
-              )}
+    <div className="space-y-3" data-testid="action-map-grid">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {ACTION_TYPES.map((type) => {
+          const mapData = actionMaps.find((m) => m.actionType === type);
+          return (
+            <div key={type} className="space-y-2">
+              {/* 상단 텍스트 헤더 (스탯은 이미지 텍스트에서 추출하여 DB 저장) */}
+              <h4 className="font-heading text-sm font-bold tracking-wide uppercase">
+                {ACTION_TYPE_LABELS[type]}
+                {mapData && mapData.totalCount > 0 && (
+                  <span className="ml-1.5 font-normal text-muted-foreground">
+                    ({mapData.totalCount} | {mapData.per90} P90)
+                  </span>
+                )}
+              </h4>
+              {/* 이미지 카드 */}
+              <div className="overflow-hidden rounded-lg border border-comic-black/10">
+                {imageUrl ? (
+                  <ActionMapImage imageUrl={imageUrl} actionType={type} />
+                ) : (
+                  <PitchSvg vertical />
+                )}
+              </div>
             </div>
-
-            {/* 범례 */}
-            <div className="flex gap-3">
-              <LegendItem color="bg-comic-pink" label="Progressive" />
-              <LegendItem color="bg-comic-skyblue" label="Threatening" />
-            </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+      {/* 하단 공유 범례 — 원본 ScoutLab 범례와 동일 */}
+      <ActionMapLegend />
     </div>
   );
 }
@@ -97,9 +91,10 @@ function ActionMapImage({
     <div
       className="relative overflow-hidden"
       // 68/96: 하단 범례(y≈700+) 완전 제거, 피치 하단(y=678)까지만 표시
+      // 상단 텍스트 헤더("Carries (19 | 2.0 P90)")는 포함
       style={{ aspectRatio: "68 / 96" }}
     >
-      {/* 원본 이미지 (배경) */}
+      {/* 원본 이미지 (배경) — 텍스트 헤더 + 피치 + 액션 라인 포함 */}
       <div
         className="absolute inset-0 bg-top bg-no-repeat"
         style={{
@@ -116,11 +111,65 @@ function ActionMapImage({
   );
 }
 
-function LegendItem({ color, label }: { color: string; label: string }) {
+/** 공유 범례 — 원본 ScoutLab 범례와 동일한 구성
+ * Start → End | Low xT ● ● ● ● High xT | ● Progressive ● xT > 0.02
+ */
+function ActionMapLegend() {
   return (
-    <span className="flex items-center gap-1 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
-      <span className={`inline-block size-2.5 rounded-full ${color}`} />
-      {label}
-    </span>
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-comic-black/10 pt-3 text-[11px] text-muted-foreground">
+      {/* Start → End 그라데이션 라인 */}
+      <span className="flex items-center gap-1.5">
+        <span className="text-muted-foreground/70">Start</span>
+        <svg width="40" height="6" className="shrink-0">
+          <defs>
+            <linearGradient id="line-grad">
+              <stop offset="0%" stopColor="currentColor" stopOpacity="0.3" />
+              <stop offset="100%" stopColor="#e91e8c" />
+            </linearGradient>
+          </defs>
+          <line
+            x1="0"
+            y1="3"
+            x2="34"
+            y2="3"
+            stroke="url(#line-grad)"
+            strokeWidth="2"
+          />
+          <circle cx="37" cy="3" r="2.5" fill="#e91e8c" />
+        </svg>
+        <span className="text-muted-foreground/70">End</span>
+      </span>
+
+      {/* Low xT → High xT 원 크기 */}
+      <span className="flex items-center gap-1.5">
+        <span className="text-muted-foreground/70">Low xT</span>
+        {[3, 4.5, 6, 8].map((size) => (
+          <span
+            key={size}
+            className="inline-block shrink-0 rounded-full bg-muted-foreground/30"
+            style={{ width: size, height: size }}
+          />
+        ))}
+        <span className="text-muted-foreground/70">High xT</span>
+      </span>
+
+      {/* Progressive (핑크) */}
+      <span className="flex items-center gap-1.5">
+        <span
+          className="inline-block size-2.5 rounded-full"
+          style={{ backgroundColor: "#e91e8c" }}
+        />
+        Progressive
+      </span>
+
+      {/* xT > 0.02 (시안) */}
+      <span className="flex items-center gap-1.5">
+        <span
+          className="inline-block size-2.5 rounded-full"
+          style={{ backgroundColor: "#22d3ee" }}
+        />
+        xT &gt; 0.02
+      </span>
+    </div>
   );
 }
