@@ -286,7 +286,9 @@ export async function navigateBackToPlayerCard(
   const btn = iframe.locator('button:has-text("Player Card")').first();
   if ((await btn.count()) > 0) {
     await btn.click();
-    await page.waitForTimeout(2000);
+    await waitForStreamlitUpdate(iframe, page);
+    // Player combobox가 완전히 렌더링될 때까지 추가 대기
+    await page.waitForTimeout(1500);
   }
 }
 

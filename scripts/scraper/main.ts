@@ -538,7 +538,13 @@ async function main(): Promise<void> {
           logInfo(`\n[${ti + 1}/${teams.length}] 팀: ${team}`);
 
           try {
+            // 팀 전환 전 Player Card 탭 확인 (Action Maps에서 복귀 후 stale 방지)
+            await selectSidebarTab(iframe, page, "Player Card");
+            await page.waitForTimeout(1000);
+
             await selectTeam(iframe, page, team);
+            // 팀 선택 후 Player combobox 업데이트 대기
+            await page.waitForTimeout(2000);
             const players = await extractPlayerList(iframe, page);
             logInfo(`  선수 ${players.length}명 발견`);
             stats.totalPlayers += players.length;

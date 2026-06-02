@@ -29,15 +29,15 @@ export async function launchBrowser(
 /** ScoutLab 접속 후 FrameLocator 반환 */
 export async function navigateToScoutLab(page: Page): Promise<FrameLocator> {
   logInfo(`ScoutLab 접속: ${SCOUTLAB_URL}`);
-  await page.goto(SCOUTLAB_URL, { waitUntil: "load", timeout: 60_000 });
+  await page.goto(SCOUTLAB_URL, { waitUntil: "load", timeout: 120_000 });
 
   // Streamlit iframe FrameLocator (lazy — 항상 최신 iframe 참조)
   const iframe = page.frameLocator('iframe[title="streamlitApp"]');
 
-  // Player Card 버튼이 나타날 때까지 대기
+  // Player Card 버튼이 나타날 때까지 대기 (콜드 스타트 대비 120초)
   await iframe
     .locator("button:has-text('Player Card')")
-    .waitFor({ state: "visible", timeout: 60_000 });
+    .waitFor({ state: "visible", timeout: 120_000 });
   logInfo("Streamlit iframe 감지 완료");
 
   await waitForStreamlitReady(iframe, page);
