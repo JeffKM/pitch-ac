@@ -3,10 +3,10 @@ import { GitCompareArrows, SearchX } from "lucide-react";
 
 import {
   getDefaultScoutlabPlayer,
+  getScoutlabFilterOptions,
   getScoutlabMetrics,
   getScoutlabPlayerById,
   getScoutlabRadar,
-  searchScoutlabPlayers,
 } from "@/lib/repositories/scoutlab-repository";
 
 import { MetricCompareTable } from "../_components/metric-compare-table";
@@ -14,6 +14,8 @@ import { MetricContextSubtitle } from "../_components/metric-context-subtitle";
 import { PlayerCardHeader } from "../_components/player-card-header";
 import { DynamicRadarChart } from "../_components/scoutlab-charts";
 import { ScoutlabCompareSearch } from "../_components/scoutlab-compare-search";
+import { ScoutlabFilterBar } from "../_components/scoutlab-filter-bar";
+import { ScoutlabGlobalSearch } from "../_components/scoutlab-global-search";
 import { positionToComparisonPosition } from "../_lib/scoutlab-constants";
 import { parseScoutlabParams } from "../_lib/scoutlab-search-params";
 
@@ -31,9 +33,9 @@ export default async function ScoutingComparePage({ searchParams }: PageProps) {
     : raw.compareId;
   const compareId = compareIdStr ? parseInt(compareIdStr, 10) : null;
 
-  // 선수 목록 + 두 선수 데이터 병렬 조회 (기본: Haaland)
-  const [players, playerA, playerB] = await Promise.all([
-    searchScoutlabPlayers({ season: params.season }),
+  // 필터 옵션 + 두 선수 데이터 병렬 조회 (기본: Haaland)
+  const [filterOptions, playerA, playerB] = await Promise.all([
+    getScoutlabFilterOptions(params.season),
     params.playerId
       ? getScoutlabPlayerById(params.playerId)
       : getDefaultScoutlabPlayer(params.season),
@@ -77,7 +79,7 @@ export default async function ScoutingComparePage({ searchParams }: PageProps) {
         <div className="text-center">
           <SearchX className="mx-auto size-10 text-comic-black/20" />
           <p className="mt-3 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-lg)] text-comic-black/50">
-            Player Card 탭에서 선수를 선택하세요.
+            상단 검색창에서 선수를 선택하세요.
           </p>
         </div>
       </div>
@@ -86,6 +88,12 @@ export default async function ScoutingComparePage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-4">
+      {/* 필터 바 + 기준 선수 검색 (한 줄) */}
+      <div className="flex flex-wrap items-center gap-3">
+        <ScoutlabFilterBar options={filterOptions} />
+        <ScoutlabGlobalSearch />
+      </div>
+
       <MetricContextSubtitle
         comparisonPosition={effectiveComparisonPosition}
         mode={params.mode}
@@ -107,7 +115,7 @@ export default async function ScoutingComparePage({ searchParams }: PageProps) {
               <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] text-comic-black/50">
                 비교 선수를 선택하세요
               </p>
-              <ScoutlabCompareSearch players={players} />
+              <ScoutlabCompareSearch />
             </div>
           </div>
         )}
@@ -117,7 +125,7 @@ export default async function ScoutingComparePage({ searchParams }: PageProps) {
       {playerB && (
         <div className="flex items-center gap-2">
           <span className="text-xs text-comic-black/50">비교 대상 변경:</span>
-          <ScoutlabCompareSearch players={players} />
+          <ScoutlabCompareSearch />
         </div>
       )}
 

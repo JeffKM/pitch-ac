@@ -6,15 +6,14 @@ import {
   getScoutlabFilterOptions,
   getScoutlabMetrics,
   getScoutlabPlayerById,
-  searchScoutlabPlayers,
 } from "@/lib/repositories/scoutlab-repository";
 
 import { MetricCategoryTable } from "./_components/metric-category-table";
 import { MetricContextSubtitle } from "./_components/metric-context-subtitle";
 import { PlayerCardHeader } from "./_components/player-card-header";
 import { ScoutlabFilterBar } from "./_components/scoutlab-filter-bar";
+import { ScoutlabGlobalSearch } from "./_components/scoutlab-global-search";
 import { ScoutlabModeToggle } from "./_components/scoutlab-mode-toggle";
-import { ScoutlabPlayerSearch } from "./_components/scoutlab-player-search";
 import { ScoutlabPositionFilter } from "./_components/scoutlab-position-filter";
 import { positionToComparisonPosition } from "./_lib/scoutlab-constants";
 import { parseScoutlabParams } from "./_lib/scoutlab-search-params";
@@ -26,14 +25,9 @@ interface PageProps {
 export default async function ScoutingPage({ searchParams }: PageProps) {
   const params = parseScoutlabParams(await searchParams);
 
-  // 필터 옵션 + 선수 목록 + 선택된 선수 데이터 병렬 조회
-  const [filterOptions, players, selectedPlayer] = await Promise.all([
+  // 필터 옵션 + 선택된 선수 데이터 병렬 조회
+  const [filterOptions, selectedPlayer] = await Promise.all([
     getScoutlabFilterOptions(params.season),
-    searchScoutlabPlayers({
-      season: params.season,
-      league: params.league ?? undefined,
-      team: params.team ?? undefined,
-    }),
     params.playerId
       ? getScoutlabPlayerById(params.playerId)
       : getDefaultScoutlabPlayer(params.season),
@@ -59,13 +53,10 @@ export default async function ScoutingPage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-4">
-      {/* 필터 바 */}
+      {/* 필터 바 + 선수 검색 (한 줄) */}
       <div className="flex flex-wrap items-center gap-3">
-        <ScoutlabPlayerSearch
-          players={players}
-          selectedPlayer={selectedPlayer}
-        />
         <ScoutlabFilterBar options={filterOptions} />
+        <ScoutlabGlobalSearch />
       </div>
 
       {/* 포지션 필터 + 모드 토글 */}
@@ -90,7 +81,7 @@ export default async function ScoutingPage({ searchParams }: PageProps) {
           )}
         </div>
       ) : (
-        <EmptyState message="좌측 검색창에서 선수를 선택하세요." />
+        <EmptyState message="상단 검색창에서 선수를 선택하세요." />
       )}
     </div>
   );

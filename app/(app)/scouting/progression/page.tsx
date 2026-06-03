@@ -3,12 +3,15 @@ import { SearchX } from "lucide-react";
 
 import {
   getDefaultScoutlabPlayer,
+  getScoutlabFilterOptions,
   getScoutlabPlayerById,
   getScoutlabProgression,
 } from "@/lib/repositories/scoutlab-repository";
 
 import { PlayerCardHeader } from "../_components/player-card-header";
 import { ProgressionView } from "../_components/progression-view";
+import { ScoutlabFilterBar } from "../_components/scoutlab-filter-bar";
+import { ScoutlabGlobalSearch } from "../_components/scoutlab-global-search";
 import { positionToComparisonPosition } from "../_lib/scoutlab-constants";
 import { parseScoutlabParams } from "../_lib/scoutlab-search-params";
 
@@ -19,9 +22,12 @@ interface PageProps {
 export default async function ProgressionPage({ searchParams }: PageProps) {
   const params = parseScoutlabParams(await searchParams);
 
-  const selectedPlayer = params.playerId
-    ? await getScoutlabPlayerById(params.playerId)
-    : await getDefaultScoutlabPlayer(params.season);
+  const [filterOptions, selectedPlayer] = await Promise.all([
+    getScoutlabFilterOptions(params.season),
+    params.playerId
+      ? getScoutlabPlayerById(params.playerId)
+      : getDefaultScoutlabPlayer(params.season),
+  ]);
 
   const effectiveComparisonPosition =
     params.isComparisonPositionExplicit || !selectedPlayer
@@ -65,6 +71,10 @@ export default async function ProgressionPage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-3">
+        <ScoutlabFilterBar options={filterOptions} />
+        <ScoutlabGlobalSearch />
+      </div>
       <PlayerCardHeader player={selectedPlayer} />
 
       <div className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-thin)] border-comic-black/20 bg-comic-white p-5">

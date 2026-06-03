@@ -1,8 +1,8 @@
-// ScoutLab Compare — 비교 선수 검색 Combobox (Client)
+// ScoutLab Compare — 비교 선수 검색 (API 기반 async 검색)
 "use client";
 
-import { Check, ChevronsUpDown, Search } from "lucide-react";
-import { useCallback, useState, useTransition } from "react";
+import { Loader2, Search } from "lucide-react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,18 +18,55 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import type { ScoutlabPlayer } from "@/types";
 
 import { useScoutlabParams } from "../_lib/use-scoutlab-params";
 
-interface ScoutlabCompareSearchProps {
-  players: ScoutlabPlayer[];
+interface SearchResult {
+  id: number;
+  name: string;
+  team: string;
+  league: string;
+  position: string;
 }
 
-export function ScoutlabCompareSearch({ players }: ScoutlabCompareSearchProps) {
+export function ScoutlabCompareSearch() {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
   const [, startTransition] = useTransition();
-  const { setParams } = useScoutlabParams();
+  const { season, setParams } = useScoutlabParams();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
+
+  // debounce 검색
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    if (query.length < 2) {
+      setResults([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `/api/scoutlab/players/search?q=${encodeURIComponent(query)}&season=${encodeURIComponent(season)}`,
+        );
+        if (res.ok) {
+          const data: SearchResult[] = await res.json();
+          setResults(data);
+        }
+      } finally {
+        setLoading(false);
+      }
+    }, 300);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [query, season]);
 
   const handleSelect = useCallback(
     (id: number) => {
@@ -37,6 +74,7 @@ export function ScoutlabCompareSearch({ players }: ScoutlabCompareSearchProps) {
         setParams({ compareId: id });
       });
       setOpen(false);
+      setQuery("");
     },
     [setParams],
   );
@@ -54,29 +92,42 @@ export function ScoutlabCompareSearch({ players }: ScoutlabCompareSearchProps) {
             <Search className="size-3.5" />
             비교 선수 검색...
           </span>
-          <ChevronsUpDown className="ml-2 size-3.5 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[220px] p-0" align="start">
-        <Command>
-          <CommandInput placeholder="선수 이름..." />
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder="선수 이름..."
+            value={query}
+            onValueChange={setQuery}
+          />
           <CommandList>
-            <CommandEmpty>결과 없음</CommandEmpty>
-            <CommandGroup>
-              {players.map((player) => (
-                <CommandItem
-                  key={player.id}
-                  value={`${player.name} ${player.team}`}
-                  onSelect={() => handleSelect(player.id)}
-                >
-                  <Check className="mr-2 size-3.5 opacity-0" />
-                  <span className="flex-1 truncate text-sm">{player.name}</span>
-                  <span className="text-xs text-comic-black/40">
-                    {player.team}
-                  </span>
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            {loading && (
+              <div className="flex items-center justify-center py-6">
+                <Loader2 className="size-4 animate-spin text-comic-black/40" />
+              </div>
+            )}
+            {!loading && query.length >= 2 && results.length === 0 && (
+              <CommandEmpty>결과 없음</CommandEmpty>
+            )}
+            {!loading && results.length > 0 && (
+              <CommandGroup>
+                {results.map((player) => (
+                  <CommandItem
+                    key={player.id}
+                    value={String(player.id)}
+                    onSelect={() => handleSelect(player.id)}
+                  >
+                    <span className="flex-1 truncate text-sm">
+                      {player.name}
+                    </span>
+                    <span className="text-xs text-comic-black/40">
+                      {player.team}
+                    </span>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
           </CommandList>
         </Command>
       </PopoverContent>

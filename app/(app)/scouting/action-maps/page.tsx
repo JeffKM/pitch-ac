@@ -4,11 +4,14 @@ import { SearchX } from "lucide-react";
 import {
   getDefaultScoutlabPlayer,
   getScoutlabActionMaps,
+  getScoutlabFilterOptions,
   getScoutlabPlayerById,
 } from "@/lib/repositories/scoutlab-repository";
 
 import { ActionMapGrid } from "../_components/action-map-grid";
 import { PlayerCardHeader } from "../_components/player-card-header";
+import { ScoutlabFilterBar } from "../_components/scoutlab-filter-bar";
+import { ScoutlabGlobalSearch } from "../_components/scoutlab-global-search";
 import { parseScoutlabParams } from "../_lib/scoutlab-search-params";
 
 interface PageProps {
@@ -18,10 +21,13 @@ interface PageProps {
 export default async function ActionMapsPage({ searchParams }: PageProps) {
   const params = parseScoutlabParams(await searchParams);
 
-  // 선수 조회 (기본: Haaland)
-  const selectedPlayer = params.playerId
-    ? await getScoutlabPlayerById(params.playerId)
-    : await getDefaultScoutlabPlayer(params.season);
+  // 필터 옵션 + 선수 조회 (기본: Haaland)
+  const [filterOptions, selectedPlayer] = await Promise.all([
+    getScoutlabFilterOptions(params.season),
+    params.playerId
+      ? getScoutlabPlayerById(params.playerId)
+      : getDefaultScoutlabPlayer(params.season),
+  ]);
 
   const actionMaps = selectedPlayer
     ? await getScoutlabActionMaps(selectedPlayer.id, params.season)
@@ -42,6 +48,10 @@ export default async function ActionMapsPage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-3">
+        <ScoutlabFilterBar options={filterOptions} />
+        <ScoutlabGlobalSearch />
+      </div>
       <PlayerCardHeader player={selectedPlayer} />
 
       <div className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-thin)] border-comic-black/20 bg-comic-white p-5">
