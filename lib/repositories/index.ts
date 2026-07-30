@@ -1,6 +1,7 @@
 // Repository 레이어 re-export
 import "server-only";
 
+export type { CurrentGameweek } from "./fixture-repository";
 export {
   getCurrentGameweek,
   getFixtureById,

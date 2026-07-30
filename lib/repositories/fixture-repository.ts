@@ -9,22 +9,29 @@ import type { Fixture } from "@/types";
 
 import { type FixtureRow, fixtureRowToFixture } from "./mappers";
 
+/** 현재 게임위크 판별 결과 — 기준 경기의 시즌을 함께 반환 */
+export interface CurrentGameweek {
+  gameweek: number;
+  /** 기준 경기의 시즌 라벨 (해당 리그 데이터가 없으면 null) */
+  season: string | null;
+}
+
 /**
  * 현재 게임위크 감지 (리그별):
  * 1) LIVE 경기가 있는 gameweek
  * 2) 가장 가까운 미래 NS 경기의 gameweek
  * 3) 가장 최근 종료된 FT 경기의 gameweek
- * 4) fallback: 1
+ * 4) fallback: 1 (시즌 미상)
  */
 export const getCurrentGameweek = cache(
-  async (leagueId: number = PL_LEAGUE_ID): Promise<number> => {
+  async (leagueId: number = PL_LEAGUE_ID): Promise<CurrentGameweek> => {
     const supabase = await createClient();
 
     const [liveResult, nextResult, lastResult] = await Promise.all([
       // 1) LIVE 경기
       supabase
         .from("fixtures")
-        .select("gameweek")
+        .select("gameweek, season")
         .eq("status", "LIVE")
         .eq("league_id", leagueId)
         .not("gameweek", "is", null)
@@ -33,7 +40,7 @@ export const getCurrentGameweek = cache(
       // 2) 가장 가까운 미래 NS 경기 (POSTP 제외)
       supabase
         .from("fixtures")
-        .select("gameweek")
+        .select("gameweek, season")
         .eq("status", "NS")
         .eq("league_id", leagueId)
         .not("gameweek", "is", null)
@@ -44,7 +51,7 @@ export const getCurrentGameweek = cache(
       // 3) 가장 최근 FT 경기
       supabase
         .from("fixtures")
-        .select("gameweek")
+        .select("gameweek, season")
         .eq("status", "FT")
         .eq("league_id", leagueId)
         .not("gameweek", "is", null)
@@ -54,11 +61,17 @@ export const getCurrentGameweek = cache(
     ]);
 
     // 우선순위: LIVE > NS(미래) > FT(과거) > fallback(1)
-    if (liveResult.data?.gameweek) return liveResult.data.gameweek;
-    if (nextResult.data?.gameweek) return nextResult.data.gameweek;
-    if (lastResult.data?.gameweek) return lastResult.data.gameweek;
+    for (const result of [liveResult, nextResult, lastResult]) {
+      const row = result.data as {
+        gameweek: number | null;
+        season: string;
+      } | null;
+      if (row?.gameweek) {
+        return { gameweek: row.gameweek, season: row.season };
+      }
+    }
 
-    return 1;
+    return { gameweek: 1, season: null };
   },
 );
 
@@ -80,19 +93,24 @@ export const getFixtureById = cache(
   },
 );
 
-/** 게임위크별 리그 전체 경기 조회 (기본값: PL) */
+/** 게임위크별 리그 전체 경기 조회 (기본값: PL, season 지정 시 해당 시즌만) */
 export async function getFixturesByGameweek(
   gameweek: number,
   leagueId: number = PL_LEAGUE_ID,
+  season?: string,
 ): Promise<Fixture[]> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("fixtures")
     .select("*")
     .eq("gameweek", gameweek)
-    .eq("league_id", leagueId)
-    .order("date", { ascending: true });
+    .eq("league_id", leagueId);
+
+  // 시즌 미지정 시 과거 시즌의 같은 라운드가 섞일 수 있으므로 가능한 항상 지정한다
+  if (season) query = query.eq("season", season);
+
+  const { data, error } = await query.order("date", { ascending: true });
 
   if (error) throw new Error(`fixtures 조회 실패: ${error.message}`);
 
