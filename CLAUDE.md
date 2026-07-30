@@ -1,8 +1,8 @@
 # pitch-ac
 
-PL(프리미어리그) 선수·경기 데이터를 맥락과 함께 시각적으로 보여주는 데이터 플랫폼.
-핵심 기능: 선수 프로필(스탯+맥락), 선수 비교 배틀카드, 매치데이 대시보드.
-현재 상태: Supabase 스타터킷 기반, 인증 플로우 구현됨. MVP 개발 초기 단계.
+유럽 5대 리그(PL, La Liga, Serie A, Bundesliga, Ligue 1) 경기·순위·선수 데이터를 맥락과 함께 시각화하는 축구 데이터 플랫폼.
+핵심 기능: 매치데이 대시보드, Ranking(5대 리그+UCL 순위표), ScoutLab(60+ 메트릭 스카우팅 분석), News(이적뉴스 큐레이션).
+현재 상태: 5대 리그 데이터 인프라·ScoutLab 1,519명 완료. 로드맵은 `docs/ROADMAP.md` 참조.
 
 ## 개발 명령어
 
@@ -40,6 +40,18 @@ npm run validate     # type-check + lint + format:check 통합 검증
 - 축구 전문 용어(xG, xA 등)에는 설명 팝오버 제공
 - 커스텀 CSS 파일 금지, Tailwind 유틸리티 클래스만 사용
 - `@/*` path alias 사용
+
+## 개발 워크플로우 (스킬 기반)
+
+작업 유형별 표준 프로세스. 해당 유형의 작업을 시작하기 전에 명시된 스킬을 로드한다.
+
+- **기능 개발**: `superpowers:brainstorming`(설계 합의) → `superpowers:writing-plans`(구현 계획) → `superpowers:test-driven-development` → `code-reviewer`(리뷰)
+- **UI 작업**: 기능 개발 프로세스 + 완료 전 `design-review` 또는 `web-design-guidelines` 통과
+- **버그 수정**: `superpowers:systematic-debugging` — 근본 원인 규명 전 수정 금지
+- **배포 전 검증**: `qa`(Playwright 시나리오) + `security-scan`
+- **DB/쿼리 작업**: `postgres-best-practices` 참조 + Supabase advisors 확인
+- **차트/시각화**: `dataviz` 로드 후 작성
+- **로드맵 관리**: `development-planner` 스킬 사용. Phase 헤더의 `> 적용 스킬:` 태그 유지
 
 ## Supabase 인증
 
