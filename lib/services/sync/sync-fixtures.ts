@@ -5,11 +5,7 @@ import {
   mapFdMatchToFixture,
 } from "@/lib/api/football-data";
 import type { FdMatch } from "@/lib/api/football-data/types";
-import {
-  ALL_COMPETITIONS,
-  CURRENT_SEASON,
-  PL_LEAGUE_ID,
-} from "@/lib/constants/football";
+import { ALL_COMPETITIONS, PL_LEAGUE_ID } from "@/lib/constants/football";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 import { fixtureToDbRow, teamToDbRow } from "./db-mappers";
@@ -38,7 +34,7 @@ export async function syncLeagueFixtures(
       .eq("league_id", leagueId);
     const postpIds = new Set((postpRows ?? []).map((r) => r.id));
 
-    const allMatches = await getCompetitionMatches(leagueCode, CURRENT_SEASON);
+    const { matches: allMatches } = await getCompetitionMatches(leagueCode);
 
     // 팀 정보 upsert — matches에서 추출
     const seenTeamIds = new Set<number>();

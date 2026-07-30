@@ -8,7 +8,6 @@ import {
   mapFdTeamToTeam,
 } from "@/lib/api/football-data";
 import {
-  CURRENT_SEASON,
   CURRENT_SEASON_LABEL,
   toScoutlabSeason,
 } from "@/lib/constants/football";
@@ -31,10 +30,10 @@ export async function syncPlayers(): Promise<SyncResult> {
 
   try {
     // 1. 팀 + squad 데이터 조회
-    const teamsRes = await getCompetitionTeams(LEAGUE_CODE, CURRENT_SEASON);
+    const teamsRes = await getCompetitionTeams(LEAGUE_CODE);
 
     // 2. 득점자 정보 조회 (등번호 + 출전경기수 보강용)
-    const scorersRes = await getCompetitionScorers(LEAGUE_CODE, CURRENT_SEASON);
+    const scorersRes = await getCompetitionScorers(LEAGUE_CODE);
 
     // 3. scorers Map: playerId → { shirtNumber, playedMatches, section }
     const scorersMap = new Map<

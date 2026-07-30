@@ -6,7 +6,7 @@ import {
   mapFdStandingToTeamStanding,
   mapFdTeamToTeam,
 } from "@/lib/api/football-data";
-import { ALL_COMPETITIONS, CURRENT_SEASON } from "@/lib/constants/football";
+import { ALL_COMPETITIONS } from "@/lib/constants/football";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 import { standingToDbRow, teamToDbRow } from "./db-mappers";
@@ -20,7 +20,7 @@ export async function syncTeams(
 ): Promise<SyncResult> {
   const supabase = createAdminClient();
   try {
-    const res = await getCompetitionTeams(leagueCode, CURRENT_SEASON);
+    const res = await getCompetitionTeams(leagueCode);
 
     const teamRows = res.teams.map((raw) => {
       const team = mapFdTeamToTeam(raw, SEASON_LABEL);
@@ -69,10 +69,7 @@ export async function syncStandings(
 ): Promise<SyncResult> {
   const supabase = createAdminClient();
   try {
-    const standingsRes = await getCompetitionStandings(
-      leagueCode,
-      CURRENT_SEASON,
-    );
+    const standingsRes = await getCompetitionStandings(leagueCode);
     const totalTable = standingsRes.standings.find((s) => s.type === "TOTAL");
     if (!totalTable?.table?.length) {
       throw new Error(`${leagueCode} 순위표 응답이 비어있습니다`);

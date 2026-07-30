@@ -9,7 +9,7 @@ export async function GET() {
   }
 
   try {
-    const matches = await getCompetitionMatches("PL");
+    const { matches } = await getCompetitionMatches("PL");
     const statusCounts = matches.reduce(
       (acc, m) => {
         acc[m.status] = (acc[m.status] || 0) + 1;
