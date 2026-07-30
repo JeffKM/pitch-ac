@@ -16,6 +16,7 @@ describe("parseScoutlabParams", () => {
       mode: "per90",
       adjustment: "padj",
       comparisonPosition: "AM/W",
+      isComparisonPositionExplicit: false,
     });
   });
 
@@ -39,6 +40,7 @@ describe("parseScoutlabParams", () => {
       mode: "total",
       adjustment: "raw",
       comparisonPosition: "CB",
+      isComparisonPositionExplicit: true,
     });
   });
 

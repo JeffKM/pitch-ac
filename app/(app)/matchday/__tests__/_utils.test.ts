@@ -33,10 +33,10 @@ function makeFixture(overrides: Partial<Fixture> = {}): Fixture {
 describe("groupFixturesByLeague", () => {
   it("리그별로 그룹핑하고 TOP5_LEAGUES 순서 유지", () => {
     const fixtures = [
-      makeFixture({ id: 1, leagueId: 135 }), // Serie A
-      makeFixture({ id: 2, leagueId: 39 }), // EPL
-      makeFixture({ id: 3, leagueId: 135 }), // Serie A
-      makeFixture({ id: 4, leagueId: 61 }), // Ligue 1
+      makeFixture({ id: 1, leagueId: 2019 }), // Serie A
+      makeFixture({ id: 2, leagueId: 2021 }), // EPL
+      makeFixture({ id: 3, leagueId: 2019 }), // Serie A
+      makeFixture({ id: 4, leagueId: 2015 }), // Ligue 1
     ];
     const groups = groupFixturesByLeague(fixtures);
     expect(groups).toHaveLength(3);
@@ -51,7 +51,7 @@ describe("groupFixturesByLeague", () => {
 
   it("경기 없는 리그는 생략", () => {
     const fixtures = [
-      makeFixture({ id: 1, leagueId: 78 }), // Bundesliga
+      makeFixture({ id: 1, leagueId: 2002 }), // Bundesliga
     ];
     const groups = groupFixturesByLeague(fixtures);
     expect(groups).toHaveLength(1);
@@ -132,7 +132,7 @@ describe("buildDateRange", () => {
   it("컵 경기 날짜는 범위에서 제외", () => {
     const fixtures = [
       // PL 경기: 3/22 (football-data.org PL competition_id = 2021)
-      makeFixture({ id: 1, date: "2026-03-22T20:00:00Z", leagueId: 39 }),
+      makeFixture({ id: 1, date: "2026-03-22T20:00:00Z", leagueId: 2021 }),
       // FA Cup 경기: 3/8 (범위에 포함되면 안 됨)
       makeFixture({
         id: 2,
