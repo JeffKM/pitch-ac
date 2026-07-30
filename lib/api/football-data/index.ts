@@ -5,6 +5,7 @@ export * from "./fixtures";
 export * from "./mappers";
 export { getUsage } from "./rate-limiter";
 export * from "./scorers";
+export * from "./season";
 export * from "./standings";
 export * from "./teams";
 export type {
