@@ -59,9 +59,9 @@ const mockTeamsResponse = {
   competition: { id: 2021, name: "PL", code: "PL", type: "LEAGUE", emblem: "" },
   season: {
     id: 1,
-    startDate: "2025-08-01",
-    endDate: "2026-05-31",
-    currentMatchday: 35,
+    startDate: "2026-08-21",
+    endDate: "2027-05-30",
+    currentMatchday: 1,
     winner: null,
   },
   teams: [
@@ -288,5 +288,21 @@ describe("syncPlayers", () => {
 
     expect(result.status).toBe("error");
     expect(result.errorMessage).toContain("FK violation");
+  });
+
+  it("teams 행은 API 응답에서 파생한 시즌을 사용", async () => {
+    await syncPlayers();
+
+    const teamRows = upsertCalls["teams"]![0][0] as Array<{ season: string }>;
+    expect(teamRows[0].season).toBe("2026/2027");
+  });
+
+  it("scoutlab_players 행은 활성 시즌(25/26)에 고정", async () => {
+    await syncPlayers();
+
+    const scoutlabRows = upsertCalls["scoutlab_players"]![0][0] as Array<{
+      season: string;
+    }>;
+    expect(scoutlabRows.every((row) => row.season === "25/26")).toBe(true);
   });
 });

@@ -1,16 +1,14 @@
 import "server-only";
 
 import {
+  deriveSeasonLabel,
   getCompetitionScorers,
   getCompetitionTeams,
   mapFdSquadPlayerToPlayer,
   mapFdSquadPlayerToScoutlabRow,
   mapFdTeamToTeam,
 } from "@/lib/api/football-data";
-import {
-  CURRENT_SEASON_LABEL,
-  toScoutlabSeason,
-} from "@/lib/constants/football";
+import { SCOUTLAB_ACTIVE_SEASON } from "@/lib/constants/scoutlab";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 import { playerToDbRow, teamToDbRow } from "./db-mappers";
@@ -18,8 +16,8 @@ import { extractErrorMessage, type SyncResult, writeSyncLog } from "./log";
 
 const LEAGUE = "Premier League";
 const LEAGUE_CODE = "PL";
-const SEASON_LABEL = CURRENT_SEASON_LABEL;
-const SCOUTLAB_SEASON = toScoutlabSeason(SEASON_LABEL);
+// ScoutLab 데이터 수집은 아직 25/26 기준 — Phase SR04에서 전환한다
+const SCOUTLAB_SEASON: string = SCOUTLAB_ACTIVE_SEASON;
 
 /**
  * PL 선수 동기화 — /competitions/PL/teams의 squad 데이터를
@@ -31,6 +29,7 @@ export async function syncPlayers(): Promise<SyncResult> {
   try {
     // 1. 팀 + squad 데이터 조회
     const teamsRes = await getCompetitionTeams(LEAGUE_CODE);
+    const seasonLabel = deriveSeasonLabel(teamsRes.season);
 
     // 2. 득점자 정보 조회 (등번호 + 출전경기수 보강용)
     const scorersRes = await getCompetitionScorers(LEAGUE_CODE);
@@ -54,7 +53,7 @@ export async function syncPlayers(): Promise<SyncResult> {
 
     // 4. teams 테이블 upsert (FK 보장)
     const teamRows = teamsRes.teams.map((raw) => {
-      const team = mapFdTeamToTeam(raw, SEASON_LABEL);
+      const team = mapFdTeamToTeam(raw, seasonLabel);
       return teamToDbRow(team);
     });
 
