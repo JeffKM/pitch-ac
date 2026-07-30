@@ -2,7 +2,6 @@
 
 import type { Metadata } from "next";
 
-import { CURRENT_SEASON_LABEL } from "@/lib/constants/football";
 import {
   formatFullDate,
   getTodayDateKey,
@@ -58,7 +57,7 @@ export default async function MatchdayPage({ searchParams }: PageProps) {
 
   const [teamsMap, standingsMap] = await Promise.all([
     getTeamsByIds(teamIds),
-    getStandingsByTeamIds(teamIds, CURRENT_SEASON_LABEL),
+    getStandingsByTeamIds(teamIds),
   ]);
 
   const initialData = {

@@ -3,7 +3,6 @@
 
 import { type NextRequest, NextResponse } from "next/server";
 
-import { CURRENT_SEASON_LABEL } from "@/lib/constants/football";
 import { isValidDateKey } from "@/lib/date-utils";
 import {
   getFixturesByDate,
@@ -47,7 +46,7 @@ export async function GET(request: NextRequest) {
 
     const [teamsMap, standingsMap] = await Promise.all([
       getTeamsByIds(teamIds),
-      getStandingsByTeamIds(teamIds, CURRENT_SEASON_LABEL),
+      getStandingsByTeamIds(teamIds),
     ]);
 
     const data: MatchdayData = {

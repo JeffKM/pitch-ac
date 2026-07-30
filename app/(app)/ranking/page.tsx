@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { PageLoadingIndicator } from "@/components/page-loading-indicator";
-import { CURRENT_SEASON_LABEL } from "@/lib/constants/football";
 import { getAllLeagueStandings, getAllTeams } from "@/lib/repositories";
 import type { Team, TeamStanding } from "@/types";
 
@@ -17,7 +16,7 @@ export const metadata: Metadata = {
 
 async function RankingData() {
   const [standingsMap, teams] = await Promise.all([
-    getAllLeagueStandings(CURRENT_SEASON_LABEL),
+    getAllLeagueStandings(),
     getAllTeams(),
   ]);
 

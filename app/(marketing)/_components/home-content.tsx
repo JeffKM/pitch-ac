@@ -2,7 +2,7 @@
 
 import { connection } from "next/server";
 
-import { CURRENT_SEASON_LABEL, PL_LEAGUE_ID } from "@/lib/constants/football";
+import { PL_LEAGUE_ID } from "@/lib/constants/football";
 import { getTodayDateKey } from "@/lib/date-utils";
 import {
   getCurrentGameweek,
@@ -49,7 +49,7 @@ export async function HomeContent() {
   const [todayFixtures, standingsMap, currentGameweek, latestNews] =
     await Promise.all([
       getFixturesByDate(todayDate),
-      getAllLeagueStandings(CURRENT_SEASON_LABEL),
+      getAllLeagueStandings(),
       getCurrentGameweek(PL_LEAGUE_ID),
       getLatestNews(3),
     ]);

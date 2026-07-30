@@ -1,7 +1,6 @@
 // Fixture 상세 데이터 조립 서비스 — page.tsx와 API route 공통 로직
 import "server-only";
 
-import { CURRENT_SEASON_LABEL } from "@/lib/constants/football";
 import {
   getInjuriesByTeamId,
   getStandingsByTeamIds,
@@ -24,7 +23,7 @@ export async function assembleFixtureDetail(
   const [teamsMap, standingsMap, h2hResults, homeInjuries, awayInjuries] =
     await Promise.all([
       getTeamsByIds(teamIds),
-      getStandingsByTeamIds(teamIds, CURRENT_SEASON_LABEL),
+      getStandingsByTeamIds(teamIds),
       fetchH2HResults(fixture.homeTeamId, fixture.awayTeamId).catch(
         () => [] as H2HResult[],
       ),
