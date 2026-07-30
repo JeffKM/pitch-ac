@@ -21,6 +21,7 @@ export type {
 export { getLatestNews } from "./news-repository";
 export {
   getAllPlayers,
+  getLatestPlayerSeasonStats,
   getMatchStatsByPlayerId,
   getPlayerById,
   getPlayerSeasonStats,

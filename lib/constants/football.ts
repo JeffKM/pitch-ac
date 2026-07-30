@@ -1,15 +1,10 @@
 // 축구 도메인 공통 상수 — API 소스에 무관한 값만 정의
+// 시즌 값은 상수로 두지 않는다: 대회마다 롤오버 시점이 달라 API 응답/DB에서 파생한다.
 
 import type { FixtureStatus } from "@/types/fixture";
 
 /** Premier League ID (football-data.org 기준) */
 export const PL_LEAGUE_ID = 2021;
-
-/** 현재 시즌 (football-data.org 형식: 연도) */
-export const CURRENT_SEASON = 2025;
-
-/** 현재 시즌 레이블 — DB standings/teams 테이블의 season 컬럼 값 */
-export const CURRENT_SEASON_LABEL = "2025/2026";
 
 /** 맨체스터 시티 팀 ID (football-data.org 기준) */
 export const MCITY_TEAM_ID = 65;
