@@ -1,6 +1,7 @@
 import "server-only";
 
 import {
+  deriveSeasonLabel,
   getCompetitionStandings,
   getCompetitionTeams,
   mapFdStandingToTeamStanding,
@@ -12,8 +13,6 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { standingToDbRow, teamToDbRow } from "./db-mappers";
 import { extractErrorMessage, type SyncResult, writeSyncLog } from "./log";
 
-const SEASON_LABEL = "2025/2026";
-
 /** 단일 리그 팀 기본정보 동기화 */
 export async function syncTeams(
   leagueCode: string = "PL",
@@ -21,9 +20,10 @@ export async function syncTeams(
   const supabase = createAdminClient();
   try {
     const res = await getCompetitionTeams(leagueCode);
+    const seasonLabel = deriveSeasonLabel(res.season);
 
     const teamRows = res.teams.map((raw) => {
-      const team = mapFdTeamToTeam(raw, SEASON_LABEL);
+      const team = mapFdTeamToTeam(raw, seasonLabel);
       return teamToDbRow(team);
     });
 
@@ -70,6 +70,8 @@ export async function syncStandings(
   const supabase = createAdminClient();
   try {
     const standingsRes = await getCompetitionStandings(leagueCode);
+    const seasonLabel = deriveSeasonLabel(standingsRes.season);
+
     const totalTable = standingsRes.standings.find((s) => s.type === "TOTAL");
     if (!totalTable?.table?.length) {
       throw new Error(`${leagueCode} 순위표 응답이 비어있습니다`);
@@ -77,7 +79,7 @@ export async function syncStandings(
 
     const standingRows = totalTable.table.map((raw) => {
       const standing = mapFdStandingToTeamStanding(raw, leagueId);
-      return standingToDbRow(standing, SEASON_LABEL);
+      return standingToDbRow(standing, seasonLabel);
     });
 
     const { error } = await supabase
