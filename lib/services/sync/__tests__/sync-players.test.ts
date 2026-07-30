@@ -305,4 +305,59 @@ describe("syncPlayers", () => {
     }>;
     expect(scoutlabRows.every((row) => row.season === "25/26")).toBe(true);
   });
+
+  it("이적 선수가 신구 두 구단 스쿼드에 동시 등재돼도 players upsert 인자에 중복 없음", async () => {
+    // 시즌 초반 API가 이적 선수를 신구 두 구단 스쿼드에 동시 등재하는 경우 재현
+    // (실측: Rogers, Garnacho, Diop) — onConflict:"id" upsert가 배치 내 동일 id
+    // 중복으로 21000 에러를 내던 버그
+    const { getCompetitionTeams } = await import("@/lib/api/football-data");
+    const duplicateTeamsResponse = {
+      ...mockTeamsResponse,
+      teams: [
+        {
+          ...mockTeamsResponse.teams[0],
+          id: 65,
+          name: "Manchester City FC",
+          squad: [
+            {
+              id: 9999,
+              name: "Transfer Player",
+              position: "Offence",
+              dateOfBirth: "1999-01-01",
+              nationality: "England",
+            },
+          ],
+        },
+        {
+          ...mockTeamsResponse.teams[0],
+          id: 66,
+          name: "Aston Villa FC",
+          squad: [
+            {
+              id: 9999,
+              name: "Transfer Player",
+              position: "Offence",
+              dateOfBirth: "1999-01-01",
+              nationality: "England",
+            },
+          ],
+        },
+      ],
+    };
+    vi.mocked(getCompetitionTeams).mockResolvedValueOnce(
+      duplicateTeamsResponse,
+    );
+
+    const result = await syncPlayers();
+
+    expect(result.status).toBe("success");
+    const playerRows = upsertCalls["players"]![0][0] as Array<{
+      id: number;
+      team_id: number;
+    }>;
+    const dupRows = playerRows.filter((r) => r.id === 9999);
+    expect(dupRows).toHaveLength(1);
+    // 마지막 등재(신규 구단 Aston Villa) 채택
+    expect(dupRows[0].team_id).toBe(66);
+  });
 });

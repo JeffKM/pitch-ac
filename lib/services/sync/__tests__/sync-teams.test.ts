@@ -72,9 +72,11 @@ let mockTeamsResponse: FdTeamsResponse = {
   ],
 };
 
+// 순위표 기본 목은 "이미 개막해 정상 진행 중인 시즌"을 표현해야 하므로
+// (개막 전 오염 가드 대상이 아니어야 함) 시작일을 과거로 둔다
 let mockStandingsResponse: FdStandingsResponse = {
   competition,
-  season: makeSeason("2026-08-21"),
+  season: makeSeason("2026-06-01"),
   standings: [
     {
       stage: "REGULAR_SEASON",
@@ -127,7 +129,7 @@ describe("syncTeams / syncStandings 시즌 파생", () => {
     };
     mockStandingsResponse = {
       ...mockStandingsResponse,
-      season: makeSeason("2026-08-21"),
+      season: makeSeason("2026-06-01"),
     };
     for (const key of Object.keys(upsertCalls)) {
       delete upsertCalls[key];
@@ -161,5 +163,48 @@ describe("syncTeams / syncStandings 시즌 파생", () => {
 
     const rows = upsertCalls["standings"]![0][0] as Array<{ season: string }>;
     expect(rows[0].season).toBe("2025/2026");
+  });
+
+  it("개막 전 모순 응답(시즌 시작일 미도래 + playedGames>0)은 적재를 건너뜀", async () => {
+    // football-data.org가 26/27 시즌 메타(시작일 미래)와 함께
+    // 25/26 최종 성적(played=38)을 테이블에 실어 보내는 실측 케이스 재현
+    mockStandingsResponse = {
+      ...mockStandingsResponse,
+      season: makeSeason("2099-08-14"), // 미래 시작일 (모순 유발)
+      standings: [
+        {
+          stage: "REGULAR_SEASON",
+          type: "TOTAL",
+          group: null,
+          table: [
+            {
+              position: 1,
+              team: {
+                id: 65,
+                name: "Manchester City FC",
+                shortName: "Man City",
+                tla: "MCI",
+                crest: "",
+              },
+              playedGames: 38, // 직전 시즌 최종 성적이 섞여 들어온 모순 신호
+              form: "W",
+              won: 30,
+              draw: 4,
+              lost: 4,
+              points: 94,
+              goalsFor: 90,
+              goalsAgainst: 30,
+              goalDifference: 60,
+            },
+          ],
+        },
+      ],
+    };
+
+    const result = await syncStandings("PL", 2021);
+
+    expect(result.status).toBe("success");
+    expect(result.recordsSynced).toBe(0);
+    expect(upsertCalls["standings"]).toBeUndefined();
   });
 });

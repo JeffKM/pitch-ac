@@ -143,26 +143,52 @@ export async function syncPlayers(): Promise<SyncResult> {
     }
 
     // 7. players 테이블 일괄 upsert
+    // 시즌 초반 이적 선수가 신구 두 구단 스쿼드에 동시 등재되어 응답에 동일 id가
+    // 중복 포함될 수 있다 (실측: Rogers, Garnacho, Diop). 배치 내 동일 id 중복은
+    // ON CONFLICT 21000으로 upsert 전체를 실패시키므로 id 기준 중복 제거 후
+    // 적재한다 (Map은 순회 순서를 보존하므로 마지막 등재 = 최신 소속 구단 채택).
+    const dedupedPlayerRows = Array.from(
+      new Map(playerRows.map((row) => [row.id, row])).values(),
+    );
+
     const { error: playerError } = await supabase
       .from("players")
-      .upsert(playerRows, { onConflict: "id" });
+      .upsert(dedupedPlayerRows, { onConflict: "id" });
 
     if (playerError) throw playerError;
 
     // 8. scoutlab_players — 새 선수만 삽입
-    if (scoutlabNewRows.length > 0) {
+    // name+team+season 조합이 배치 내 중복되면 동일한 ON CONFLICT 위험이 있으므로
+    // 방어적으로 중복 제거한다 (마지막 등재 채택)
+    const dedupedScoutlabNewRows = Array.from(
+      new Map(
+        scoutlabNewRows.map((row) => [
+          `${row.name}|${row.team}|${row.season}`,
+          row,
+        ]),
+      ).values(),
+    );
+
+    if (dedupedScoutlabNewRows.length > 0) {
       const { error: scoutlabError } = await supabase
         .from("scoutlab_players")
-        .upsert(scoutlabNewRows, { onConflict: "name,team,season" });
+        .upsert(dedupedScoutlabNewRows, { onConflict: "name,team,season" });
 
       if (scoutlabError) throw scoutlabError;
     }
 
     // 9. 기존 선수 pitch_ac_player_id 일괄 업데이트
-    if (pitchAcIdUpdates.length > 0) {
+    // 이적 선수가 신구 스쿼드에 중복 등재되면 이름 기준 매칭으로 동일 existing.id가
+    // 두 번 push되어 여기서도 동일한 21000 위험이 발생하므로 id 기준 중복 제거한다
+    // (내용이 동일하므로 마지막 등재를 채택해도 무해하다)
+    const dedupedPitchAcIdUpdates = Array.from(
+      new Map(pitchAcIdUpdates.map((row) => [row.id, row])).values(),
+    );
+
+    if (dedupedPitchAcIdUpdates.length > 0) {
       const { error: updateError } = await supabase
         .from("scoutlab_players")
-        .upsert(pitchAcIdUpdates, { onConflict: "id" });
+        .upsert(dedupedPitchAcIdUpdates, { onConflict: "id" });
 
       if (updateError) throw updateError;
     }
@@ -171,12 +197,12 @@ export async function syncPlayers(): Promise<SyncResult> {
     const result: SyncResult = {
       entity: "players",
       status: "success",
-      recordsSynced: playerRows.length,
+      recordsSynced: dedupedPlayerRows.length,
     };
     await writeSyncLog(supabase, result);
 
     console.log(
-      `[syncPlayers] 완료: players=${playerRows.length}, scoutlab 신규=${scoutlabNewRows.length}, pitch_ac_id 업데이트=${pitchAcIdUpdates.length}`,
+      `[syncPlayers] 완료: players=${dedupedPlayerRows.length}, scoutlab 신규=${dedupedScoutlabNewRows.length}, pitch_ac_id 업데이트=${dedupedPitchAcIdUpdates.length}`,
     );
 
     return result;

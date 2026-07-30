@@ -27,6 +27,24 @@ export const getCurrentGameweek = cache(
   async (leagueId: number = PL_LEAGUE_ID): Promise<CurrentGameweek> => {
     const supabase = await createClient();
 
+    // 리그의 최신 시즌을 먼저 구해 LIVE/NS/FT 조회 전부를 해당 시즌으로 한정한다.
+    // 이렇게 하지 않으면 이전 시즌의 stuck LIVE/NS 행(재동기화로도 회복 안 되는
+    // 경기 데이터 오류)이 최신 시즌 게임위크 판별을 영구적으로 가로막을 수 있다.
+    const { data: latestSeasonRow } = await supabase
+      .from("fixtures")
+      .select("season")
+      .eq("league_id", leagueId)
+      .not("season", "is", null)
+      .order("season", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const latestSeason = (latestSeasonRow as { season: string } | null)?.season;
+
+    if (!latestSeason) {
+      return { gameweek: 1, season: null };
+    }
+
     const [liveResult, nextResult, lastResult] = await Promise.all([
       // 1) LIVE 경기
       supabase
@@ -34,6 +52,7 @@ export const getCurrentGameweek = cache(
         .select("gameweek, season")
         .eq("status", "LIVE")
         .eq("league_id", leagueId)
+        .eq("season", latestSeason)
         .not("gameweek", "is", null)
         .limit(1)
         .maybeSingle(),
@@ -43,6 +62,7 @@ export const getCurrentGameweek = cache(
         .select("gameweek, season")
         .eq("status", "NS")
         .eq("league_id", leagueId)
+        .eq("season", latestSeason)
         .not("gameweek", "is", null)
         .gte("date", new Date().toISOString())
         .order("date", { ascending: true })
@@ -54,6 +74,7 @@ export const getCurrentGameweek = cache(
         .select("gameweek, season")
         .eq("status", "FT")
         .eq("league_id", leagueId)
+        .eq("season", latestSeason)
         .not("gameweek", "is", null)
         .order("date", { ascending: false })
         .limit(1)
