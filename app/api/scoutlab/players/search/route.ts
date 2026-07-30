@@ -1,12 +1,13 @@
 // ScoutLab 선수 검색 API — 리그/팀 필터 + 이름 검색
 import { NextResponse } from "next/server";
 
+import { SCOUTLAB_ACTIVE_SEASON } from "@/lib/constants/scoutlab";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const q = searchParams.get("q")?.trim() ?? "";
-  const season = searchParams.get("season") ?? "25/26";
+  const season = searchParams.get("season") ?? SCOUTLAB_ACTIVE_SEASON;
   const id = searchParams.get("id");
   const league = searchParams.get("league");
   const team = searchParams.get("team");

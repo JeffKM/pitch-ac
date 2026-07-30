@@ -1,6 +1,7 @@
 // ScoutLab Ranking API — 메트릭별 랭킹 데이터 조회
 import { NextResponse } from "next/server";
 
+import { SCOUTLAB_ACTIVE_SEASON } from "@/lib/constants/scoutlab";
 import { getRankingData } from "@/lib/repositories/scoutlab-repository";
 import type { ScoutlabCategory } from "@/types";
 
@@ -22,7 +23,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const category = searchParams.get("category") as ScoutlabCategory | null;
   const metric = searchParams.get("metric");
-  const season = searchParams.get("season") ?? "25/26";
+  const season = searchParams.get("season") ?? SCOUTLAB_ACTIVE_SEASON;
   const league = searchParams.get("league") ?? undefined;
 
   if (!category || !metric || !VALID_CATEGORIES.includes(category)) {

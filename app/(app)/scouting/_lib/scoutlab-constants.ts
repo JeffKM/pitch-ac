@@ -1,5 +1,6 @@
 // ScoutLab 공유 상수 (Server/Client 공용)
 
+import { SCOUTLAB_ACTIVE_SEASON } from "@/lib/constants/scoutlab";
 import type {
   ScoutlabAdjustment,
   ScoutlabComparisonPosition,
@@ -49,7 +50,7 @@ export const COMPARISON_POSITION_LABELS: Record<
   FW: "Forwards",
 };
 
-export const DEFAULT_SEASON = "25/26";
+export const DEFAULT_SEASON = SCOUTLAB_ACTIVE_SEASON;
 export const DEFAULT_MODE: ScoutlabMode = "per90";
 export const DEFAULT_ADJUSTMENT: ScoutlabAdjustment = "padj";
 export const DEFAULT_COMPARISON_POSITION: ScoutlabComparisonPosition = "AM/W";
