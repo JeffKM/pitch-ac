@@ -87,6 +87,7 @@ export function fixtureToDbRow(fixture: Fixture) {
     events: fixture.events,
     league_id: fixture.leagueId,
     competition_name: fixture.competitionName,
+    season: fixture.season,
   };
 }
 

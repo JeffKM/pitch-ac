@@ -4,10 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   calculateAge,
+  mapFdMatchToFixture,
   mapFdSquadPlayerToPlayer,
   mapFdSquadPlayerToScoutlabRow,
 } from "../mappers";
-import type { FdSquadPlayer } from "../types";
+import type { FdMatch, FdSquadPlayer } from "../types";
 
 // ─── calculateAge ───────────────────────────────
 
@@ -234,5 +235,76 @@ describe("mapFdSquadPlayerToScoutlabRow", () => {
     );
     expect(row).not.toBeNull();
     expect(row!.position).toBe("MF");
+  });
+});
+
+// ─── mapFdMatchToFixture ────────────────────────
+
+describe("mapFdMatchToFixture", () => {
+  function makeMatch(startDate: string): FdMatch {
+    return {
+      id: 500001,
+      utcDate: "2026-08-21T19:00:00Z",
+      status: "SCHEDULED",
+      matchday: 1,
+      stage: "REGULAR_SEASON",
+      group: null,
+      lastUpdated: "2026-07-30T00:00:00Z",
+      homeTeam: {
+        id: 65,
+        name: "Manchester City FC",
+        shortName: "Man City",
+        tla: "MCI",
+        crest: "https://crests.football-data.org/65.svg",
+      },
+      awayTeam: {
+        id: 57,
+        name: "Arsenal FC",
+        shortName: "Arsenal",
+        tla: "ARS",
+        crest: "https://crests.football-data.org/57.svg",
+      },
+      score: {
+        winner: null,
+        duration: "REGULAR",
+        fullTime: { home: null, away: null },
+        halfTime: { home: null, away: null },
+      },
+      referees: [],
+      competition: {
+        id: 2021,
+        name: "Premier League",
+        code: "PL",
+        type: "LEAGUE",
+        emblem: "",
+      },
+      season: {
+        id: 2403,
+        startDate,
+        endDate: "2027-05-30",
+        currentMatchday: 1,
+        winner: null,
+      },
+      area: { id: 2072, name: "England", code: "ENG", flag: null },
+    };
+  }
+
+  it("경기 season.startDate에서 시즌 라벨 파생", () => {
+    const fixture = mapFdMatchToFixture(makeMatch("2026-08-21"));
+    expect(fixture.season).toBe("2026/2027");
+  });
+
+  it("아직 전환 전인 대회는 이전 시즌 라벨 유지", () => {
+    const fixture = mapFdMatchToFixture(makeMatch("2025-07-08"));
+    expect(fixture.season).toBe("2025/2026");
+  });
+
+  it("기본 필드 매핑 유지", () => {
+    const fixture = mapFdMatchToFixture(makeMatch("2026-08-21"));
+    expect(fixture.id).toBe(500001);
+    expect(fixture.gameweek).toBe(1);
+    expect(fixture.status).toBe("NS");
+    expect(fixture.leagueId).toBe(2021);
+    expect(fixture.competitionName).toBe("Premier League");
   });
 });

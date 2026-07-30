@@ -68,4 +68,6 @@ export interface Fixture {
   leagueId: number;
   /** 대회 표시명 */
   competitionName: string | null;
+  /** 시즌 라벨 (예: "2026/2027") — 대회별로 롤오버 시점이 다르다 */
+  season: string;
 }

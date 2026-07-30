@@ -17,6 +17,7 @@ import type {
   TeamStanding,
 } from "@/types";
 
+import { deriveSeasonLabel } from "./season";
 import type {
   FdMatch,
   FdMatchTeam,
@@ -103,6 +104,7 @@ export function mapFdMatchToFixture(raw: FdMatch): Fixture {
     events,
     leagueId,
     competitionName,
+    season: deriveSeasonLabel(raw.season),
   };
 }
 

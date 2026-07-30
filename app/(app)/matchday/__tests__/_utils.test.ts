@@ -24,6 +24,7 @@ function makeFixture(overrides: Partial<Fixture> = {}): Fixture {
     events: [],
     leagueId: 2021,
     competitionName: null,
+    season: "2025/2026",
     ...overrides,
   };
 }
