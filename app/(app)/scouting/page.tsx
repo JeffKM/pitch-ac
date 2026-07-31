@@ -1,9 +1,10 @@
 // ScoutLab Player Card — 메인 페이지
+// 데이터 의존 영역만 Suspense로 감싸 필터 변경 시 정적 셸이 유지되도록 구성
 import { SearchX } from "lucide-react";
+import { Suspense } from "react";
 
 import {
   getDefaultScoutlabPlayer,
-  getScoutlabFilterOptions,
   getScoutlabMetrics,
   getScoutlabPlayerById,
 } from "@/lib/repositories/scoutlab-repository";
@@ -11,10 +12,15 @@ import {
 import { MetricCategoryTable } from "./_components/metric-category-table";
 import { MetricContextSubtitle } from "./_components/metric-context-subtitle";
 import { PlayerCardHeader } from "./_components/player-card-header";
-import { ScoutlabFilterBar } from "./_components/scoutlab-filter-bar";
-import { ScoutlabGlobalSearch } from "./_components/scoutlab-global-search";
+import { ScoutlabFilterSection } from "./_components/scoutlab-filter-section";
 import { ScoutlabModeToggle } from "./_components/scoutlab-mode-toggle";
 import { ScoutlabPositionFilter } from "./_components/scoutlab-position-filter";
+import {
+  MetricRowsSkeleton,
+  PlayerCardHeaderSkeleton,
+  ScoutlabControlRowSkeleton,
+  ScoutlabFilterSectionSkeleton,
+} from "./_components/scoutlab-skeletons";
 import { positionToComparisonPosition } from "./_lib/scoutlab-constants";
 import { parseScoutlabParams } from "./_lib/scoutlab-search-params";
 
@@ -22,67 +28,80 @@ interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export default async function ScoutingPage({ searchParams }: PageProps) {
-  const params = parseScoutlabParams(await searchParams);
-
-  // 필터 옵션 + 선택된 선수 데이터 병렬 조회
-  const [filterOptions, selectedPlayer] = await Promise.all([
-    getScoutlabFilterOptions(params.season),
-    params.playerId
-      ? getScoutlabPlayerById(params.playerId)
-      : getDefaultScoutlabPlayer(params.season),
-  ]);
-
-  // 선수 포지션 기반 comparisonPosition 결정
-  // URL에 명시적으로 지정되지 않았으면 선수의 실제 포지션으로 자동 매핑
-  const effectiveComparisonPosition =
-    params.isComparisonPositionExplicit || !selectedPlayer
-      ? params.comparisonPosition
-      : positionToComparisonPosition(selectedPlayer.position);
-
-  // 선수가 선택된 경우 메트릭 조회
-  const metrics = selectedPlayer
-    ? await getScoutlabMetrics(
-        selectedPlayer.id,
-        params.season,
-        params.mode,
-        params.adjustment,
-        effectiveComparisonPosition,
-      )
-    : null;
-
+export default function ScoutingPage({ searchParams }: PageProps) {
   return (
     <div className="space-y-4">
       {/* 필터 바 + 선수 검색 (한 줄) */}
-      <div className="flex flex-wrap items-center gap-3">
-        <ScoutlabFilterBar options={filterOptions} />
-        <ScoutlabGlobalSearch />
-      </div>
+      <Suspense fallback={<ScoutlabFilterSectionSkeleton />}>
+        <ScoutlabFilterSection searchParams={searchParams} />
+      </Suspense>
 
       {/* 포지션 필터 + 모드 토글 */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <ScoutlabPositionFilter />
-        <ScoutlabModeToggle />
-      </div>
+      <Suspense fallback={<ScoutlabControlRowSkeleton />}>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <ScoutlabPositionFilter />
+          <ScoutlabModeToggle />
+        </div>
+      </Suspense>
 
       {/* 메인 콘텐츠 */}
-      {selectedPlayer ? (
-        <div className="space-y-4">
-          <PlayerCardHeader player={selectedPlayer} />
-          <MetricContextSubtitle
-            comparisonPosition={effectiveComparisonPosition}
-            mode={params.mode}
-            adjustment={params.adjustment}
-          />
-          {metrics ? (
-            <MetricCategoryTable metrics={metrics} />
-          ) : (
-            <EmptyState message="선택한 시즌/모드에 해당하는 메트릭 데이터가 없습니다." />
-          )}
-        </div>
+      <Suspense fallback={<PlayerCardSkeleton />}>
+        <PlayerCardContent searchParams={searchParams} />
+      </Suspense>
+    </div>
+  );
+}
+
+/** 선수 카드 + 메트릭 테이블 — searchParams 의존 데이터 영역 */
+async function PlayerCardContent({ searchParams }: PageProps) {
+  const params = parseScoutlabParams(await searchParams);
+
+  const selectedPlayer = params.playerId
+    ? await getScoutlabPlayerById(params.playerId)
+    : await getDefaultScoutlabPlayer(params.season);
+
+  if (!selectedPlayer) {
+    return <EmptyState message="상단 검색창에서 선수를 선택하세요." />;
+  }
+
+  // 선수 포지션 기반 comparisonPosition 결정
+  // URL에 명시적으로 지정되지 않았으면 선수의 실제 포지션으로 자동 매핑
+  const effectiveComparisonPosition = params.isComparisonPositionExplicit
+    ? params.comparisonPosition
+    : positionToComparisonPosition(selectedPlayer.position);
+
+  const metrics = await getScoutlabMetrics(
+    selectedPlayer.id,
+    params.season,
+    params.mode,
+    params.adjustment,
+    effectiveComparisonPosition,
+  );
+
+  return (
+    <div className="space-y-4">
+      <PlayerCardHeader player={selectedPlayer} />
+      <MetricContextSubtitle
+        comparisonPosition={effectiveComparisonPosition}
+        mode={params.mode}
+        adjustment={params.adjustment}
+      />
+      {metrics ? (
+        <MetricCategoryTable metrics={metrics} />
       ) : (
-        <EmptyState message="상단 검색창에서 선수를 선택하세요." />
+        <EmptyState message="선택한 시즌/모드에 해당하는 메트릭 데이터가 없습니다." />
       )}
+    </div>
+  );
+}
+
+/** 선수 카드 영역 fallback */
+function PlayerCardSkeleton() {
+  return (
+    <div className="space-y-4">
+      <PlayerCardHeaderSkeleton />
+      <div className="h-4 w-64 animate-pulse rounded bg-comic-cream" />
+      <MetricRowsSkeleton />
     </div>
   );
 }

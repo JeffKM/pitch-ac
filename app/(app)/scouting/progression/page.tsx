@@ -1,17 +1,21 @@
 // ScoutLab Progression — 시즌별 메트릭 추이 차트
 import { SearchX } from "lucide-react";
+import { Suspense } from "react";
 
 import {
   getDefaultScoutlabPlayer,
-  getScoutlabFilterOptions,
   getScoutlabPlayerById,
   getScoutlabProgression,
 } from "@/lib/repositories/scoutlab-repository";
 
 import { PlayerCardHeader } from "../_components/player-card-header";
 import { ProgressionView } from "../_components/progression-view";
-import { ScoutlabFilterBar } from "../_components/scoutlab-filter-bar";
-import { ScoutlabGlobalSearch } from "../_components/scoutlab-global-search";
+import { ScoutlabFilterSection } from "../_components/scoutlab-filter-section";
+import {
+  PlayerCardHeaderSkeleton,
+  ScoutlabFilterSectionSkeleton,
+  ScoutlabPanelSkeleton,
+} from "../_components/scoutlab-skeletons";
 import { positionToComparisonPosition } from "../_lib/scoutlab-constants";
 import { parseScoutlabParams } from "../_lib/scoutlab-search-params";
 
@@ -19,29 +23,27 @@ interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export default async function ProgressionPage({ searchParams }: PageProps) {
+export default function ProgressionPage({ searchParams }: PageProps) {
+  return (
+    <div className="space-y-4">
+      <Suspense fallback={<ScoutlabFilterSectionSkeleton />}>
+        <ScoutlabFilterSection searchParams={searchParams} />
+      </Suspense>
+
+      <Suspense fallback={<ProgressionSkeleton />}>
+        <ProgressionContent searchParams={searchParams} />
+      </Suspense>
+    </div>
+  );
+}
+
+/** 선수 카드 + 시즌 추이 차트 — searchParams 의존 데이터 영역 */
+async function ProgressionContent({ searchParams }: PageProps) {
   const params = parseScoutlabParams(await searchParams);
 
-  const [filterOptions, selectedPlayer] = await Promise.all([
-    getScoutlabFilterOptions(params.season),
-    params.playerId
-      ? getScoutlabPlayerById(params.playerId)
-      : getDefaultScoutlabPlayer(params.season),
-  ]);
-
-  const effectiveComparisonPosition =
-    params.isComparisonPositionExplicit || !selectedPlayer
-      ? params.comparisonPosition
-      : positionToComparisonPosition(selectedPlayer.position);
-
-  const progressionData = selectedPlayer
-    ? await getScoutlabProgression(
-        selectedPlayer.id,
-        params.mode,
-        params.adjustment,
-        effectiveComparisonPosition,
-      )
-    : [];
+  const selectedPlayer = params.playerId
+    ? await getScoutlabPlayerById(params.playerId)
+    : await getDefaultScoutlabPlayer(params.season);
 
   if (!selectedPlayer) {
     return (
@@ -55,6 +57,17 @@ export default async function ProgressionPage({ searchParams }: PageProps) {
       </div>
     );
   }
+
+  const effectiveComparisonPosition = params.isComparisonPositionExplicit
+    ? params.comparisonPosition
+    : positionToComparisonPosition(selectedPlayer.position);
+
+  const progressionData = await getScoutlabProgression(
+    selectedPlayer.id,
+    params.mode,
+    params.adjustment,
+    effectiveComparisonPosition,
+  );
 
   if (progressionData.length === 0) {
     return (
@@ -71,10 +84,6 @@ export default async function ProgressionPage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <ScoutlabFilterBar options={filterOptions} />
-        <ScoutlabGlobalSearch />
-      </div>
       <PlayerCardHeader player={selectedPlayer} />
 
       <div className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-thin)] border-comic-black/20 bg-comic-white p-5">
@@ -83,6 +92,16 @@ export default async function ProgressionPage({ searchParams }: PageProps) {
         </h3>
         <ProgressionView progressionData={progressionData} />
       </div>
+    </div>
+  );
+}
+
+/** Progression 본문 fallback */
+function ProgressionSkeleton() {
+  return (
+    <div className="space-y-4">
+      <PlayerCardHeaderSkeleton />
+      <ScoutlabPanelSkeleton bodyClassName="h-72" />
     </div>
   );
 }

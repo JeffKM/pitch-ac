@@ -1,33 +1,48 @@
 // ScoutLab Radar — 카테고리별 백분위 레이더 차트
 import { SearchX } from "lucide-react";
+import { Suspense } from "react";
 
 import {
   getDefaultScoutlabPlayer,
-  getScoutlabFilterOptions,
   getScoutlabPlayerById,
   getScoutlabRadar,
 } from "@/lib/repositories/scoutlab-repository";
 
 import { PlayerCardHeader } from "../_components/player-card-header";
 import { DynamicRadarChart } from "../_components/scoutlab-charts";
-import { ScoutlabFilterBar } from "../_components/scoutlab-filter-bar";
-import { ScoutlabGlobalSearch } from "../_components/scoutlab-global-search";
+import { ScoutlabFilterSection } from "../_components/scoutlab-filter-section";
+import {
+  PlayerCardHeaderSkeleton,
+  ScoutlabFilterSectionSkeleton,
+  ScoutlabPanelSkeleton,
+} from "../_components/scoutlab-skeletons";
 import { parseScoutlabParams } from "../_lib/scoutlab-search-params";
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export default async function RadarPage({ searchParams }: PageProps) {
+export default function RadarPage({ searchParams }: PageProps) {
+  return (
+    <div className="space-y-4">
+      <Suspense fallback={<ScoutlabFilterSectionSkeleton />}>
+        <ScoutlabFilterSection searchParams={searchParams} />
+      </Suspense>
+
+      <Suspense fallback={<RadarSkeleton />}>
+        <RadarContent searchParams={searchParams} />
+      </Suspense>
+    </div>
+  );
+}
+
+/** 선수 카드 + 레이더 차트 — searchParams 의존 데이터 영역 */
+async function RadarContent({ searchParams }: PageProps) {
   const params = parseScoutlabParams(await searchParams);
 
-  // 필터 옵션 + 선수 조회 (기본: Haaland)
-  const [filterOptions, selectedPlayer] = await Promise.all([
-    getScoutlabFilterOptions(params.season),
-    params.playerId
-      ? getScoutlabPlayerById(params.playerId)
-      : getDefaultScoutlabPlayer(params.season),
-  ]);
+  const selectedPlayer = params.playerId
+    ? await getScoutlabPlayerById(params.playerId)
+    : await getDefaultScoutlabPlayer(params.season);
 
   const radar = selectedPlayer
     ? await getScoutlabRadar(selectedPlayer.id, params.season)
@@ -50,10 +65,6 @@ export default async function RadarPage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <ScoutlabFilterBar options={filterOptions} />
-        <ScoutlabGlobalSearch />
-      </div>
       <PlayerCardHeader player={selectedPlayer} />
 
       <div className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-thin)] border-comic-black/20 bg-comic-white p-5">
@@ -62,6 +73,16 @@ export default async function RadarPage({ searchParams }: PageProps) {
         </h3>
         <DynamicRadarChart axes={radar.axes} playerName={selectedPlayer.name} />
       </div>
+    </div>
+  );
+}
+
+/** Radar 본문 fallback */
+function RadarSkeleton() {
+  return (
+    <div className="space-y-4">
+      <PlayerCardHeaderSkeleton />
+      <ScoutlabPanelSkeleton bodyClassName="h-80" />
     </div>
   );
 }

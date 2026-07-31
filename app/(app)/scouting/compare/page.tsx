@@ -1,9 +1,9 @@
 // ScoutLab Compare — 두 선수 메트릭 비교
 import { GitCompareArrows, SearchX } from "lucide-react";
+import { Suspense } from "react";
 
 import {
   getDefaultScoutlabPlayer,
-  getScoutlabFilterOptions,
   getScoutlabMetrics,
   getScoutlabPlayerById,
   getScoutlabRadar,
@@ -14,8 +14,12 @@ import { MetricContextSubtitle } from "../_components/metric-context-subtitle";
 import { PlayerCardHeader } from "../_components/player-card-header";
 import { DynamicRadarChart } from "../_components/scoutlab-charts";
 import { ScoutlabCompareSearch } from "../_components/scoutlab-compare-search";
-import { ScoutlabFilterBar } from "../_components/scoutlab-filter-bar";
-import { ScoutlabGlobalSearch } from "../_components/scoutlab-global-search";
+import { ScoutlabFilterSection } from "../_components/scoutlab-filter-section";
+import {
+  PlayerCardHeaderSkeleton,
+  ScoutlabFilterSectionSkeleton,
+  ScoutlabPanelSkeleton,
+} from "../_components/scoutlab-skeletons";
 import { positionToComparisonPosition } from "../_lib/scoutlab-constants";
 import { parseScoutlabParams } from "../_lib/scoutlab-search-params";
 
@@ -23,7 +27,23 @@ interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export default async function ScoutingComparePage({ searchParams }: PageProps) {
+export default function ScoutingComparePage({ searchParams }: PageProps) {
+  return (
+    <div className="space-y-4">
+      {/* 필터 바 + 기준 선수 검색 (한 줄) */}
+      <Suspense fallback={<ScoutlabFilterSectionSkeleton />}>
+        <ScoutlabFilterSection searchParams={searchParams} />
+      </Suspense>
+
+      <Suspense fallback={<CompareSkeleton />}>
+        <CompareContent searchParams={searchParams} />
+      </Suspense>
+    </div>
+  );
+}
+
+/** 두 선수 헤더 + 레이더 + 비교 테이블 — searchParams 의존 데이터 영역 */
+async function CompareContent({ searchParams }: PageProps) {
   const raw = await searchParams;
   const params = parseScoutlabParams(raw);
 
@@ -33,9 +53,8 @@ export default async function ScoutingComparePage({ searchParams }: PageProps) {
     : raw.compareId;
   const compareId = compareIdStr ? parseInt(compareIdStr, 10) : null;
 
-  // 필터 옵션 + 두 선수 데이터 병렬 조회 (기본: Haaland)
-  const [filterOptions, playerA, playerB] = await Promise.all([
-    getScoutlabFilterOptions(params.season),
+  // 두 선수 데이터 병렬 조회 (기본: Haaland)
+  const [playerA, playerB] = await Promise.all([
     params.playerId
       ? getScoutlabPlayerById(params.playerId)
       : getDefaultScoutlabPlayer(params.season),
@@ -88,12 +107,6 @@ export default async function ScoutingComparePage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-4">
-      {/* 필터 바 + 기준 선수 검색 (한 줄) */}
-      <div className="flex flex-wrap items-center gap-3">
-        <ScoutlabFilterBar options={filterOptions} />
-        <ScoutlabGlobalSearch />
-      </div>
-
       <MetricContextSubtitle
         comparisonPosition={effectiveComparisonPosition}
         mode={params.mode}
@@ -130,7 +143,7 @@ export default async function ScoutingComparePage({ searchParams }: PageProps) {
       )}
 
       {/* 레이더 차트 오버레이 */}
-      {playerA && radarA && (
+      {radarA && (
         <div className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-thin)] border-comic-black/20 bg-comic-white p-5">
           <h3 className="mb-2 font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-lg)] text-comic-black">
             Radar Comparison
@@ -171,6 +184,23 @@ export default async function ScoutingComparePage({ searchParams }: PageProps) {
           />
         </div>
       )}
+    </div>
+  );
+}
+
+/** Compare 본문 fallback — 2열 헤더 + 레이더 패널 */
+function CompareSkeleton() {
+  return (
+    <div className="space-y-4">
+      <div className="h-4 w-64 animate-pulse rounded bg-comic-cream" />
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto_1fr]">
+        <PlayerCardHeaderSkeleton />
+        <div className="flex items-center justify-center">
+          <GitCompareArrows className="size-6 text-comic-black/20" />
+        </div>
+        <PlayerCardHeaderSkeleton />
+      </div>
+      <ScoutlabPanelSkeleton bodyClassName="h-80" />
     </div>
   );
 }
