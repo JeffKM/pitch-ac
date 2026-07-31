@@ -104,6 +104,7 @@ export type FdMatchStatus =
   | "IN_PLAY"
   | "PAUSED"
   | "FINISHED"
+  | "AWARDED"
   | "POSTPONED"
   | "SUSPENDED"
   | "CANCELLED";

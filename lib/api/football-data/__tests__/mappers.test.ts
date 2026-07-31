@@ -299,6 +299,21 @@ describe("mapFdMatchToFixture", () => {
     expect(fixture.season).toBe("2025/2026");
   });
 
+  it("AWARDED(몰수·판정 결과) → FT", () => {
+    const match = makeMatch("2025-08-17");
+    match.status = "AWARDED";
+    match.score = {
+      winner: "DRAW",
+      duration: "REGULAR",
+      fullTime: { home: 0, away: 0 },
+      halfTime: { home: null, away: null },
+    };
+    const fixture = mapFdMatchToFixture(match);
+    expect(fixture.status).toBe("FT");
+    expect(fixture.homeScore).toBe(0);
+    expect(fixture.awayScore).toBe(0);
+  });
+
   it("기본 필드 매핑 유지", () => {
     const fixture = mapFdMatchToFixture(makeMatch("2026-08-21"));
     expect(fixture.id).toBe(500001);

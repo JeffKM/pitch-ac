@@ -217,6 +217,7 @@ export const FIXTURE_STATUS_MAP: Record<string, FixtureStatus> = {
   IN_PLAY: "LIVE",
   PAUSED: "LIVE",
   FINISHED: "FT",
+  AWARDED: "FT",
   POSTPONED: "POSTP",
   SUSPENDED: "NS",
   CANCELLED: "NS",
