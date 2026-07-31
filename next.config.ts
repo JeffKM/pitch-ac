@@ -1,14 +1,15 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
-// CSP (Content Security Policy) — Report-Only 모드로 위반 모니터링
+// CSP (Content Security Policy) — enforce 모드 (QA03에서 Report-Only에서 전환)
 const cspHeader = `
   default-src 'self';
   script-src 'self' 'unsafe-inline' 'unsafe-eval';
   style-src 'self' 'unsafe-inline';
-  img-src 'self' blob: data: https://crests.football-data.org https://*.supabase.co;
+  img-src 'self' blob: data: https://crests.football-data.org https://*.supabase.co https://upload.wikimedia.org;
   font-src 'self';
-  connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+  connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.ingest.us.sentry.io;
+  worker-src 'self' blob:;
   frame-ancestors 'none';
   form-action 'self';
   base-uri 'self';
@@ -83,9 +84,9 @@ const nextConfig: NextConfig = {
           },
           // XSS 필터 (레거시 브라우저용)
           { key: "X-XSS-Protection", value: "1; mode=block" },
-          // CSP Report-Only — 위반 로그만 기록, 차단하지 않음
+          // CSP enforce — 위반 리소스 차단
           {
-            key: "Content-Security-Policy-Report-Only",
+            key: "Content-Security-Policy",
             value: cspHeader,
           },
         ],

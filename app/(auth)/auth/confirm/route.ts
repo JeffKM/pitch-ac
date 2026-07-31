@@ -10,6 +10,9 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get("type") as EmailOtpType | null;
   const next = searchParams.get("next") ?? "/";
 
+  // 내부 경로만 허용 (//evil.com 같은 open redirect 방지)
+  const safePath = next.startsWith("/") && !next.startsWith("//") ? next : "/";
+
   if (token_hash && type) {
     const supabase = await createClient();
 
@@ -19,7 +22,7 @@ export async function GET(request: NextRequest) {
     });
     if (!error) {
       // redirect user to specified redirect URL or root of app
-      redirect(next);
+      redirect(safePath);
     } else {
       // redirect the user to an error page with some instructions
       redirect(`/auth/error?error=${error?.message}`);
