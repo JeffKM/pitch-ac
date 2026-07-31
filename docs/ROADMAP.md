@@ -89,10 +89,10 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
 
 - **Task QA01: 성능·쿼리 감사**
   - > 적용 스킬: postgres-best-practices, vercel-react-best-practices, silent-failure-hunter
-  - Supabase advisors(performance) 실행 + 인덱스/RLS 성능 점검
-  - N+1 패턴 스캔: 순차 await, 루프 내 쿼리, `select("*")` 과다 조회
-  - 렌더링 성능: Server/Client Component 경계, 번들 사이즈, 캐싱(`cache()`/`revalidate`/staleTime) 일관성
-  - 발견 건별 측정치 기록 후 수정
+  - ✅ Supabase advisors(performance) 실행 + 인덱스/RLS 성능 점검 (2026-07-31): WARN 86건+INFO 3건 → INFO 3건. `0017_rls_performance.sql`로 `*_service_write`/`*_service_only` 정책 16개 제거(service_role은 BYPASSRLS라 기능상 무의미, FOR ALL이라 모든 공개 SELECT에 `auth.role()` 행 단위 재평가 유발 — multiple_permissive 70건+initplan 16건 원인) + `injuries.player_id` FK 인덱스. anon 쓰기/sync_logs 읽기 차단 유지 실측 확인. 잔여 INFO 3건은 unused_index — 최근 도입 기능이라 관찰 유지
+  - ✅ N+1 패턴 스캔 (2026-07-31): 전수 스캔 결과 리포지토리 레이어는 양호(`.in()` 배치+`cache()` 기적용). 수정 — getScatterData 4,242KB→1,142KB(-73%, JSONB 2개+선수 5필드만 select), getRankingData 4,242KB→568KB(-87%, 요청 카테고리만), 두 함수 comparison_position 중복 선수 dedupe(랭킹 이중 표시 버그 겸 수정), ranking API CDN 캐시(s-maxage=300), ranking-view 마운트 중복 재조회 제거, schedule-calculator 리그별 최신 시즌 조회 Promise.all 병렬화. sync 경로의 순차 await는 rate limit(분당 10회) 의도 설계라 유지
+  - ✅ 렌더링 성능 (2026-07-31): 로그아웃 버튼 Supabase SDK(184KB) 클릭 시점 지연 로드 — 전 라우트 초기 번들에서 제거(빌드 매니페스트 실측 확인). `cache()` 누락 8개 함수 보강(news/injury/team/player/fixture/scoutlab). `metric-row`·`metric-compare-table` 불필요 "use client" 제거. `scoutlab/players/search`에 Cache-Control 추가. loading.tsx 커버리지는 전 페이지 완비 확인
+  - **QA01 잔여(후속 검토)**: ① `use cache` 0건 — `createClient()`가 cookies() 의존이라 현 구조로는 불가, 쿠키 없는 공개 읽기 전용 클라이언트 도입+`cacheTag`/크론 `revalidateTag` 설계 필요(아키텍처 변경이라 별도 합의) ② recharts 코어 3중 중복 방출(청크당 324KB, radar/progression/scatter 순회 시 ~972KB 중복 다운로드) — Turbopack 청크 호이스팅 조사 필요 ③ scouting 10개 페이지 Suspense 입도 세분화(필터 변경마다 전체 스켈레톤 교체 — ranking/page.tsx 패턴으로 데이터 부분만 분리, QA02 UI 감사와 병행 가능) ④ scoutlab raw fetch 6곳 TanStack Query 통일 ⑤ 데드 클라이언트 컴포넌트 6개·radix-ui 통합/개별 패키지 혼재 → QA04로 이관
 
 - **Task QA02: UI·접근성 감사**
   - > 적용 스킬: design-review, web-design-guidelines, fixing-accessibility
@@ -114,6 +114,8 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
   - 피벗 잔재 정리: 카툰 시스템(`lib/services/cartoon/`, `types/cartoon.ts`, cartoon 컴포넌트·테이블), SportMonks/API-Football 잔재, 라이브 시스템 잔재
   - `.claude/plans/` 임시 파일 정리, `shrimp_data/`·`lively-bubbling-hennessy.md` 등 루트 잡동사니 처리
   - SR 리뷰 잔여 데드코드 2건 제거: `getPlayerSeasonStats`·`getAllStandings` (~~`toScoutlabSeason`~~은 SR06에서 `toShortSeasonLabel`로 리네이밍 후 랭킹 시즌 배지에 사용 중 — 삭제 대상 아님)
+  - QA01 렌더링 스캔에서 발견된 데드 클라이언트 컴포넌트 6개 삭제: `components/charts/player-radar-chart.tsx`(recharts 연쇄), `components/player-search-combobox.tsx`(cmdk 연쇄), cartoon 3종(`cartoon-avatar`·`mood-transition`·`speech-bubble` — 위 카툰 잔재와 동일 건), `scouting/_components/action-map-overlay.tsx`. `searchScoutlabPlayers`(scoutlab-repository)도 앱 내 호출처 없음 — 삭제 검토
+  - radix-ui 통합 패키지와 `@radix-ui/react-{checkbox,dropdown-menu,label,slot}` 개별 4개 혼재 — 코드가 통합 패키지만 쓰므로 개별 패키지 정리 검토 (QA01 이관분)
   - 소소한 정리: sync-players dedupe "최신 구단" 주석 정정, `prevSeasonLabel` 리네이밍
 
 ---
