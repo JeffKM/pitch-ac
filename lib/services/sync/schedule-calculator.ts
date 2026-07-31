@@ -47,26 +47,39 @@ export async function getPendingResultLeagues(): Promise<LeagueConfig[]> {
         const league = COMPETITION_BY_ID[leagueId];
         if (!league) return null;
 
-        // 리그 최신 시즌 파생 — "YYYY/YYYY" 고정폭 문자열 내림차순 = 최신
-        const { data: latestRows, error: latestError } = await supabase
-          .from("fixtures")
-          .select("season")
-          .eq("league_id", leagueId)
-          .order("season", { ascending: false })
-          .limit(1);
+        try {
+          // 리그 최신 시즌 파생 — "YYYY/YYYY" 고정폭 문자열 내림차순 = 최신
+          const { data: latestRows, error: latestError } = await supabase
+            .from("fixtures")
+            .select("season")
+            .eq("league_id", leagueId)
+            .order("season", { ascending: false })
+            .limit(1);
 
-        const latestSeason = latestRows?.[0]?.season;
+          const latestSeason = latestRows?.[0]?.season;
 
-        // 최신 시즌 조회 실패 시 기존 동작 유지 (fail-open: 동기화 시도)
-        if (latestError || !latestSeason || pendingSeasons.has(latestSeason)) {
+          // 최신 시즌 조회 실패 시 기존 동작 유지 (fail-open: 동기화 시도)
+          if (
+            latestError ||
+            !latestSeason ||
+            pendingSeasons.has(latestSeason)
+          ) {
+            return league;
+          }
+
+          console.warn(
+            `[getPendingResultLeagues] ${league.code}: 구시즌 잔존 NS 행 스킵 ` +
+              `(잔존 시즌 ${[...pendingSeasons].join(", ")} / 최신 시즌 ${latestSeason})`,
+          );
+          return null;
+        } catch (error) {
+          // 네트워크 예외가 다른 리그의 스케줄링까지 막지 않도록 리그 단위 격리 (fail-open)
+          console.error(
+            `[getPendingResultLeagues] ${league.code}: 최신 시즌 조회 예외 — 동기화 시도 유지:`,
+            error,
+          );
           return league;
         }
-
-        console.warn(
-          `[getPendingResultLeagues] ${league.code}: 구시즌 잔존 NS 행 스킵 ` +
-            `(잔존 시즌 ${[...pendingSeasons].join(", ")} / 최신 시즌 ${latestSeason})`,
-        );
-        return null;
       },
     ),
   );
