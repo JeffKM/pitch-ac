@@ -64,7 +64,7 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
 - **Task SR04: ScoutLab 시즌 전환**
   - 시즌 셀렉터 기본값 처리: 26/27 데이터 없는 동안 25/26 유지, 수집 후 전환
   - ScoutLab 원본(Streamlit)의 26/27 데이터 제공 시점 모니터링 → 제공 시 26/27 스크래핑 착수
-  - `toScoutlabSeason()` 등 시즌 변환 유틸 26/27 대응 확인
+  - `toShortSeasonLabel()`(구 `toScoutlabSeason`) 등 시즌 변환 유틸 26/27 대응 확인
 
 - **Task SR05: 방치 기간 헬스체크** ✅ (2026-07-31)
   - ✅ football-data 동기화 65일 중단 발견(Vercel `FOOTBALL_DATA_API_KEY` 오설정) → 키 교체+재배포, 07-31 13:00 KST sync-fixtures cron 6개 대회 전부 성공으로 복구 확인
@@ -78,8 +78,8 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
   - ✅ `getPendingResultLeagues()` 시즌 인식 추가 (2026-07-31): NS 행의 season이 해당 리그 최신 시즌과 일치할 때만 pending 인정, 구시즌 잔존 행은 경고 로그 후 제외 (무한 재시도 방지). 최신 시즌 조회 실패 시 fail-open. 테스트 6건 추가
   - sync-results cron 정상 동작 확인 (season NOT NULL 위반 재발 여부)
   - ✅ 리포지토리 시즌 파생 로직 테스트 추가 (2026-07-31): `getLatestStandingSeasons`(UCL 시차)·`getCurrentGameweek`(LIVE>NS>FT 우선순위, 구시즌 stuck 행 무시)·`resolveStatsSeasons`(export 전환) 12건 + 공용 인메모리 쿼리 빌더 `lib/__tests__/in-memory-supabase.ts` 신설
-  - 시즌 모순 가드 스킵 시 sync_logs 가시성 확보 (스킵 사유를 errorMessage에 기록)
-  - 랭킹 화면 시즌 배지·빈 표 fallback (개막 8/21 전까지 SA·FL1은 0경기 빈 표 노출)
+  - ✅ 시즌 모순 가드 스킵 시 sync_logs 가시성 확보 (2026-07-31): 스킵 사유(시즌 시작일 미도래+playedGames>0)를 errorMessage에 기록, status는 success 유지
+  - ✅ 랭킹 화면 시즌 배지·빈 표 fallback (2026-07-31): 탭별 시즌 배지(예: "26/27 Season", UCL 시차 대응) + 전 팀 0경기면 "Kicks Off Soon" 카드로 대체. `toScoutlabSeason`→`toShortSeasonLabel` 리네이밍 재활용. Playwright로 EPL(25/26 표)·Serie A(개막 전 카드)·UCL(25/26 최종) 3상태 렌더 확인
 
 ---
 
@@ -113,7 +113,7 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
   - knip/depcheck/ts-prune으로 미사용 코드·의존성 탐지
   - 피벗 잔재 정리: 카툰 시스템(`lib/services/cartoon/`, `types/cartoon.ts`, cartoon 컴포넌트·테이블), SportMonks/API-Football 잔재, 라이브 시스템 잔재
   - `.claude/plans/` 임시 파일 정리, `shrimp_data/`·`lively-bubbling-hennessy.md` 등 루트 잡동사니 처리
-  - SR 리뷰 잔여 데드코드 3건 제거: `toScoutlabSeason`·`getPlayerSeasonStats`·`getAllStandings`
+  - SR 리뷰 잔여 데드코드 2건 제거: `getPlayerSeasonStats`·`getAllStandings` (~~`toScoutlabSeason`~~은 SR06에서 `toShortSeasonLabel`로 리네이밍 후 랭킹 시즌 배지에 사용 중 — 삭제 대상 아님)
   - 소소한 정리: sync-players dedupe "최신 구단" 주석 정정, `prevSeasonLabel` 리네이밍
 
 ---
