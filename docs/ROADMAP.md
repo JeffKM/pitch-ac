@@ -74,7 +74,7 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
   - 참고: 07-31 08:00 KST sync-results는 구 배포 코드+0015 시차로 FL1 season NOT NULL 위반 1회 발생 — 머지 배포 후 해소 예상, 다음 실행에서 확인(SR06)
 
 - **Task SR06: 롤오버 후속 정리** (SR01·SR03 리뷰 잔여 백로그)
-  - stuck 25/26 행 2건 결과 백필: fixtures id 538145(LIVE), 542704(NS) — 삭제 금지, 결과 반영으로 해소
+  - ✅ stuck 25/26 행 2건 결과 백필 (2026-07-31): 538145 LIVE→FT 1-1(본머스-맨시티), 542704 NS→FT 0-0(낭트-툴루즈, 업스트림 상태 AWARDED). 근본 원인은 `FIXTURE_STATUS_MAP`·`FdMatchStatus`에 `AWARDED` 누락(→NS fallback) — 매핑·타입 보강 + 매퍼 테스트 추가로 재발 차단
   - `getPendingResultLeagues()` 시즌 인식 추가 (`lib/services/sync/schedule-calculator.ts`) — FL1 잔존 NS 행 탓에 sync-results가 매 실행 API 2회 낭비 중
   - sync-results cron 정상 동작 확인 (season NOT NULL 위반 재발 여부)
   - 리포지토리 시즌 파생 로직 테스트 추가 (`getLatestStandingSeasons`, `getCurrentGameweek`, `resolveStatsSeasons`)
@@ -275,5 +275,5 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
 
 ---
 
-**최종 업데이트**: 2026-07-30 (로드맵 재수립 — ARCHIVE 분리, PR 완료, SR/QA Phase 신설, S703/S8→S8′ 통합)
+**최종 업데이트**: 2026-07-31 (SR06 착수 — stuck 행 2건 백필 완료, AWARDED 상태 매핑 보강)
 **진행 상황**: PR ✅ → **SR (개막 전 필수)** → QA (병행) → 백로그(S8′ → SF → RK3 → MP → S804 → CV)
