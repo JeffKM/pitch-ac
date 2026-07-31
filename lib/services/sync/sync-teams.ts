@@ -93,6 +93,8 @@ export async function syncStandings(
         entity: `standings-${leagueCode}`,
         status: "success",
         recordsSynced: 0,
+        // 무음 스킵 방지: 스킵 사유를 sync_logs에서 확인할 수 있게 기록
+        errorMessage: `개막 전 모순 응답 스킵: 시즌 시작일(${standingsRes.season.startDate}) 미도래인데 playedGames>0 — 직전 시즌 최종 성적으로 판정`,
       };
       await writeSyncLog(supabase, result);
       return result;

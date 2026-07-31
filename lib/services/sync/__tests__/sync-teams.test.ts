@@ -206,5 +206,14 @@ describe("syncTeams / syncStandings 시즌 파생", () => {
     expect(result.status).toBe("success");
     expect(result.recordsSynced).toBe(0);
     expect(upsertCalls["standings"]).toBeUndefined();
+
+    // 스킵 사유가 sync_logs error_message로 남아야 무음 스킵이 되지 않는다
+    expect(result.errorMessage).toContain("개막 전 모순 응답 스킵");
+    expect(mockInsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: "success",
+        error_message: expect.stringContaining("개막 전 모순 응답 스킵"),
+      }),
+    );
   });
 });
