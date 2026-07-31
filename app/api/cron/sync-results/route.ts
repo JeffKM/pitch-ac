@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 
 import {
@@ -35,6 +36,14 @@ export async function GET(request: NextRequest) {
       const fixtureResult = await syncLeagueFixtures(league.code, league.id);
       const standingResult = await syncStandings(league.code, league.id);
       results.push({ league: league.shortName, fixtureResult, standingResult });
+    }
+
+    // 결과 반영분 use cache 캐시 무효화 (stale-while-revalidate)
+    if (results.some((r) => r.fixtureResult.status === "success")) {
+      revalidateTag("fixtures", "max");
+    }
+    if (results.some((r) => r.standingResult.status === "success")) {
+      revalidateTag("standings", "max");
     }
 
     // 요약 로그 기록

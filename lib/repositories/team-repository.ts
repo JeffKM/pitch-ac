@@ -1,16 +1,21 @@
 // teams 테이블 배치 쿼리
 import "server-only";
 
+import { cacheLife, cacheTag } from "next/cache";
 import { cache } from "react";
 
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import type { Team } from "@/types";
 
 import { type TeamRow, teamRowToTeam } from "./mappers";
 
 /** 전체 팀 목록 조회 (이름순 정렬) */
 export const getAllTeams = cache(async (): Promise<Team[]> => {
-  const supabase = await createClient();
+  "use cache";
+  cacheLife("hours");
+  cacheTag("teams");
+
+  const supabase = createPublicClient();
 
   const { data, error } = await supabase
     .from("teams")
@@ -25,9 +30,13 @@ export const getAllTeams = cache(async (): Promise<Team[]> => {
 /** 여러 팀 ID를 한 번에 조회 → Map<id, Team> */
 export const getTeamsByIds = cache(
   async (ids: number[]): Promise<Map<number, Team>> => {
+    "use cache";
+    cacheLife("hours");
+    cacheTag("teams");
+
     if (ids.length === 0) return new Map();
 
-    const supabase = await createClient();
+    const supabase = createPublicClient();
 
     const { data, error } = await supabase
       .from("teams")

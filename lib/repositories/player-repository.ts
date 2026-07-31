@@ -1,10 +1,11 @@
 // 선수 관련 테이블 쿼리 함수 (맨시티 선수 필터링)
 import "server-only";
 
+import { cacheLife, cacheTag } from "next/cache";
 import { cache } from "react";
 
 import { MCITY_TEAM_ID } from "@/lib/constants/football";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import type { Player, PlayerMatchStats, PlayerSeasonStats } from "@/types";
 
 import {
@@ -18,7 +19,11 @@ import {
 
 /** 맨시티 선수 목록 조회 (이름순 정렬) */
 export const getAllPlayers = cache(async (): Promise<Player[]> => {
-  const supabase = await createClient();
+  "use cache";
+  cacheLife("hours");
+  cacheTag("players");
+
+  const supabase = createPublicClient();
 
   const { data, error } = await supabase
     .from("players")
@@ -34,7 +39,11 @@ export const getAllPlayers = cache(async (): Promise<Player[]> => {
 /** ID로 선수 단건 조회 */
 export const getPlayerById = cache(
   async (id: number): Promise<Player | null> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("players");
+
+    const supabase = createPublicClient();
 
     const { data, error } = await supabase
       .from("players")
@@ -55,7 +64,11 @@ export const getPlayerSeasonStats = cache(
     playerId: number,
     season: string,
   ): Promise<PlayerSeasonStats | null> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("players");
+
+    const supabase = createPublicClient();
 
     const { data, error } = await supabase
       .from("player_season_stats")
@@ -75,7 +88,11 @@ export const getPlayerSeasonStats = cache(
 /** 선수의 가장 최신 시즌 스탯 조회 (시즌 라벨 문자열 내림차순 = 최신순) */
 export const getLatestPlayerSeasonStats = cache(
   async (playerId: number): Promise<PlayerSeasonStats | null> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("players");
+
+    const supabase = createPublicClient();
 
     const { data, error } = await supabase
       .from("player_season_stats")
@@ -98,9 +115,13 @@ export async function getPlayerSeasonStatsByIds(
   playerIds: number[],
   season: string,
 ): Promise<Map<number, PlayerSeasonStats>> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("players");
+
   if (playerIds.length === 0) return new Map();
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   const { data, error } = await supabase
     .from("player_season_stats")
@@ -121,7 +142,11 @@ export async function getPlayerSeasonStatsByIds(
 /** 선수 ID로 최근 경기 스탯 조회 (최신순, 최대 10경기) */
 export const getMatchStatsByPlayerId = cache(
   async (playerId: number): Promise<PlayerMatchStats[]> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("players");
+
+    const supabase = createPublicClient();
 
     const { data, error } = await supabase
       .from("player_match_stats")

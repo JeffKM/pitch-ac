@@ -1,15 +1,20 @@
 // 뉴스 조회 Repository
 
+import { cacheLife, cacheTag } from "next/cache";
 import { cache } from "react";
 
 import { dbRowToTransferNewsItem } from "@/lib/api/fmkorea";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import type { TransferNewsItem } from "@/types";
 
 /** 최신 뉴스 N건 조회 (홈 화면용) */
 export const getLatestNews = cache(
   async (limit: number = 3): Promise<TransferNewsItem[]> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("minutes");
+    cacheTag("news");
+
+    const supabase = createPublicClient();
 
     const { data: rows, error } = await supabase
       .from("transfer_news")

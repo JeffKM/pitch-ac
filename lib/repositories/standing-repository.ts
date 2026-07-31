@@ -1,10 +1,11 @@
 // standings 테이블 배치 쿼리
 import "server-only";
 
+import { cacheLife, cacheTag } from "next/cache";
 import { cache } from "react";
 
 import { ALL_COMPETITIONS, TOP5_LEAGUE_IDS } from "@/lib/constants/football";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import type { TeamStanding } from "@/types";
 
 import { type StandingRow, standingRowToStanding } from "./mappers";
@@ -12,7 +13,11 @@ import { type StandingRow, standingRowToStanding } from "./mappers";
 /** 시즌 전체 순위 조회 (position 오름차순) */
 export const getAllStandings = cache(
   async (season: string): Promise<TeamStanding[]> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("standings");
+
+    const supabase = createPublicClient();
 
     const { data, error } = await supabase
       .from("standings")
@@ -32,7 +37,11 @@ export const getAllStandings = cache(
  */
 export const getLatestStandingSeasons = cache(
   async (): Promise<Map<number, string>> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("standings");
+
+    const supabase = createPublicClient();
     const leagueIds = ALL_COMPETITIONS.map((c) => c.id);
 
     const { data, error } = await supabase
@@ -54,10 +63,14 @@ export const getLatestStandingSeasons = cache(
 /** 전체 대회 최신 시즌 순위 조회 (5대 리그 + UCL) → Map<leagueId, TeamStanding[]> */
 export const getAllLeagueStandings = cache(
   async (): Promise<Map<number, TeamStanding[]>> => {
+    "use cache";
+    cacheLife("hours");
+    cacheTag("standings");
+
     const latestSeasons = await getLatestStandingSeasons();
     if (latestSeasons.size === 0) return new Map();
 
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const leagueIds = ALL_COMPETITIONS.map((c) => c.id);
     // 대회마다 최신 시즌이 다를 수 있어(UCL 시차) 등장하는 시즌을 모두 조회한 뒤 대회별로 걸러낸다
     const seasons = Array.from(new Set(latestSeasons.values()));
@@ -87,9 +100,13 @@ export const getAllLeagueStandings = cache(
  *  UCL standings가 덮어쓰지 않도록 TOP5_LEAGUE_IDS로 필터 */
 export const getStandingsByTeamIds = cache(
   async (teamIds: number[]): Promise<Map<number, TeamStanding>> => {
+    "use cache";
+    cacheLife("hours");
+    cacheTag("standings");
+
     if (teamIds.length === 0) return new Map();
 
-    const supabase = await createClient();
+    const supabase = createPublicClient();
 
     const { data, error } = await supabase
       .from("standings")

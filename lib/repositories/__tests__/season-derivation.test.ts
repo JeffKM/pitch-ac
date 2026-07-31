@@ -14,6 +14,18 @@ vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => db.client,
 }));
 
+// 리포지토리는 use cache용 공개 클라이언트를 사용
+vi.mock("@/lib/supabase/public", () => ({
+  createPublicClient: () => db.client,
+}));
+
+// use cache 지시어의 cacheLife/cacheTag는 Next 런타임 밖에서 no-op 처리
+vi.mock("next/cache", () => ({
+  cacheLife: () => {},
+  cacheTag: () => {},
+  revalidateTag: () => {},
+}));
+
 vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: () => db.client,
 }));

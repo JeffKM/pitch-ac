@@ -1,10 +1,11 @@
 // fixtures 테이블 쿼리 함수 및 현재 게임위크 감지 (리그별 필터링)
 import "server-only";
 
+import { cacheLife, cacheTag } from "next/cache";
 import { cache } from "react";
 
 import { ALL_COMPETITION_IDS, PL_LEAGUE_ID } from "@/lib/constants/football";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import type { Fixture } from "@/types";
 
 import { type FixtureRow, fixtureRowToFixture } from "./mappers";
@@ -25,7 +26,11 @@ export interface CurrentGameweek {
  */
 export const getCurrentGameweek = cache(
   async (leagueId: number = PL_LEAGUE_ID): Promise<CurrentGameweek> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("fixtures");
+
+    const supabase = createPublicClient();
 
     // 리그의 최신 시즌을 먼저 구해 LIVE/NS/FT 조회 전부를 해당 시즌으로 한정한다.
     // 이렇게 하지 않으면 이전 시즌의 stuck LIVE/NS 행(재동기화로도 회복 안 되는
@@ -99,7 +104,11 @@ export const getCurrentGameweek = cache(
 /** ID로 경기 상세 조회 */
 export const getFixtureById = cache(
   async (id: number): Promise<Fixture | null> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("fixtures");
+
+    const supabase = createPublicClient();
 
     const { data, error } = await supabase
       .from("fixtures")
@@ -121,7 +130,11 @@ export const getFixturesByGameweek = cache(
     leagueId: number = PL_LEAGUE_ID,
     season?: string,
   ): Promise<Fixture[]> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("fixtures");
+
+    const supabase = createPublicClient();
 
     let query = supabase
       .from("fixtures")
@@ -143,7 +156,11 @@ export const getFixturesByGameweek = cache(
 /** 전체 대회에서 다음 예정(NS) 경기 조회 (시즌 종료 시 UCL 결승 등 표시용) */
 export const getUpcomingFixtures = cache(
   async (limit: number = 6): Promise<Fixture[]> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("fixtures");
+
+    const supabase = createPublicClient();
 
     const leagueIds = Array.from(ALL_COMPETITION_IDS);
 
@@ -165,7 +182,11 @@ export const getUpcomingFixtures = cache(
 /** KST 날짜 기준 전체 대회 경기 조회 (5대 리그 + UCL) */
 export const getFixturesByDate = cache(
   async (dateStr: string): Promise<Fixture[]> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("fixtures");
+
+    const supabase = createPublicClient();
 
     // KST 00:00~23:59:59 → UTC 변환
     const startKST = new Date(`${dateStr}T00:00:00+09:00`);

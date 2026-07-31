@@ -1,9 +1,10 @@
 // ScoutLab 스카우팅 데이터 조회 Repository
 import "server-only";
 
+import { cacheLife, cacheTag } from "next/cache";
 import { cache } from "react";
 
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import type {
   ScoutlabActionMap,
   ScoutlabActionType,
@@ -39,7 +40,11 @@ import {
 export async function searchScoutlabPlayers(
   filters: ScoutlabSearchFilters,
 ): Promise<ScoutlabPlayer[]> {
-  const supabase = await createClient();
+  "use cache";
+  cacheLife("hours");
+  cacheTag("scoutlab");
+
+  const supabase = createPublicClient();
 
   let query = supabase
     .from("scoutlab_players")
@@ -64,7 +69,11 @@ export async function searchScoutlabPlayers(
 /** 기본 선수 조회 (playerId 미지정 시 Haaland 표시용) */
 export const getDefaultScoutlabPlayer = cache(
   async (season: string): Promise<ScoutlabPlayer | null> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("scoutlab");
+
+    const supabase = createPublicClient();
 
     const { data, error } = await supabase
       .from("scoutlab_players")
@@ -82,7 +91,11 @@ export const getDefaultScoutlabPlayer = cache(
 /** ScoutLab 선수 단건 조회 */
 export const getScoutlabPlayerById = cache(
   async (id: number): Promise<ScoutlabPlayer | null> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("scoutlab");
+
+    const supabase = createPublicClient();
 
     const { data, error } = await supabase
       .from("scoutlab_players")
@@ -106,7 +119,11 @@ export const getScoutlabMetrics = cache(
     adjustment: ScoutlabAdjustment = "padj",
     comparisonPosition: ScoutlabComparisonPosition = "AM/W",
   ): Promise<ScoutlabMetrics | null> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("scoutlab");
+
+    const supabase = createPublicClient();
 
     // 1차: 요청된 comparison_position으로 조회
     const { data, error } = await supabase
@@ -149,7 +166,11 @@ export const getScoutlabProgression = cache(
     adjustment: ScoutlabAdjustment = "padj",
     comparisonPosition: ScoutlabComparisonPosition = "AM/W",
   ): Promise<ScoutlabMetrics[]> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("scoutlab");
+
+    const supabase = createPublicClient();
 
     const { data, error } = await supabase
       .from("scoutlab_metrics")
@@ -170,7 +191,11 @@ export const getScoutlabProgression = cache(
 /** 레이더 차트 데이터 조회 */
 export const getScoutlabRadar = cache(
   async (playerId: number, season: string): Promise<ScoutlabRadar | null> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("scoutlab");
+
+    const supabase = createPublicClient();
 
     const { data, error } = await supabase
       .from("scoutlab_radar")
@@ -192,7 +217,11 @@ export const getScoutlabSimilarity = cache(
     playerId: number,
     season: string,
   ): Promise<ScoutlabSimilarity | null> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("scoutlab");
+
+    const supabase = createPublicClient();
 
     const { data, error } = await supabase
       .from("scoutlab_similarity")
@@ -216,7 +245,11 @@ export const getScoutlabActionMaps = cache(
     season: string,
     actionType?: ScoutlabActionType,
   ): Promise<ScoutlabActionMap[]> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("scoutlab");
+
+    const supabase = createPublicClient();
 
     let query = supabase
       .from("scoutlab_action_maps")
@@ -245,7 +278,11 @@ export async function getScatterData(
   yCategory: ScoutlabCategory,
   filters: ScoutlabSearchFilters,
 ): Promise<ScoutlabScatterPoint[]> {
-  const supabase = await createClient();
+  "use cache";
+  cacheLife("hours");
+  cacheTag("scoutlab");
+
+  const supabase = createPublicClient();
 
   // 필요 컬럼만 조회 — JSONB 11개 전체(행당 ~3.4KB)가 아닌 x/y 카테고리 2개만
   const categories = [...new Set([xCategory, yCategory])].join(", ");
@@ -316,7 +353,11 @@ export async function getRankingData(
 ): Promise<
   Array<{ player: ScoutlabPlayer; value: number; percentile: number }>
 > {
-  const supabase = await createClient();
+  "use cache";
+  cacheLife("hours");
+  cacheTag("scoutlab");
+
+  const supabase = createPublicClient();
 
   // 매퍼가 선수 전체 행을 요구하므로 선수는 *, 메트릭은 요청 카테고리 JSONB만 조회
   let query = supabase
@@ -380,7 +421,11 @@ export const getSampleMetrics = cache(
     mode: ScoutlabMode = "per90",
     adjustment: ScoutlabAdjustment = "padj",
   ): Promise<ScoutlabMetrics | null> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("scoutlab");
+
+    const supabase = createPublicClient();
 
     const { data, error } = await supabase
       .from("scoutlab_metrics")
@@ -400,7 +445,11 @@ export const getSampleMetrics = cache(
 /** 필터 옵션 조회 (드롭다운용) */
 export const getScoutlabFilterOptions = cache(
   async (season?: string): Promise<ScoutlabFilterOptions> => {
-    const supabase = await createClient();
+    "use cache";
+    cacheLife("hours");
+    cacheTag("scoutlab");
+
+    const supabase = createPublicClient();
 
     let query = supabase
       .from("scoutlab_players")
