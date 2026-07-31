@@ -11,7 +11,7 @@ const ChartSpinner = () => (
 
 export const DynamicRadarChart = dynamic(
   () =>
-    import("./scoutlab-radar-chart").then((mod) => ({
+    import("./scoutlab-charts-bundle").then((mod) => ({
       default: mod.ScoutlabRadarChart,
     })),
   { ssr: false, loading: ChartSpinner },
@@ -19,7 +19,7 @@ export const DynamicRadarChart = dynamic(
 
 export const DynamicProgressionChart = dynamic(
   () =>
-    import("./progression-chart").then((mod) => ({
+    import("./scoutlab-charts-bundle").then((mod) => ({
       default: mod.ProgressionChart,
     })),
   { ssr: false, loading: ChartSpinner },
@@ -27,7 +27,7 @@ export const DynamicProgressionChart = dynamic(
 
 export const DynamicScatterPlot = dynamic(
   () =>
-    import("./scatter-plot").then((mod) => ({
+    import("./scoutlab-charts-bundle").then((mod) => ({
       default: mod.ScatterPlot,
     })),
   { ssr: false, loading: ChartSpinner },
