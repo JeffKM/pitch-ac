@@ -1,24 +1,20 @@
 // ScoutLab Ranking — 클라이언트 뷰 (필터 + 테이블)
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useTransition,
-} from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import type {
   ScoutlabCategory,
   ScoutlabCategoryMetrics,
   ScoutlabMetrics,
-  ScoutlabPlayer,
 } from "@/types";
 
 import { formatMetricLabel } from "../_lib/format-metric";
 import { useScoutlabParams } from "../_lib/use-scoutlab-params";
+import {
+  type RankingEntry,
+  useScoutlabRanking,
+} from "../_lib/use-scoutlab-ranking";
 import { RankingFilterPanel } from "./ranking-filter-panel";
 import { RankingTable } from "./ranking-table";
 
@@ -37,12 +33,6 @@ const CATEGORY_PROP_MAP: Record<ScoutlabCategory, keyof ScoutlabMetrics> = {
   misc: "misc",
 };
 
-interface RankingEntry {
-  player: ScoutlabPlayer;
-  value: number;
-  percentile: number;
-}
-
 interface RankingViewProps {
   initialEntries: RankingEntry[];
   sampleMetrics: ScoutlabMetrics | null;
@@ -59,8 +49,13 @@ export function RankingView({
   const { league } = useScoutlabParams();
   const [category, setCategory] = useState(initialCategory);
   const [metric, setMetric] = useState(initialMetric);
-  const [entries, setEntries] = useState(initialEntries);
-  const [isPending, startTransition] = useTransition();
+
+  // 카테고리/메트릭/리그 변경 시 자동 재조회 (첫 렌더는 initialEntries로 커버)
+  const { data, isFetching } = useScoutlabRanking(
+    { category, metric, league },
+    initialEntries,
+  );
+  const entries = data ?? initialEntries;
 
   // 카테고리에서 첫 번째 메트릭 키 가져오기
   const getDefaultMetric = useCallback(
@@ -82,35 +77,6 @@ export function RankingView({
   // 메트릭 라벨
   const metricLabel = useMemo(() => formatMetricLabel(metric), [metric]);
 
-  // 카테고리/메트릭/리그 변경 시 서버에서 랭킹 데이터 재조회
-  // 첫 렌더는 서버가 동일 파라미터로 initialEntries를 이미 조회했으므로 스킵
-  const isFirstRun = useRef(true);
-  useEffect(() => {
-    if (isFirstRun.current) {
-      isFirstRun.current = false;
-      return;
-    }
-    if (!metric) return;
-
-    startTransition(async () => {
-      try {
-        const params = new URLSearchParams({
-          category,
-          metric,
-        });
-        if (league) params.set("league", league);
-
-        const response = await fetch(`/api/scoutlab/ranking?${params}`);
-        if (response.ok) {
-          const data = await response.json();
-          setEntries(data);
-        }
-      } catch {
-        // 에러 시 기존 데이터 유지
-      }
-    });
-  }, [category, metric, league]);
-
   return (
     <div className="space-y-4">
       <RankingFilterPanel
@@ -121,7 +87,7 @@ export function RankingView({
         onMetricChange={setMetric}
       />
 
-      <div className={isPending ? "opacity-50 transition-opacity" : ""}>
+      <div className={isFetching ? "opacity-50 transition-opacity" : ""}>
         <RankingTable
           entries={entries}
           metricLabel={metricLabel}

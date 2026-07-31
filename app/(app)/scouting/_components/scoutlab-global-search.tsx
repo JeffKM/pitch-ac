@@ -2,8 +2,9 @@
 
 // ScoutLab 글로벌 선수 검색 — 리그/팀 필터 연동
 
+import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, Search, X } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,157 +20,54 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import type { ScoutlabComparisonPosition, ScoutlabPosition } from "@/types";
+import type { ScoutlabComparisonPosition } from "@/types";
 
 import { positionToComparisonPosition } from "../_lib/scoutlab-constants";
+import { useDebouncedValue } from "../_lib/use-debounced-value";
 import { useScoutlabParams } from "../_lib/use-scoutlab-params";
-
-interface SearchResult {
-  id: number;
-  name: string;
-  team: string;
-  league: string;
-  position: ScoutlabPosition;
-}
+import {
+  type PlayerSearchResult,
+  scoutlabPlayerQueryKey,
+  useScoutlabPlayerById,
+  useScoutlabPlayerSearch,
+} from "../_lib/use-scoutlab-player-search";
 
 export function ScoutlabGlobalSearch() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [loading, setLoading] = useState(false);
   const [, startTransition] = useTransition();
   const { playerId, season, league, team, setParams } = useScoutlabParams();
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const queryClient = useQueryClient();
 
-  // 현재 선택된 선수 정보 (playerId 변경 시 fetch)
-  const [selectedPlayer, setSelectedPlayer] = useState<SearchResult | null>(
-    null,
+  // 디바운스된 검색어를 queryKey에 넣어 타이핑 중 요청을 억제
+  const debouncedQuery = useDebouncedValue(query);
+  // 2자 미만 검색어는 서버가 무시하므로 빈 문자열로 정규화 (캐시 키 중복 방지)
+  const effectiveQuery = debouncedQuery.length >= 2 ? debouncedQuery : "";
+
+  // 팀/리그가 선택된 경우에는 빈 검색어도 허용 (필터링용 후보 목록)
+  const hasFilter = !!team || !!league;
+  const searchEnabled = open && (effectiveQuery !== "" || hasFilter);
+
+  const { data: searchData, isFetching } = useScoutlabPlayerSearch(
+    { query: effectiveQuery, season, league, team },
+    { enabled: searchEnabled },
   );
-  const prevPlayerIdRef = useRef<number | null>(null);
+  const results = searchEnabled ? (searchData ?? []) : [];
 
-  useEffect(() => {
-    if (playerId === prevPlayerIdRef.current) return;
-    prevPlayerIdRef.current = playerId;
-
-    if (!playerId) {
-      setSelectedPlayer(null);
-      return;
-    }
-
-    // 이미 검색 결과에서 선택한 선수라면 API 호출 불필요
-    const fromResults = results.find((r) => r.id === playerId);
-    if (fromResults) {
-      setSelectedPlayer(fromResults);
-      return;
-    }
-
-    // playerId로 선수 이름 조회
-    fetch(
-      `/api/scoutlab/players/search?q=&season=${encodeURIComponent(season)}&id=${playerId}`,
-    )
-      .then((res) => res.json())
-      .then((data: SearchResult[]) => {
-        if (data.length > 0) setSelectedPlayer(data[0]);
-      })
-      .catch(() => {});
-  }, [playerId, season, results]);
-
-  /** API 검색 URL 빌드 (league/team 필터 포함) */
-  const buildSearchUrl = useCallback(
-    (q: string) => {
-      const params = new URLSearchParams({
-        q,
-        season,
-      });
-      if (league) params.set("league", league);
-      if (team) params.set("team", team);
-      return `/api/scoutlab/players/search?${params.toString()}`;
-    },
-    [season, league, team],
-  );
-
-  // 팀/리그가 선택된 상태에서 popover 열면 바로 후보 목록 로드
-  const handleOpenChange = useCallback(
-    (nextOpen: boolean) => {
-      setOpen(nextOpen);
-      if (nextOpen && results.length === 0 && (team || league)) {
-        setLoading(true);
-        fetch(buildSearchUrl(""))
-          .then((res) => res.json())
-          .then((data: SearchResult[]) => setResults(data))
-          .catch(() => {})
-          .finally(() => setLoading(false));
-      }
-    },
-    [results.length, team, league, buildSearchUrl],
-  );
-
-  // debounce 검색
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-
-    // 팀/리그가 선택된 경우에는 빈 쿼리도 허용 (필터링용)
-    const hasFilter = !!team || !!league;
-    if (query.length < 2 && !hasFilter) {
-      setResults([]);
-      setLoading(false);
-      return;
-    }
-
-    // 빈 쿼리 + 필터가 있는 경우 (이미 popover open 시 로드됨) 건너뜀
-    if (query.length === 0 && hasFilter) {
-      return;
-    }
-
-    setLoading(true);
-    debounceRef.current = setTimeout(async () => {
-      try {
-        const res = await fetch(buildSearchUrl(query));
-        if (res.ok) {
-          const data: SearchResult[] = await res.json();
-          setResults(data);
-        }
-      } finally {
-        setLoading(false);
-      }
-    }, 300);
-
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, [query, buildSearchUrl]);
-
-  // 리그/팀 변경 시 후보 목록 갱신
-  const prevLeagueRef = useRef(league);
-  const prevTeamRef = useRef(team);
-  useEffect(() => {
-    if (league === prevLeagueRef.current && team === prevTeamRef.current)
-      return;
-    prevLeagueRef.current = league;
-    prevTeamRef.current = team;
-
-    // popover가 열려있을 때만 갱신
-    if (!open) {
-      setResults([]);
-      return;
-    }
-
-    if (team || league) {
-      setLoading(true);
-      fetch(buildSearchUrl(query))
-        .then((res) => res.json())
-        .then((data: SearchResult[]) => setResults(data))
-        .catch(() => {})
-        .finally(() => setLoading(false));
-    } else {
-      if (query.length < 2) setResults([]);
-    }
-  }, [league, team, open, buildSearchUrl, query]);
+  // 선택된 선수: 검색 결과에 있으면 그대로 쓰고, 없을 때만 단건 조회
+  const playerFromResults = results.find((r) => r.id === playerId) ?? null;
+  const { data: fetchedPlayer } = useScoutlabPlayerById(playerId, season, {
+    enabled: playerFromResults === null,
+  });
+  const selectedPlayer = playerFromResults ?? fetchedPlayer ?? null;
 
   const handleSelect = useCallback(
-    (player: SearchResult) => {
-      setSelectedPlayer(player);
-      prevPlayerIdRef.current = player.id;
+    (player: PlayerSearchResult) => {
+      // 단건 조회 캐시를 미리 채워 팝오버가 닫힌 뒤 재조회가 발생하지 않게 한다
+      queryClient.setQueryData(
+        scoutlabPlayerQueryKey(player.id, season),
+        player,
+      );
       const comparisonPosition: ScoutlabComparisonPosition =
         positionToComparisonPosition(player.position);
       startTransition(() => {
@@ -178,24 +76,22 @@ export function ScoutlabGlobalSearch() {
       setOpen(false);
       setQuery("");
     },
-    [setParams],
+    [queryClient, season, setParams],
   );
 
   const handleClear = useCallback(() => {
-    setSelectedPlayer(null);
-    prevPlayerIdRef.current = null;
     startTransition(() => {
       setParams({ playerId: null });
     });
   }, [setParams]);
 
-  const hasFilter = !!team || !!league;
+  const loading = searchEnabled && (isFetching || query !== debouncedQuery);
   const showEmpty =
     !loading && results.length === 0 && (query.length >= 2 || hasFilter);
 
   return (
     <div className="flex items-center gap-2">
-      <Popover open={open} onOpenChange={handleOpenChange}>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"

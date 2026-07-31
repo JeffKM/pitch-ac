@@ -2,7 +2,7 @@
 "use client";
 
 import { Loader2, Search } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,54 +19,28 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+import { useDebouncedValue } from "../_lib/use-debounced-value";
 import { useScoutlabParams } from "../_lib/use-scoutlab-params";
-
-interface SearchResult {
-  id: number;
-  name: string;
-  team: string;
-  league: string;
-  position: string;
-}
+import { useScoutlabPlayerSearch } from "../_lib/use-scoutlab-player-search";
 
 export function ScoutlabCompareSearch() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [loading, setLoading] = useState(false);
   const [, startTransition] = useTransition();
   const { season, setParams } = useScoutlabParams();
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
 
-  // debounce 검색
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
+  // 디바운스된 검색어를 queryKey에 넣어 타이핑 중 요청을 억제
+  const debouncedQuery = useDebouncedValue(query);
+  const isSearchable = debouncedQuery.length >= 2;
 
-    if (query.length < 2) {
-      setResults([]);
-      setLoading(false);
-      return;
-    }
+  const { data, isFetching } = useScoutlabPlayerSearch(
+    { query: debouncedQuery, season },
+    { enabled: isSearchable },
+  );
 
-    setLoading(true);
-    debounceRef.current = setTimeout(async () => {
-      try {
-        const res = await fetch(
-          `/api/scoutlab/players/search?q=${encodeURIComponent(query)}&season=${encodeURIComponent(season)}`,
-        );
-        if (res.ok) {
-          const data: SearchResult[] = await res.json();
-          setResults(data);
-        }
-      } finally {
-        setLoading(false);
-      }
-    }, 300);
-
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, [query, season]);
+  // 입력·디바운스 값 중 하나라도 2자 미만이면 직전 결과를 노출하지 않는다
+  const results = query.length >= 2 && isSearchable ? (data ?? []) : [];
+  const loading = query.length >= 2 && (isFetching || query !== debouncedQuery);
 
   const handleSelect = useCallback(
     (id: number) => {
