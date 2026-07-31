@@ -75,9 +75,9 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
 
 - **Task SR06: 롤오버 후속 정리** (SR01·SR03 리뷰 잔여 백로그)
   - ✅ stuck 25/26 행 2건 결과 백필 (2026-07-31): 538145 LIVE→FT 1-1(본머스-맨시티), 542704 NS→FT 0-0(낭트-툴루즈, 업스트림 상태 AWARDED). 근본 원인은 `FIXTURE_STATUS_MAP`·`FdMatchStatus`에 `AWARDED` 누락(→NS fallback) — 매핑·타입 보강 + 매퍼 테스트 추가로 재발 차단
-  - `getPendingResultLeagues()` 시즌 인식 추가 (`lib/services/sync/schedule-calculator.ts`) — FL1 잔존 NS 행 탓에 sync-results가 매 실행 API 2회 낭비 중
+  - ✅ `getPendingResultLeagues()` 시즌 인식 추가 (2026-07-31): NS 행의 season이 해당 리그 최신 시즌과 일치할 때만 pending 인정, 구시즌 잔존 행은 경고 로그 후 제외 (무한 재시도 방지). 최신 시즌 조회 실패 시 fail-open. 테스트 6건 추가
   - sync-results cron 정상 동작 확인 (season NOT NULL 위반 재발 여부)
-  - 리포지토리 시즌 파생 로직 테스트 추가 (`getLatestStandingSeasons`, `getCurrentGameweek`, `resolveStatsSeasons`)
+  - ✅ 리포지토리 시즌 파생 로직 테스트 추가 (2026-07-31): `getLatestStandingSeasons`(UCL 시차)·`getCurrentGameweek`(LIVE>NS>FT 우선순위, 구시즌 stuck 행 무시)·`resolveStatsSeasons`(export 전환) 12건 + 공용 인메모리 쿼리 빌더 `lib/__tests__/in-memory-supabase.ts` 신설
   - 시즌 모순 가드 스킵 시 sync_logs 가시성 확보 (스킵 사유를 errorMessage에 기록)
   - 랭킹 화면 시즌 배지·빈 표 fallback (개막 8/21 전까지 SA·FL1은 0경기 빈 표 노출)
 
