@@ -9,13 +9,13 @@ export function BestElevenPlaceholder() {
 
       <div className="flex flex-col items-center justify-center py-4">
         <span
-          className="font-[family-name:var(--font-bangers)] text-comic-black/30"
+          className="font-[family-name:var(--font-bangers)] text-comic-black"
           style={{ fontSize: "var(--comic-text-xl)" }}
         >
           COMING SOON
         </span>
         <p
-          className="mt-1.5 font-[family-name:var(--font-permanent-marker)] text-comic-black/40"
+          className="mt-1.5 font-[family-name:var(--font-permanent-marker)] text-comic-black"
           style={{ fontSize: "var(--comic-body-sm)" }}
         >
           라운드별 베스트 일레븐을 선정합니다

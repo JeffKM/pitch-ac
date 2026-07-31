@@ -10,7 +10,7 @@ interface EmptyMatchdayProps {
 
 export function EmptyMatchday({ date }: EmptyMatchdayProps) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-16 text-comic-black/50">
+    <div className="flex flex-col items-center justify-center gap-3 py-16 text-comic-black/60">
       <CalendarX2 className="size-10" />
       <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)]">
         {formatFullDate(date)}에 예정된 경기가 없습니다

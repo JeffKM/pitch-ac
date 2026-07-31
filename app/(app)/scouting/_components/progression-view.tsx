@@ -75,7 +75,7 @@ export function ProgressionView({ progressionData }: ProgressionViewProps) {
 
   if (!firstMetrics) {
     return (
-      <p className="py-10 text-center text-comic-black/50">
+      <p className="py-10 text-center text-comic-black/60">
         추이 데이터가 없습니다.
       </p>
     );

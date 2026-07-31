@@ -13,7 +13,7 @@ interface PostmatchTabProps {
 export function PostmatchTab({ fixture }: PostmatchTabProps) {
   if (fixture.status !== "FT") {
     return (
-      <div className="py-12 text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50">
+      <div className="py-12 text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/60">
         Match hasn&apos;t ended yet.
       </div>
     );

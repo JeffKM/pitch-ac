@@ -40,10 +40,10 @@ export function PlayerCardHeader({ player }: PlayerCardHeaderProps) {
 
           {/* 리그 + 시즌 배지 */}
           <div className="mt-2 flex gap-2">
-            <span className="rounded-full bg-comic-skyblue/10 px-2 py-0.5 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-skyblue">
+            <span className="rounded-full bg-comic-skyblue/10 px-2 py-0.5 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-skyblue-text">
               {player.league}
             </span>
-            <span className="rounded-full bg-comic-cream px-2 py-0.5 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+            <span className="rounded-full bg-comic-cream px-2 py-0.5 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
               {player.season}
             </span>
           </div>

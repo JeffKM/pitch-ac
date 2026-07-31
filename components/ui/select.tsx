@@ -33,7 +33,7 @@ function SelectTrigger({
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       className={cn(
-        "flex h-9 w-full items-center justify-between gap-2 rounded-[var(--comic-panel-radius)] border-[var(--comic-border-thin)] border-comic-black/20 bg-comic-white px-3 py-2 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black shadow-sm transition-colors placeholder:text-comic-black/50 focus:ring-2 focus:ring-comic-skyblue/50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+        "flex h-9 w-full items-center justify-between gap-2 rounded-[var(--comic-panel-radius)] border-[var(--comic-border-thin)] border-comic-black/20 bg-comic-white px-3 py-2 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black shadow-sm transition-colors placeholder:text-comic-black/60 focus:ring-2 focus:ring-comic-skyblue/50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
         className,
       )}
       {...props}
@@ -125,7 +125,7 @@ function SelectLabel({
     <SelectPrimitive.Label
       data-slot="select-label"
       className={cn(
-        "px-2 py-1.5 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50",
+        "px-2 py-1.5 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60",
         className,
       )}
       {...props}

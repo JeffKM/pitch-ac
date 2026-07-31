@@ -52,7 +52,7 @@ function ProgressionTooltip({
       <p className="text-comic-black/70">
         {metricLabel}: {formatMetricValue(point.value)}
       </p>
-      <p className="text-comic-black/50">백분위: {point.percentile}%</p>
+      <p className="text-comic-black/60">백분위: {point.percentile}%</p>
     </ChartComicTooltipShell>
   );
 }
@@ -61,6 +61,8 @@ export function ProgressionChart({ data, metricLabel }: ProgressionChartProps) {
   return (
     <div
       data-testid="progression-chart"
+      role="img"
+      aria-label={`${metricLabel} 시즌별 추이 차트`}
       className="rounded-[var(--comic-panel-radius)] paper-texture p-2"
     >
       <ResponsiveContainer width="100%" height={400}>

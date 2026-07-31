@@ -39,7 +39,7 @@ export function PercentileBar({
         />
       </div>
       {showLabel && (
-        <span className="w-8 text-right font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/40 tabular-nums">
+        <span className="w-8 text-right font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60 tabular-nums">
           {clamped}%
         </span>
       )}

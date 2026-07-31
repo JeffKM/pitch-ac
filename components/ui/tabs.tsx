@@ -26,7 +26,7 @@ function Tabs({
 }
 
 const tabsListVariants = cva(
-  "group/tabs-list inline-flex w-fit items-center justify-center rounded-[var(--comic-panel-radius)] p-[3px] font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50 group-data-[orientation=horizontal]/tabs:h-9 group-data-[orientation=vertical]/tabs:h-fit group-data-[orientation=vertical]/tabs:flex-col data-[variant=line]:rounded-none",
+  "group/tabs-list inline-flex w-fit items-center justify-center rounded-[var(--comic-panel-radius)] p-[3px] font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/60 group-data-[orientation=horizontal]/tabs:h-9 group-data-[orientation=vertical]/tabs:h-fit group-data-[orientation=vertical]/tabs:flex-col data-[variant=line]:rounded-none",
   {
     variants: {
       variant: {
@@ -65,7 +65,7 @@ function TabsTrigger({
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-[var(--comic-panel-radius)] border border-transparent px-2 py-1 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] whitespace-nowrap text-comic-black/50 transition-all group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start hover:text-comic-black focus-visible:border-comic-skyblue focus-visible:ring-[3px] focus-visible:ring-comic-skyblue/50 focus-visible:outline-1 focus-visible:outline-comic-skyblue disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-[var(--comic-panel-radius)] border border-transparent px-2 py-1 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] whitespace-nowrap text-comic-black/60 transition-all group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start hover:text-comic-black focus-visible:border-comic-skyblue focus-visible:ring-[3px] focus-visible:ring-comic-skyblue/50 focus-visible:outline-1 focus-visible:outline-comic-skyblue disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         "data-[state=active]:bg-comic-white data-[state=active]:text-comic-black data-[state=active]:shadow-sm group-data-[variant=default]/tabs-list:data-[state=active]:border-comic-black/20",
         "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent",
         "after:absolute after:bg-comic-black after:opacity-0 after:transition-opacity group-data-[orientation=horizontal]/tabs:after:inset-x-0 group-data-[orientation=horizontal]/tabs:after:bottom-[-5px] group-data-[orientation=horizontal]/tabs:after:h-0.5 group-data-[orientation=vertical]/tabs:after:inset-y-0 group-data-[orientation=vertical]/tabs:after:-right-1 group-data-[orientation=vertical]/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-[state=active]:after:opacity-100",

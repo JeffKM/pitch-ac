@@ -62,7 +62,7 @@ export function ScoutlabCompareSearch() {
           aria-expanded={open}
           className="w-[220px] justify-between border-comic-black/20 bg-comic-white text-sm"
         >
-          <span className="flex items-center gap-2 text-comic-black/50">
+          <span className="flex items-center gap-2 text-comic-black/60">
             <Search className="size-3.5" />
             비교 선수 검색...
           </span>
@@ -78,7 +78,7 @@ export function ScoutlabCompareSearch() {
           <CommandList>
             {loading && (
               <div className="flex items-center justify-center py-6">
-                <Loader2 className="size-4 animate-spin text-comic-black/40" />
+                <Loader2 className="size-4 animate-spin text-comic-black/60" />
               </div>
             )}
             {!loading && query.length >= 2 && results.length === 0 && (
@@ -95,7 +95,7 @@ export function ScoutlabCompareSearch() {
                     <span className="flex-1 truncate text-sm">
                       {player.name}
                     </span>
-                    <span className="text-xs text-comic-black/40">
+                    <span className="text-xs text-comic-black/60">
                       {player.team}
                     </span>
                   </CommandItem>

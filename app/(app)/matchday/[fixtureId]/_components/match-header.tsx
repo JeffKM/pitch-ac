@@ -53,7 +53,7 @@ export function MatchHeader({
               {homeTeam.name}
             </p>
             {homeStanding && (
-              <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+              <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
                 {homeStanding.position}위 · {homeStanding.points}pts
               </p>
             )}
@@ -66,7 +66,7 @@ export function MatchHeader({
                 {fixture.homeScore} – {fixture.awayScore}
               </p>
             ) : (
-              <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-2xl)] text-comic-black/40">
+              <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-2xl)] text-comic-black/60">
                 vs
               </p>
             )}
@@ -89,7 +89,7 @@ export function MatchHeader({
               {awayTeam.name}
             </p>
             {awayStanding && (
-              <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+              <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
                 {awayStanding.position}위 · {awayStanding.points}pts
               </p>
             )}

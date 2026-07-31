@@ -41,10 +41,11 @@ export function AppHeader({ authSlot }: AppHeaderProps) {
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "flex items-center gap-1.5 rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black px-3 py-1.5 font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] tracking-[var(--comic-tracking-normal)] transition-colors",
                   isActive
-                    ? "bg-comic-yellow text-comic-black"
+                    ? "bg-comic-yellow text-comic-yellow-fg"
                     : "bg-comic-black text-comic-white hover:bg-comic-black/80",
                 )}
               >

@@ -27,7 +27,10 @@ export function ComicHomeContent({
   latestNews,
 }: ComicHomeContentProps) {
   return (
-    <main className="mx-auto max-w-5xl p-[var(--comic-panel-padding)]">
+    <main
+      id="main-content"
+      className="mx-auto max-w-5xl p-[var(--comic-panel-padding)]"
+    >
       {/* 2패널 그리드: 경기 | 리그 순위 */}
       <div className="grid gap-[var(--comic-panel-gap)] md:grid-cols-2">
         <RoundMatchesPanel

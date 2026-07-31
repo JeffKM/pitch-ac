@@ -31,6 +31,9 @@ interface PageProps {
 export default function ScoutingPage({ searchParams }: PageProps) {
   return (
     <div className="space-y-4">
+      {/* 탭 내비게이션에 시각적 타이틀이 있으므로 헤딩 구조용 sr-only h1 */}
+      <h1 className="sr-only">ScoutLab Player Card</h1>
+
       {/* 필터 바 + 선수 검색 (한 줄) */}
       <Suspense fallback={<ScoutlabFilterSectionSkeleton />}>
         <ScoutlabFilterSection searchParams={searchParams} />
@@ -112,7 +115,7 @@ function EmptyState({ message }: { message: string }) {
     <div className="flex min-h-[30vh] items-center justify-center">
       <div className="text-center">
         <SearchX className="mx-auto size-10 text-comic-black/20" />
-        <p className="mt-3 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-lg)] text-comic-black/50">
+        <p className="mt-3 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-lg)] text-comic-black/60">
           {message}
         </p>
       </div>

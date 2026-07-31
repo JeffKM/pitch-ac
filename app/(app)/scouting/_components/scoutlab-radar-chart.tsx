@@ -69,6 +69,12 @@ export function ScoutlabRadarChart({
   return (
     <div
       data-testid="scoutlab-radar-chart"
+      role="img"
+      aria-label={
+        compareAxes && compareName
+          ? `${playerName ?? "선수"} vs ${compareName} 백분위 레이더 차트`
+          : `${playerName ?? "선수"} 백분위 레이더 차트`
+      }
       className="rounded-[var(--comic-panel-radius)] paper-texture p-2"
     >
       <ResponsiveContainer width="100%" height={400}>

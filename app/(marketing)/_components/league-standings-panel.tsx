@@ -69,7 +69,7 @@ export function LeagueStandingsPanel({
       {/* 미니 순위 테이블 */}
       {topTeams.length === 0 ? (
         <p
-          className="py-6 text-center font-[family-name:var(--font-bangers)] text-comic-black/40"
+          className="py-6 text-center font-[family-name:var(--font-bangers)] text-comic-black/60"
           style={{ fontSize: "var(--comic-text-base)" }}
         >
           NO DATA YET
@@ -77,15 +77,30 @@ export function LeagueStandingsPanel({
       ) : (
         <div className="overflow-x-auto rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
           <table className="w-full text-left">
+            <caption className="sr-only">
+              {TAB_LABELS[activeSlug]} 상위 {TOP_N}팀 순위표 — 순위, 팀, 경기수,
+              득실차, 승점
+            </caption>
             <thead>
               <tr className="border-comic-black border-b-[var(--comic-border-width)] bg-comic-cream font-[family-name:var(--font-bangers)] text-[length:var(--comic-body-sm)] tracking-[var(--comic-tracking-normal)] text-comic-black/70">
-                <th className="px-2 py-1.5 text-center">#</th>
-                <th className="px-2 py-1.5">Team</th>
-                <th className="px-2 py-1.5 text-center">P</th>
-                <th className="hidden px-2 py-1.5 text-center sm:table-cell">
+                <th scope="col" className="px-2 py-1.5 text-center">
+                  #
+                </th>
+                <th scope="col" className="px-2 py-1.5">
+                  Team
+                </th>
+                <th scope="col" className="px-2 py-1.5 text-center">
+                  P
+                </th>
+                <th
+                  scope="col"
+                  className="hidden px-2 py-1.5 text-center sm:table-cell"
+                >
                   GD
                 </th>
-                <th className="px-2 py-1.5 text-center">Pts</th>
+                <th scope="col" className="px-2 py-1.5 text-center">
+                  Pts
+                </th>
               </tr>
             </thead>
             <tbody>

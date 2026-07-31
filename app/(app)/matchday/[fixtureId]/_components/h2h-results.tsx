@@ -36,10 +36,10 @@ export function H2HResults({
     return (
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle>H2H Records</CardTitle>
+          <CardTitle as="h2">H2H Records</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50">
+          <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/60">
             No H2H data available.
           </p>
         </CardContent>
@@ -60,7 +60,7 @@ export function H2HResults({
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle>H2H Records</CardTitle>
+        <CardTitle as="h2">H2H Records</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
         {results.map((result) => {
@@ -74,7 +74,7 @@ export function H2HResults({
               key={result.fixtureId}
               className="flex items-center justify-between gap-2 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)]"
             >
-              <span className="w-24 shrink-0 text-[length:var(--comic-body-xs)] text-comic-black/50">
+              <span className="w-24 shrink-0 text-[length:var(--comic-body-xs)] text-comic-black/60">
                 {formatH2HDate(result.date)}
               </span>
 
@@ -89,13 +89,15 @@ export function H2HResults({
 
         <Separator className="my-2" />
 
-        <div className="flex justify-center gap-4 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+        <div className="flex justify-center gap-4 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
           <span>
-            <span className="text-comic-green">{wins}W</span> ({homeTeamName})
+            <span className="text-comic-green-text">{wins}W</span> (
+            {homeTeamName})
           </span>
-          <span className="text-comic-yellow">{draws}D</span>
+          <span className="text-comic-yellow-text">{draws}D</span>
           <span>
-            <span className="text-comic-red">{losses}L</span> ({homeTeamName})
+            <span className="text-comic-red-text">{losses}L</span> (
+            {homeTeamName})
           </span>
         </div>
       </CardContent>

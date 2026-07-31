@@ -2,7 +2,11 @@
 
 import Image from "next/image";
 
-import { PL_LEAGUE_ID, UCL_COMPETITION_ID } from "@/lib/constants/football";
+import {
+  LEAGUE_NAME_MAP,
+  PL_LEAGUE_ID,
+  UCL_COMPETITION_ID,
+} from "@/lib/constants/football";
 import { cn } from "@/lib/utils";
 import type { Team, TeamStanding } from "@/types";
 
@@ -167,14 +171,16 @@ function getLegendItems(leagueId: number): LegendItem[] {
 
 // ─── 폼 뱃지 색상 ───────────────────────────────
 
+// 흰 텍스트 기준 WCAG AA(4.5:1) 충족 톤 — green-500/gray-400/red-500(각 2.28:1, 2.54:1, 3.76:1)는 미달이라
+// green-700(5.02:1)/gray-600(7.56:1)/red-700(6.47:1)로 교체
 function getFormColor(result: "W" | "D" | "L"): string {
   switch (result) {
     case "W":
-      return "bg-green-500 text-white";
+      return "bg-green-700 text-white";
     case "D":
-      return "bg-gray-400 text-white";
+      return "bg-gray-600 text-white";
     case "L":
-      return "bg-red-500 text-white";
+      return "bg-red-700 text-white";
   }
 }
 
@@ -191,19 +197,63 @@ export function StandingsTable({
   return (
     <div className="overflow-x-auto rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
       <table className="w-full text-left">
+        <caption className="sr-only">
+          {LEAGUE_NAME_MAP[leagueId] ?? "리그"} 순위표 — 순위, 팀, 경기수, 승,
+          무, 패, 득점, 실점, 득실차, 승점, 최근 5경기 폼
+        </caption>
         <thead>
           <tr className="border-comic-black border-b-[var(--comic-border-width)] bg-comic-cream font-[family-name:var(--font-bangers)] text-[length:var(--comic-body-sm)] tracking-[var(--comic-tracking-normal)] text-comic-black/70">
-            <th className="px-3 py-2 text-center">#</th>
-            <th className="px-3 py-2">Team</th>
-            <th className="px-3 py-2 text-center">P</th>
-            <th className="hidden px-3 py-2 text-center sm:table-cell">W</th>
-            <th className="hidden px-3 py-2 text-center sm:table-cell">D</th>
-            <th className="hidden px-3 py-2 text-center sm:table-cell">L</th>
-            <th className="hidden px-3 py-2 text-center md:table-cell">GF</th>
-            <th className="hidden px-3 py-2 text-center md:table-cell">GA</th>
-            <th className="px-3 py-2 text-center">GD</th>
-            <th className="px-3 py-2 text-center">Pts</th>
-            <th className="hidden px-3 py-2 text-center lg:table-cell">Form</th>
+            <th scope="col" className="px-3 py-2 text-center">
+              #
+            </th>
+            <th scope="col" className="px-3 py-2">
+              Team
+            </th>
+            <th scope="col" className="px-3 py-2 text-center">
+              P
+            </th>
+            <th
+              scope="col"
+              className="hidden px-3 py-2 text-center sm:table-cell"
+            >
+              W
+            </th>
+            <th
+              scope="col"
+              className="hidden px-3 py-2 text-center sm:table-cell"
+            >
+              D
+            </th>
+            <th
+              scope="col"
+              className="hidden px-3 py-2 text-center sm:table-cell"
+            >
+              L
+            </th>
+            <th
+              scope="col"
+              className="hidden px-3 py-2 text-center md:table-cell"
+            >
+              GF
+            </th>
+            <th
+              scope="col"
+              className="hidden px-3 py-2 text-center md:table-cell"
+            >
+              GA
+            </th>
+            <th scope="col" className="px-3 py-2 text-center">
+              GD
+            </th>
+            <th scope="col" className="px-3 py-2 text-center">
+              Pts
+            </th>
+            <th
+              scope="col"
+              className="hidden px-3 py-2 text-center lg:table-cell"
+            >
+              Form
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -285,7 +335,7 @@ export function StandingsTable({
       </table>
 
       {/* 동적 범례 */}
-      <div className="flex flex-wrap gap-4 border-t border-comic-black/20 px-3 py-2 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+      <div className="flex flex-wrap gap-4 border-t border-comic-black/20 px-3 py-2 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
         {legendItems.map((item) => (
           <span key={item.label} className="flex items-center gap-1">
             <span className={cn("inline-block h-3 w-0.5", item.colorClass)} />

@@ -25,6 +25,7 @@ interface PageProps {
 export default function RadarPage({ searchParams }: PageProps) {
   return (
     <div className="space-y-4">
+      <h1 className="sr-only">ScoutLab Radar</h1>
       <Suspense fallback={<ScoutlabFilterSectionSkeleton />}>
         <ScoutlabFilterSection searchParams={searchParams} />
       </Suspense>
@@ -53,7 +54,7 @@ async function RadarContent({ searchParams }: PageProps) {
       <div className="flex min-h-[40vh] items-center justify-center">
         <div className="text-center">
           <SearchX className="mx-auto size-10 text-comic-black/20" />
-          <p className="mt-3 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-lg)] text-comic-black/50">
+          <p className="mt-3 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-lg)] text-comic-black/60">
             {!selectedPlayer
               ? "Player Card 탭에서 선수를 선택하세요."
               : "해당 시즌의 레이더 데이터가 없습니다."}

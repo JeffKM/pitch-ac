@@ -142,7 +142,7 @@ function DialogDescription({
     <DialogPrimitive.Description
       data-slot="dialog-description"
       className={cn(
-        "font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50",
+        "font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/60",
         className,
       )}
       {...props}

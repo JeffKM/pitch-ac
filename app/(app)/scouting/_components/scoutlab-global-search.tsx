@@ -97,17 +97,18 @@ export function ScoutlabGlobalSearch() {
             variant="outline"
             role="combobox"
             aria-expanded={open}
+            aria-label="선수 검색"
             className="w-[220px] justify-between border-comic-black/20 bg-comic-white text-sm"
           >
             {selectedPlayer ? (
               <span className="truncate">
                 {selectedPlayer.name}{" "}
-                <span className="text-comic-black/40">
+                <span className="text-comic-black/60">
                   ({selectedPlayer.team})
                 </span>
               </span>
             ) : (
-              <span className="flex items-center gap-2 text-comic-black/50">
+              <span className="flex items-center gap-2 text-comic-black/60">
                 <Search className="size-3.5" />
                 {team ? `${team} 선수...` : "선수 검색..."}
               </span>
@@ -124,7 +125,7 @@ export function ScoutlabGlobalSearch() {
             <CommandList>
               {loading && (
                 <div className="flex items-center justify-center py-6">
-                  <Loader2 className="size-4 animate-spin text-comic-black/40" />
+                  <Loader2 className="size-4 animate-spin text-comic-black/60" />
                 </div>
               )}
               {showEmpty && <CommandEmpty>결과 없음</CommandEmpty>}
@@ -137,7 +138,7 @@ export function ScoutlabGlobalSearch() {
                       onSelect={() => handleSelect(player)}
                     >
                       <span className="flex-1 truncate">{player.name}</span>
-                      <span className="text-xs text-comic-black/40">
+                      <span className="text-xs text-comic-black/60">
                         {player.team}
                       </span>
                     </CommandItem>
@@ -152,10 +153,11 @@ export function ScoutlabGlobalSearch() {
         <Button
           variant="ghost"
           size="icon"
-          className="size-7 text-comic-black/40 hover:text-comic-black"
+          aria-label="선택 해제"
+          className="size-7 text-comic-black/60 hover:text-comic-black"
           onClick={handleClear}
         >
-          <X className="size-3.5" />
+          <X className="size-3.5" aria-hidden="true" />
         </Button>
       )}
     </div>

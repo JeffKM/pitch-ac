@@ -19,7 +19,7 @@ export function LeagueFixtureGroup({
         <h2 className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-body-base)] tracking-[var(--comic-tracking-wide)] text-comic-black">
           {shortName}
         </h2>
-        <span className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/40">
+        <span className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
           {country}
         </span>
       </div>

@@ -25,7 +25,7 @@ export function MetricRow({
           {name}
         </span>
         {brief && (
-          <span className="hidden shrink-0 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/40 sm:inline">
+          <span className="hidden shrink-0 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60 sm:inline">
             {brief}
           </span>
         )}

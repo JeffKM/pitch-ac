@@ -24,7 +24,7 @@ function getCompetitionColorClass(leagueId: number): string {
     case "SA":
       return "border-sky-500 bg-sky-500/10 text-sky-700";
     case "BL1":
-      return "border-comic-red bg-comic-red/10 text-comic-red";
+      return "border-comic-red bg-comic-red/10 text-comic-red-text";
     case "FL1":
       return "border-emerald-500 bg-emerald-500/10 text-emerald-700";
     default:

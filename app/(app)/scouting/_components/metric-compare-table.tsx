@@ -57,13 +57,25 @@ export function MetricCompareTable({
               {SCOUTLAB_CATEGORY_LABELS[key]}
             </h4>
             <table className="w-full text-sm">
+              <caption className="sr-only">
+                {SCOUTLAB_CATEGORY_LABELS[key]} 메트릭 비교: {playerAName} vs{" "}
+                {playerBName}
+              </caption>
               <thead>
-                <tr className="border-b border-comic-black/10 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
-                  <th className="w-1/4 truncate px-2 py-1.5 text-right">
+                <tr className="border-b border-comic-black/10 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
+                  <th
+                    scope="col"
+                    className="w-1/4 truncate px-2 py-1.5 text-right"
+                  >
                     {playerAName}
                   </th>
-                  <th className="px-2 py-1.5 text-center">메트릭</th>
-                  <th className="w-1/4 truncate px-2 py-1.5 text-left">
+                  <th scope="col" className="px-2 py-1.5 text-center">
+                    메트릭
+                  </th>
+                  <th
+                    scope="col"
+                    className="w-1/4 truncate px-2 py-1.5 text-left"
+                  >
                     {playerBName}
                   </th>
                 </tr>
@@ -86,7 +98,7 @@ export function MetricCompareTable({
                         className={cn(
                           "px-2 py-1.5 text-right tabular-nums",
                           aWins
-                            ? "font-bold text-comic-skyblue"
+                            ? "font-bold text-comic-skyblue-text"
                             : "text-comic-black/70",
                         )}
                       >
@@ -104,7 +116,7 @@ export function MetricCompareTable({
                         className={cn(
                           "px-2 py-1.5 text-left tabular-nums",
                           bWins
-                            ? "font-bold text-comic-pink"
+                            ? "font-bold text-comic-pink-text"
                             : "text-comic-black/70",
                         )}
                       >

@@ -7,10 +7,10 @@ export default function ScoutingGlossaryPage() {
   return (
     <div className="space-y-8" data-testid="glossary-page">
       <div>
-        <h2 className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-xl)] text-comic-black">
+        <h1 className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-xl)] text-comic-black">
           Metric Glossary
-        </h2>
-        <p className="mt-1 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] text-comic-black/50">
+        </h1>
+        <p className="mt-1 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] text-comic-black/60">
           ScoutLab에서 사용하는 고급 메트릭 용어 정의
         </p>
       </div>
@@ -41,7 +41,7 @@ export default function ScoutingGlossaryPage() {
                   {term.description}
                 </p>
                 {term.example && (
-                  <p className="mt-1.5 text-xs leading-relaxed text-comic-black/50 italic">
+                  <p className="mt-1.5 text-xs leading-relaxed text-comic-black/60 italic">
                     예: {term.example}
                   </p>
                 )}

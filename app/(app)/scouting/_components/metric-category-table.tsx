@@ -82,7 +82,7 @@ export function MetricCategoryTable({ metrics }: MetricCategoryTableProps) {
                 <span className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-lg)] text-comic-black">
                   {SCOUTLAB_CATEGORY_LABELS[category]}
                 </span>
-                <span className="ml-auto font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/40">
+                <span className="ml-auto font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
                   avg {avgPercentile}%
                 </span>
               </div>

@@ -44,6 +44,9 @@ export async function generateMetadata({
 export default function MatchdayPage({ searchParams }: PageProps) {
   return (
     <div className="space-y-8">
+      {/* 시각적 타이틀 없는 페이지 — 헤딩 구조용 sr-only h1 */}
+      <h1 className="sr-only">Matchday</h1>
+
       {/* 날짜 스트립 — searchParams만 필요하므로 경기 조회와 별도 경계로 분리 */}
       <Suspense fallback={<DateStripSkeleton />}>
         <MatchdayDateStrip searchParams={searchParams} />

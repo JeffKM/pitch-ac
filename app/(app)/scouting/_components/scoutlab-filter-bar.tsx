@@ -29,7 +29,7 @@ export function ScoutlabFilterBar({ options }: ScoutlabFilterBarProps) {
     <div className="flex flex-wrap items-center gap-2">
       {/* 시즌 */}
       <Select value={season} onValueChange={(v) => setParams({ season: v })}>
-        <SelectTrigger className="w-[100px]">
+        <SelectTrigger className="w-[100px]" aria-label="시즌 선택">
           <SelectValue placeholder="시즌" />
         </SelectTrigger>
         <SelectContent>
@@ -51,7 +51,7 @@ export function ScoutlabFilterBar({ options }: ScoutlabFilterBarProps) {
           })
         }
       >
-        <SelectTrigger className="w-[160px]">
+        <SelectTrigger className="w-[160px]" aria-label="리그 필터">
           <SelectValue placeholder="리그" />
         </SelectTrigger>
         <SelectContent>
@@ -69,7 +69,7 @@ export function ScoutlabFilterBar({ options }: ScoutlabFilterBarProps) {
         value={team ?? "all"}
         onValueChange={(v) => setParams({ team: v === "all" ? null : v })}
       >
-        <SelectTrigger className="w-[160px]">
+        <SelectTrigger className="w-[160px]" aria-label="팀 필터">
           <SelectValue placeholder="팀" />
         </SelectTrigger>
         <SelectContent>

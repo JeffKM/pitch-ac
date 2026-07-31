@@ -20,14 +20,14 @@ export default function Error({
 
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 text-center">
-      <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-3xl)] text-comic-black/50">
+      <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-3xl)] text-comic-black/60">
         Error
       </p>
       <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-lg)]">
         An unexpected error occurred
       </p>
       {error.digest && (
-        <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+        <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
           Error code: {error.digest}
         </p>
       )}

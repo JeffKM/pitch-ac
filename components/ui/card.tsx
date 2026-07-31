@@ -32,19 +32,23 @@ const CardHeader = React.forwardRef<
 ));
 CardHeader.displayName = "CardHeader";
 
-const CardTitle = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-lg)] leading-none tracking-[var(--comic-tracking-wide)]",
-      className,
-    )}
-    {...props}
-  />
-));
+type CardTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
+  /** 렌더링할 시맨틱 헤딩 레벨 (기본 h3) — 페이지 헤딩 구조에 맞춰 조정 */
+  as?: React.ElementType;
+};
+
+const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
+  ({ className, as: Comp = "h3", ...props }, ref) => (
+    <Comp
+      ref={ref}
+      className={cn(
+        "font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-lg)] leading-none tracking-[var(--comic-tracking-wide)]",
+        className,
+      )}
+      {...props}
+    />
+  ),
+);
 CardTitle.displayName = "CardTitle";
 
 const CardDescription = React.forwardRef<
@@ -54,7 +58,7 @@ const CardDescription = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50",
+      "font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/60",
       className,
     )}
     {...props}

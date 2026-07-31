@@ -17,10 +17,11 @@ interface PageProps {
 export default function ScatterPage({ searchParams }: PageProps) {
   return (
     <div className="space-y-4">
+      <h1 className="sr-only">ScoutLab Scatter</h1>
       <div className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-thin)] border-comic-black/20 bg-comic-white p-5">
-        <h3 className="mb-4 font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-lg)] text-comic-black">
+        <h2 className="mb-4 font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-lg)] text-comic-black">
           Scatter Plot
-        </h3>
+        </h2>
         <Suspense fallback={<ScatterSkeleton />}>
           <ScatterContent searchParams={searchParams} />
         </Suspense>

@@ -30,6 +30,8 @@ interface PageProps {
 export default function ScoutingComparePage({ searchParams }: PageProps) {
   return (
     <div className="space-y-4">
+      <h1 className="sr-only">ScoutLab Compare</h1>
+
       {/* 필터 바 + 기준 선수 검색 (한 줄) */}
       <Suspense fallback={<ScoutlabFilterSectionSkeleton />}>
         <ScoutlabFilterSection searchParams={searchParams} />
@@ -97,7 +99,7 @@ async function CompareContent({ searchParams }: PageProps) {
       <div className="flex min-h-[40vh] items-center justify-center">
         <div className="text-center">
           <SearchX className="mx-auto size-10 text-comic-black/20" />
-          <p className="mt-3 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-lg)] text-comic-black/50">
+          <p className="mt-3 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-lg)] text-comic-black/60">
             상단 검색창에서 선수를 선택하세요.
           </p>
         </div>
@@ -125,7 +127,7 @@ async function CompareContent({ searchParams }: PageProps) {
         ) : (
           <div className="flex items-center justify-center rounded-[var(--comic-panel-radius)] border-dashed border-[var(--comic-border-thin)] border-comic-black/20 bg-comic-white p-4">
             <div className="space-y-2 text-center">
-              <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] text-comic-black/50">
+              <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] text-comic-black/60">
                 비교 선수를 선택하세요
               </p>
               <ScoutlabCompareSearch />
@@ -137,7 +139,7 @@ async function CompareContent({ searchParams }: PageProps) {
       {/* 비교 선수 검색 (이미 선택된 경우) */}
       {playerB && (
         <div className="flex items-center gap-2">
-          <span className="text-xs text-comic-black/50">비교 대상 변경:</span>
+          <span className="text-xs text-comic-black/60">비교 대상 변경:</span>
           <ScoutlabCompareSearch />
         </div>
       )}

@@ -23,7 +23,7 @@ type RankingContentProps = {
 /** 시즌 배지 — 탭마다 어느 시즌 순위표인지 표시 (UCL 롤오버 시차 대응) */
 function SeasonBadge({ season }: { season: string }) {
   return (
-    <span className="inline-flex items-center rounded-full border-[var(--comic-border-width)] border-comic-black bg-comic-yellow px-3 py-0.5 font-[family-name:var(--font-bangers)] text-[length:var(--comic-body-sm)] tracking-[var(--comic-tracking-normal)] text-comic-black">
+    <span className="inline-flex items-center rounded-full border-[var(--comic-border-width)] border-comic-black bg-comic-yellow px-3 py-0.5 font-[family-name:var(--font-bangers)] text-[length:var(--comic-body-sm)] tracking-[var(--comic-tracking-normal)] text-comic-yellow-fg">
       {toShortSeasonLabel(season)} Season
     </span>
   );
@@ -51,7 +51,7 @@ export function RankingContent({
           <TabsTrigger
             key={league.slug}
             value={league.slug}
-            className="font-[family-name:var(--font-bangers)] tracking-[var(--comic-tracking-normal)] data-[state=active]:bg-comic-yellow data-[state=active]:text-comic-black"
+            className="font-[family-name:var(--font-bangers)] tracking-[var(--comic-tracking-normal)] data-[state=active]:bg-comic-yellow data-[state=active]:text-comic-yellow-fg"
           >
             {league.shortName}
           </TabsTrigger>

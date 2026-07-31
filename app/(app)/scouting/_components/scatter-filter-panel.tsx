@@ -64,7 +64,7 @@ export function ScatterFilterPanel({
             value={xCategory}
             onValueChange={(v) => onXCategoryChange(v as ScoutlabCategory)}
           >
-            <SelectTrigger className="w-36">
+            <SelectTrigger className="w-36" aria-label="X축 카테고리 선택">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -76,7 +76,7 @@ export function ScatterFilterPanel({
             </SelectContent>
           </Select>
           <Select value={xMetric} onValueChange={onXMetricChange}>
-            <SelectTrigger className="w-44">
+            <SelectTrigger className="w-44" aria-label="X축 지표 선택">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -98,7 +98,7 @@ export function ScatterFilterPanel({
             value={yCategory}
             onValueChange={(v) => onYCategoryChange(v as ScoutlabCategory)}
           >
-            <SelectTrigger className="w-36">
+            <SelectTrigger className="w-36" aria-label="Y축 카테고리 선택">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -110,7 +110,7 @@ export function ScatterFilterPanel({
             </SelectContent>
           </Select>
           <Select value={yMetric} onValueChange={onYMetricChange}>
-            <SelectTrigger className="w-44">
+            <SelectTrigger className="w-44" aria-label="Y축 지표 선택">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

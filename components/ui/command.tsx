@@ -52,7 +52,7 @@ function CommandDialog({
         className={cn("overflow-hidden p-0", className)}
         showCloseButton={showCloseButton}
       >
-        <Command className="**:data-[slot=command-input-wrapper]:h-12 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-[family-name:var(--font-permanent-marker)] [&_[cmdk-group-heading]]:text-comic-black/50 [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
+        <Command className="**:data-[slot=command-input-wrapper]:h-12 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-[family-name:var(--font-permanent-marker)] [&_[cmdk-group-heading]]:text-comic-black/60 [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
           {children}
         </Command>
       </DialogContent>
@@ -73,7 +73,7 @@ function CommandInput({
       <CommandPrimitive.Input
         data-slot="command-input"
         className={cn(
-          "flex h-10 w-full rounded-[var(--comic-panel-radius)] bg-transparent py-3 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] outline-hidden placeholder:text-comic-black/50 disabled:cursor-not-allowed disabled:opacity-50",
+          "flex h-10 w-full rounded-[var(--comic-panel-radius)] bg-transparent py-3 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] outline-hidden placeholder:text-comic-black/60 disabled:cursor-not-allowed disabled:opacity-50",
           className,
         )}
         {...props}
@@ -118,7 +118,7 @@ function CommandGroup({
     <CommandPrimitive.Group
       data-slot="command-group"
       className={cn(
-        "overflow-hidden p-1 text-comic-black [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:font-[family-name:var(--font-permanent-marker)] [&_[cmdk-group-heading]]:text-[length:var(--comic-body-xs)] [&_[cmdk-group-heading]]:text-comic-black/50",
+        "overflow-hidden p-1 text-comic-black [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:font-[family-name:var(--font-permanent-marker)] [&_[cmdk-group-heading]]:text-[length:var(--comic-body-xs)] [&_[cmdk-group-heading]]:text-comic-black/60",
         className,
       )}
       {...props}
@@ -150,7 +150,7 @@ function CommandItem({
     <CommandPrimitive.Item
       data-slot="command-item"
       className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-[var(--comic-panel-radius)] px-2 py-1.5 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[selected=true]:bg-comic-cream data-[selected=true]:text-comic-black [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-comic-black/50",
+        "relative flex cursor-default items-center gap-2 rounded-[var(--comic-panel-radius)] px-2 py-1.5 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[selected=true]:bg-comic-cream data-[selected=true]:text-comic-black [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-comic-black/60",
         className,
       )}
       {...props}
@@ -166,7 +166,7 @@ function CommandShortcut({
     <span
       data-slot="command-shortcut"
       className={cn(
-        "ml-auto font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] tracking-widest text-comic-black/50",
+        "ml-auto font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] tracking-widest text-comic-black/60",
         className,
       )}
       {...props}

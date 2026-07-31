@@ -26,7 +26,7 @@ export function GlossaryPopover({ glossaryId }: GlossaryPopoverProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="size-5 shrink-0 text-comic-black/50 hover:text-comic-black"
+          className="size-5 shrink-0 text-comic-black/60 hover:text-comic-black"
           aria-label={`${term.term} 용어 설명`}
         >
           <CircleHelp className="size-3.5" />
@@ -39,10 +39,10 @@ export function GlossaryPopover({ glossaryId }: GlossaryPopoverProps) {
         <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black">
           {term.definition}
         </p>
-        <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50">
+        <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/60">
           {term.analogy}
         </p>
-        <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50 italic">
+        <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60 italic">
           예: {term.example}
         </p>
       </PopoverContent>

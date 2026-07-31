@@ -16,7 +16,7 @@ export function FixtureStatusBadge({
     return (
       <Badge
         variant="outline"
-        className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-red bg-comic-red/10 font-[family-name:var(--font-bangers)] text-comic-red"
+        className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-red bg-comic-red/10 font-[family-name:var(--font-bangers)] text-comic-red-text"
       >
         POSTPONED
       </Badge>
@@ -49,7 +49,7 @@ export function FixtureStatusBadge({
   return (
     <Badge
       variant="outline"
-      className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-yellow font-[family-name:var(--font-bangers)] text-comic-black"
+      className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-yellow font-[family-name:var(--font-bangers)] text-comic-yellow-fg"
     >
       FT
     </Badge>

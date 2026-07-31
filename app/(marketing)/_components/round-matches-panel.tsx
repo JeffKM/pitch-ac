@@ -110,7 +110,7 @@ export function RoundMatchesPanel({
 
                 {/* vs */}
                 <span
-                  className="font-[family-name:var(--font-permanent-marker)] text-comic-black/40"
+                  className="font-[family-name:var(--font-permanent-marker)] text-comic-black/60"
                   style={{ fontSize: "var(--comic-body-xs)" }}
                 >
                   vs
@@ -209,14 +209,14 @@ export function RoundMatchesPanel({
           WORLD CUP 2026
         </p>
         <p
-          className="mt-1 font-[family-name:var(--font-permanent-marker)] text-comic-black/50"
+          className="mt-1 font-[family-name:var(--font-permanent-marker)] text-comic-black/60"
           style={{ fontSize: "var(--comic-body-sm)" }}
         >
           is coming soon!
         </p>
         <Link
           href="/matchday"
-          className="mt-3 inline-block rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-yellow px-4 py-2 font-[family-name:var(--font-bangers)] text-comic-black transition-transform hover:scale-105"
+          className="mt-3 inline-block rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-yellow px-4 py-2 font-[family-name:var(--font-bangers)] text-comic-yellow-fg transition-transform hover:scale-105"
           style={{ fontSize: "var(--comic-text-sm)" }}
         >
           SEE MATCHDAY →

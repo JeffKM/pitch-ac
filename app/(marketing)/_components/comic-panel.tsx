@@ -51,7 +51,7 @@ export function ComicPanelTitle({
       </h3>
       {subtitle && (
         <p
-          className="mt-0.5 font-[family-name:var(--font-permanent-marker)] text-comic-black/60"
+          className="mt-0.5 font-[family-name:var(--font-permanent-marker)] text-comic-black"
           style={{
             fontSize: "var(--comic-body-lg)",
             letterSpacing: "var(--comic-tracking-wide)",

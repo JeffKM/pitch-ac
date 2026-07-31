@@ -82,6 +82,8 @@ export function ScatterPlot({ data, xLabel, yLabel }: ScatterPlotProps) {
   return (
     <div
       data-testid="scatter-plot"
+      role="img"
+      aria-label={`${xLabel} 대비 ${yLabel} 산점도`}
       className="rounded-[var(--comic-panel-radius)] paper-texture p-2"
     >
       <ResponsiveContainer width="100%" height={450}>

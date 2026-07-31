@@ -124,6 +124,7 @@ export function PitchSvg({
       viewBox={vb}
       className={className}
       data-testid="pitch-svg"
+      aria-hidden="true"
       // overlay: 이미지 위에 겹칠 때 컨테이너에 맞게 스트레칭 (정확한 위치 정렬)
       preserveAspectRatio={overlay ? "none" : "xMidYMid meet"}
     >

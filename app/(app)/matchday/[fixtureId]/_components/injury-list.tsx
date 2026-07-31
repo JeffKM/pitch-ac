@@ -23,25 +23,25 @@ function TeamInjuries({
 }) {
   return (
     <div className="space-y-2">
-      <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+      <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
         {teamName}
       </p>
       {injuries.length === 0 ? (
-        <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50">
+        <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/60">
           No injuries
         </p>
       ) : (
         <ul className="space-y-1.5">
           {injuries.map((player) => (
             <li key={player.playerId} className="flex items-start gap-1.5">
-              <AlertCircle className="mt-0.5 size-3.5 shrink-0 text-comic-red" />
+              <AlertCircle className="mt-0.5 size-3.5 shrink-0 text-comic-red-text" />
               <div className="min-w-0">
                 <PlayerNameLink
                   playerId={player.playerId}
                   playerName={player.playerName}
                   className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)]"
                 />
-                <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+                <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
                   {player.reason}
                 </p>
               </div>
@@ -62,7 +62,7 @@ export function InjuryList({
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle>Injuries</CardTitle>
+        <CardTitle as="h2">Injuries</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">

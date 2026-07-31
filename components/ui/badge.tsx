@@ -12,9 +12,10 @@ const badgeVariants = cva(
         secondary: "bg-comic-cream text-comic-black",
         destructive: "bg-comic-red text-comic-white shadow-sm",
         outline: "bg-transparent text-comic-black",
-        green: "border-comic-green/30 bg-comic-green/15 text-comic-green",
-        yellow: "border-comic-yellow/30 bg-comic-yellow/15 text-comic-yellow",
-        red: "border-comic-red/30 bg-comic-red/15 text-comic-red",
+        green: "border-comic-green/30 bg-comic-green/15 text-comic-green-text",
+        yellow:
+          "border-comic-yellow/30 bg-comic-yellow/15 text-comic-yellow-text",
+        red: "border-comic-red/30 bg-comic-red/15 text-comic-red-text",
       },
     },
     defaultVariants: {

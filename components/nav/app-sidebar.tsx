@@ -27,7 +27,7 @@ import { leagueLinks, tournamentItems } from "./sidebar-config";
 /** 그라데이션 페이드 구분선 — 양 끝이 투명하게 사라지는 자연스러운 구분 */
 function FadeDivider() {
   return (
-    <div className="mx-3 my-2 h-px bg-gradient-to-r from-transparent via-sidebar-foreground/15 to-transparent" />
+    <div className="mx-3 my-1 h-px bg-gradient-to-r from-transparent via-sidebar-foreground/15 to-transparent" />
   );
 }
 
@@ -37,7 +37,8 @@ function SidebarCollapseButton() {
   return (
     <button
       onClick={toggleSidebar}
-      className="flex size-7 items-center justify-center rounded-[var(--comic-panel-radius)] border-[2px] border-comic-black bg-comic-white text-comic-black transition-colors hover:bg-comic-yellow"
+      aria-label="사이드바 접기/펼치기"
+      className="flex size-9 items-center justify-center rounded-[var(--comic-panel-radius)] border-[2px] border-comic-black bg-comic-white text-comic-black transition-colors hover:bg-comic-yellow hover:text-comic-yellow-fg focus-visible:ring-2 focus-visible:ring-comic-black focus-visible:ring-offset-2 focus-visible:outline-none"
     >
       {state === "expanded" ? (
         <ChevronsLeft className="size-3.5" />
@@ -59,7 +60,7 @@ export function AppSidebar() {
       className="hidden !border-r-0 after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-px after:bg-gradient-to-b after:from-transparent after:via-sidebar-foreground/15 after:to-transparent md:flex"
     >
       {/* ── 헤더: 접기 토글 (오른쪽 정렬) ── */}
-      <SidebarHeader className="!flex-row items-center justify-end px-3 py-2.5">
+      <SidebarHeader className="!flex-row items-center justify-end px-3 py-2">
         <SidebarCollapseButton />
       </SidebarHeader>
 
@@ -67,7 +68,7 @@ export function AppSidebar() {
 
       <SidebarContent className="px-1">
         {/* ── LEAGUES ── */}
-        <SidebarGroup>
+        <SidebarGroup className="p-1.5">
           <SidebarGroupLabel className="mb-1 font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-xs)] tracking-[var(--comic-tracking-widest)] text-sidebar-foreground/50 uppercase">
             Leagues
           </SidebarGroupLabel>
@@ -83,13 +84,16 @@ export function AppSidebar() {
                       isActive={isActive}
                       tooltip={league.shortName}
                       className={cn(
-                        "h-9 gap-3 rounded-[var(--comic-panel-radius)] font-[family-name:var(--font-fredoka)] text-[13px] font-medium transition-all",
+                        "h-8 gap-3 rounded-[var(--comic-panel-radius)] font-[family-name:var(--font-fredoka)] text-[13px] font-medium transition-all",
                         isActive
-                          ? "border-[2px] border-comic-black bg-comic-yellow text-comic-black shadow-[2px_2px_0px_var(--comic-black)]"
+                          ? "border-[2px] border-comic-black bg-comic-yellow text-comic-yellow-fg shadow-[2px_2px_0px_var(--comic-black)]"
                           : "border-[2px] border-transparent hover:border-comic-black/20 hover:bg-sidebar-accent/30",
                       )}
                     >
-                      <Link href={league.href}>
+                      <Link
+                        href={league.href}
+                        aria-current={isActive ? "page" : undefined}
+                      >
                         <Image
                           src={league.emblemUrl}
                           alt={league.shortName}
@@ -111,7 +115,7 @@ export function AppSidebar() {
         <FadeDivider />
 
         {/* ── TOURNAMENTS (placeholder) ── */}
-        <SidebarGroup>
+        <SidebarGroup className="p-1.5">
           <SidebarGroupLabel className="mb-1 font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-xs)] tracking-[var(--comic-tracking-widest)] text-sidebar-foreground/50 uppercase">
             Tournaments
           </SidebarGroupLabel>
@@ -126,7 +130,7 @@ export function AppSidebar() {
                       <SidebarMenuButton
                         disabled
                         tooltip={`${item.label} (Coming Soon)`}
-                        className="h-9 gap-3 rounded-[var(--comic-panel-radius)] border-[2px] border-dashed border-sidebar-foreground/10 font-[family-name:var(--font-fredoka)] text-[13px] opacity-35"
+                        className="h-8 gap-3 rounded-[var(--comic-panel-radius)] border-[2px] border-dashed border-sidebar-foreground/10 font-[family-name:var(--font-fredoka)] text-[13px] opacity-35"
                       >
                         <Icon className="size-4 shrink-0" />
                         <span>{item.label}</span>
@@ -138,7 +142,7 @@ export function AppSidebar() {
                       <SidebarMenuButton
                         asChild
                         tooltip={item.label}
-                        className="h-9 gap-3 rounded-[var(--comic-panel-radius)] border-[2px] border-sidebar-foreground/10 font-[family-name:var(--font-fredoka)] text-[13px] transition-colors hover:border-comic-yellow hover:bg-comic-yellow/10"
+                        className="h-8 gap-3 rounded-[var(--comic-panel-radius)] border-[2px] border-sidebar-foreground/10 font-[family-name:var(--font-fredoka)] text-[13px] transition-colors hover:border-comic-yellow hover:bg-comic-yellow/10"
                       >
                         <a href={item.href}>
                           <Icon className="size-4 shrink-0" />
@@ -155,7 +159,7 @@ export function AppSidebar() {
 
         {/* ── SCOUTING ── */}
         <FadeDivider />
-        <SidebarGroup>
+        <SidebarGroup className="p-1.5">
           <SidebarGroupLabel className="mb-1 font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-xs)] tracking-[var(--comic-tracking-widest)] text-sidebar-foreground/50 uppercase">
             Scouting
           </SidebarGroupLabel>
@@ -178,11 +182,14 @@ export function AppSidebar() {
                       className={cn(
                         "h-8 gap-3 rounded-[var(--comic-panel-radius)] font-[family-name:var(--font-fredoka)] text-[13px] font-medium transition-all",
                         isActive
-                          ? "border-[2px] border-comic-black bg-comic-yellow text-comic-black shadow-[2px_2px_0px_var(--comic-black)]"
+                          ? "border-[2px] border-comic-black bg-comic-yellow text-comic-yellow-fg shadow-[2px_2px_0px_var(--comic-black)]"
                           : "border-[2px] border-transparent hover:border-comic-black/20 hover:bg-sidebar-accent/30",
                       )}
                     >
-                      <Link href={`${tab.href}${contextQuery}`}>
+                      <Link
+                        href={`${tab.href}${contextQuery}`}
+                        aria-current={isActive ? "page" : undefined}
+                      >
                         <Icon className="size-4 shrink-0" />
                         <span>{tab.label}</span>
                       </Link>
@@ -196,7 +203,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       {/* ── 푸터 ── */}
-      <SidebarFooter className="px-3 py-2.5" />
+      <SidebarFooter className="px-3 py-2" />
     </Sidebar>
   );
 }

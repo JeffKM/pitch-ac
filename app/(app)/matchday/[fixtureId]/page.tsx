@@ -65,5 +65,13 @@ export default async function FixtureDetailPage({
   const initialData = await assembleFixtureDetail(fixture);
   if (!initialData) notFound();
 
-  return <FixtureDetailContent initialData={initialData} />;
+  return (
+    <>
+      {/* 시각적 타이틀은 MatchHeader가 담당하므로 헤딩 구조용 sr-only h1만 추가 */}
+      <h1 className="sr-only">
+        {initialData.homeTeam.name} vs {initialData.awayTeam.name}
+      </h1>
+      <FixtureDetailContent initialData={initialData} />
+    </>
+  );
 }

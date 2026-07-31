@@ -8,6 +8,8 @@ import { PitchSvg } from "./pitch-svg";
 
 interface ActionMapGridProps {
   actionMaps: ScoutlabActionMap[];
+  /** 접근성 이름 구성용 선수명 */
+  playerName: string;
 }
 
 /** 각 타입의 이미지 위치 (CSS background-position percentage) */
@@ -42,7 +44,7 @@ const PITCH_OVERLAY = {
   height: "90.87%", // ((678-53)/487) / (96/68)
 } as const;
 
-export function ActionMapGrid({ actionMaps }: ActionMapGridProps) {
+export function ActionMapGrid({ actionMaps, playerName }: ActionMapGridProps) {
   const imageUrl = actionMaps.find((m) => m.imageUrl)?.imageUrl ?? null;
 
   return (
@@ -50,6 +52,7 @@ export function ActionMapGrid({ actionMaps }: ActionMapGridProps) {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {ACTION_TYPES.map((type) => {
           const mapData = actionMaps.find((m) => m.actionType === type);
+          const totalCount = mapData?.totalCount ?? 0;
           return (
             <div key={type} className="space-y-2">
               {/* 상단 텍스트 헤더 (스탯은 이미지 텍스트에서 추출하여 DB 저장) */}
@@ -62,7 +65,11 @@ export function ActionMapGrid({ actionMaps }: ActionMapGridProps) {
                 )}
               </h4>
               {/* 이미지 카드 */}
-              <div className="overflow-hidden rounded-lg border border-comic-black/10">
+              <div
+                role="img"
+                aria-label={`${playerName} ${ACTION_TYPE_LABELS[type]} 액션맵 — 총 ${totalCount}회`}
+                className="overflow-hidden rounded-lg border border-comic-black/10"
+              >
                 {imageUrl ? (
                   <ActionMapImage imageUrl={imageUrl} actionType={type} />
                 ) : (
@@ -96,6 +103,7 @@ function ActionMapImage({
     >
       {/* 원본 이미지 (배경) — 텍스트 헤더 + 피치 + 액션 라인 포함 */}
       <div
+        aria-hidden="true"
         className="absolute inset-0 bg-top bg-no-repeat"
         style={{
           backgroundImage: `url(${imageUrl})`,
@@ -104,7 +112,7 @@ function ActionMapImage({
         }}
       />
       {/* 검은 피치 라인 오버레이 — 원본 이미지 피치 좌표에 정확히 정렬 */}
-      <div className="absolute" style={PITCH_OVERLAY}>
+      <div aria-hidden="true" className="absolute" style={PITCH_OVERLAY}>
         <PitchSvg vertical overlay className="size-full" />
       </div>
     </div>

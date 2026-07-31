@@ -78,7 +78,7 @@ function PopoverDescription({
   return (
     <p
       data-slot="popover-description"
-      className={cn("text-comic-black/50", className)}
+      className={cn("text-comic-black/60", className)}
       {...props}
     />
   );

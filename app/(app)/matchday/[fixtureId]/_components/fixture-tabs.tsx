@@ -46,13 +46,13 @@ export function FixtureTabs({
       <TabsList className="w-full rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-cream">
         <TabsTrigger
           value="prematch"
-          className="flex-1 rounded-[var(--comic-panel-radius)] font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] tracking-[var(--comic-tracking-normal)] data-[state=active]:bg-comic-yellow data-[state=active]:text-comic-black"
+          className="flex-1 rounded-[var(--comic-panel-radius)] font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] tracking-[var(--comic-tracking-normal)] data-[state=active]:bg-comic-yellow data-[state=active]:text-comic-yellow-fg"
         >
           Pre-match
         </TabsTrigger>
         <TabsTrigger
           value="postmatch"
-          className="flex-1 rounded-[var(--comic-panel-radius)] font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] tracking-[var(--comic-tracking-normal)] data-[state=active]:bg-comic-yellow data-[state=active]:text-comic-black"
+          className="flex-1 rounded-[var(--comic-panel-radius)] font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] tracking-[var(--comic-tracking-normal)] data-[state=active]:bg-comic-yellow data-[state=active]:text-comic-yellow-fg"
         >
           Post-match
         </TabsTrigger>

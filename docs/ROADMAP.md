@@ -95,11 +95,15 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
   - ✅ QA01 잔여 4건 처리 (2026-07-31): ① `use cache` 도입 — 쿠키 미사용 공개 읽기 클라이언트(`lib/supabase/public.ts`) 신설, 리포지토리 7개 파일 31개 함수에 `"use cache"`+`cacheLife`+`cacheTag` 적용(fixtures/standings/teams/players/injuries/scoutlab은 hours, 외부 스크립트 동기화인 news는 minutes), 인앱 크론 6개에 성공 시 `revalidateTag(tag, "max")` — 라우트 핸들러 경유 캐시 경로 프로덕션 서버 실호출 검증 ② recharts 코어 청크 995KB(331KB×3) → 381KB 단일 공유 청크(`scoutlab-charts-bundle.ts` 단일 진입점) ③ scouting 10개+matchday 페이지 Suspense 세분화 — 필터 섹션·데이터 영역 분리로 전 페이지 정적 셸(PPR) 유지, 공용 `scoutlab-filter-section`·`scoutlab-skeletons` 신설 ④ scoutlab raw fetch 6곳 → TanStack Query 훅 3개(use-scoutlab-ranking, use-scoutlab-player-search, use-debounced-value)로 통일, 에러 콘솔 로깅 추가 ⑤ 데드 클라이언트 컴포넌트 6개·radix-ui 패키지 혼재는 QA04로 이관(해당 태스크에 기재)
   - **후속 관찰**: ranking API가 URL season 파라미터를 넘기지 않고 서버 기본 시즌 사용(기존 이슈, 시즌 전환기에 확인) / 필터 조작 시 셸 유지의 브라우저 실측은 QA02 UI 감사에서 Playwright로 확인
 
-- **Task QA02: UI·접근성 감사**
+- **Task QA02: UI·접근성 감사** ✅ (2026-07-31)
   - > 적용 스킬: design-review, web-design-guidelines, fixing-accessibility
-  - 전 페이지(홈/매치데이/랭킹/ScoutLab 10탭/뉴스) 시각 일관성·간격·계층 점검
-  - WCAG: 키보드 내비게이션, ARIA, 색상 대비 (코믹 팔레트 대비 검증)
-  - 반응형 (375px 모바일 ~ 데스크탑) 점검
+  - ✅ 2트랙 감사: Playwright 브라우저 실측(15페이지 — 홈/matchday/ranking/news/ScoutLab 10탭/로그인, 데스크탑 1440·모바일 375, 콘솔 에러·키보드·접근성 트리·반응형) + 정적 코드 감사(OKLCH→sRGB→WCAG 대비율 수학 검증, 라이트·다크 전 토큰 조합)
+  - ✅ **수정 배치 1 — 색상 대비 (64파일)**: 다크모드 `bg-comic-yellow`+`text-comic-black` 액티브 패턴 1.92:1 → 전경 토큰 `--comic-yellow-fg` 신설로 8.85:1(15파일 22곳). 텍스트 전용 토큰 7종 신설(`--comic-{green,skyblue,yellow,red,pink}-text`, `--comic-yellow-ink` 등)로 텍스트로 쓰인 원색(유사도%·델타·배지) 전부 4.5:1+ 확보. `text-comic-black/{50,40,30,20}` 알파 텍스트 101곳 → `/60` 상향(푸터 `/70`), 다크 `--comic-red`·`--comic-skyblue` 토큰 조정. 빌드 CSS 실측 hex 기준 재계산 후 실패 0건. `prefers-reduced-motion` 전역 블록 추가
+  - ✅ **수정 배치 2 — 접근성 구조**: `<html lang="ko">`·스킵 링크·`<main>` 중첩 해소(SidebarInset 유지, 내부 div화). 19페이지 h1 부여 + CardTitle을 heading으로(`as` prop, 기본 h3) + 레벨 스킵 정리. ScoutLab 탭 sr-only 라벨(모바일 접근성 이름 소실 해결)·오버플로 페이드·터치 타깃 44px. 아이콘 버튼·필터 콤보박스 aria-label 일괄, 내비 aria-current, 액션맵 role="img"+aria-label, 차트 3종 컨테이너 라벨, 테이블 scope/caption(5곳)+모바일 스크롤 힌트, standings 폼 배지 green-700/gray-600/red-700(4.5:1+), radiogroup 화살표 키(roving tabindex)
+  - ✅ **수정 배치 3 — 버그·UX**: **React #418 모바일 하이드레이션(전 페이지) 근본 원인 규명·해결** — 첫 렌더 불일치가 아니라 Suspense 하이드레이션 도중 `useIsMobile` 플립으로 sidebar DOM 분기가 바뀌는 타이밍 문제. Sheet+데스크탑 div 동시 렌더(CSS 분기)로 전환, `SidebarProvider`에서 isMobile 상태 제거. theme-switcher의 mounted-null 패턴도 동일 계열로 수정. 모바일 전 페이지 콘솔 에러 0건 실측. 그 외: 마케팅 홈 모바일 내비 부재 → MobileTopBar/TabBar 추가+main 중첩 해소+sr-only h1 / matchday 날짜 화살표 데스크탑 무동작 → ResizeObserver 오버플로 감지 disabled 처리 + aria-current="date" / 인증: `(auth)` layout 신설(main 랜드마크·홈 로고 링크), 페이지별 metadata 타이틀, CardTitle h1화, 폼 4종 role="alert"·aria-invalid·aria-describedby·autocomplete, 로그인 탭 순서 정상화(DOM 이동+CSS 배치 유지), 문구 한국어 통일(auth-button 포함) / 뉴스 헤드라인 h3+원문 링크화, 출처 칩 터치 타깃 97×36, 푸터 연도 동적화(`"use cache"`+cacheLife — cacheComponents에서 bare `new Date()` 빌드 실패 회피), scouting 타이틀 중복 제거
+  - ✅ QA01 이월 검증 통과: 필터 조작 시 정적 셸 유지 Playwright 실측(ScoutLab 랭킹 단일 API 요청만 발생, matchday 날짜 변경·`/ranking` 탭 전환 모두 셸 유지)
+  - ✅ 최종 통합 검증: `validate` + vitest 152건 전부 + build 49페이지 + 6페이지×2뷰포트 콘솔 에러 0건 + 라이트/다크 시각 회귀 판독 이상 없음
+  - **후속 관찰**: `/scouting/summary` 잔존 #418 — 콜드캐시+CPU 6배 스로틀 조건 한정, 뷰포트 무관, PPR 스트림 재개 경로 추정(재현: CDP `Network.clearBrowserCache`+`Emulation.setCPUThrottlingRate {rate:6}` 후 prod 접속) / `SidebarMenuSkeleton`의 `Math.random()` 잠재 하이드레이션 위험(현재 미사용 컴포넌트)
 
 - **Task QA03: 보안 감사**
   - > 적용 스킬: security-scan, postgres-best-practices
@@ -132,6 +136,18 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
 > 우선순위는 SR/QA 완료 후 재산정. 아래 순서는 잠정.
 
 - glossary 팝오버 실제 DB(glossary 테이블) 연결 및 페이지 배선 (QA04에서 `glossary.ts`+`glossary-popover.tsx` 유지 결정 시 파생)
+
+### QA02 이관 — UI·데이터 개선
+
+- Radar 탭 기본 진입 빈 화면(레이더 데이터셋 결손 — 데이터 수집 필요)
+- 뉴스 카테고리 전부 "Summary"(크롤러 sourceType 분류 개선)
+- 필터↔URL 동기화 규약 통일(`/ranking` 탭 URL 미반영·딥링크 불일치, ScoutLab summary 리그 필터가 표시 선수와 모순)
+- Scatter 1,000+ 포인트 과밀·Ligue 1 검정 범례(데이터 0인데 광고)·모바일 판독성 — dataviz 재설계
+- 데이터 부족 상태 처리(단일 시즌 점 1개 라인차트, VAEP 0% 결측/실제0 구분, 1건 액션맵)
+- 인증 페이지 코믹 디자인 리스타일(현재 shadcn 기본 스타일로 앱과 단절)
+- 홈 개선: THIS ROUND 경기 클릭 불가·킥오프 시각 없음, 시즌 라벨 혼재(GW1 26/27 vs 순위표 25/26), BEST XI placeholder, 푸터 죽은 링크 7개(`href="#"`)
+- 마이크로 타이포·가독: comic-body-xs 9px 크기 재검토(한 페이지 108노드), `/ranking` sticky thead, 백분위 색 티어 범례, 다크모드 리그 크레스트 판독
+- Sentry 로컬 이벤트 프로덕션 DSN 전송 차단, RSC 중복 프리페치(동일 URL 3~5회) 점검
 
 ### Phase S8′: 멀티시즌 아카이브 (구 S703 + S8 통합)
 

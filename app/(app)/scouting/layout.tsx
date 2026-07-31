@@ -4,7 +4,8 @@ import { Suspense } from "react";
 import { ScoutingTabNav } from "./_components/scouting-tab-nav";
 
 export const metadata: Metadata = {
-  title: "Scouting | pitch-ac",
+  // 루트 layout의 title.template("%s | pitch-ac")이 적용되므로 접미사를 붙이지 않는다
+  title: "Scouting",
   description: "Big 5 리그 선수 고급 메트릭 스카우팅 플랫폼",
 };
 

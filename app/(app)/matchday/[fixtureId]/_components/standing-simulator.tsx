@@ -44,7 +44,7 @@ export function StandingSimulator({
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle>Standing Simulator</CardTitle>
+        <CardTitle as="h2">Standing Simulator</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex gap-2">
@@ -63,7 +63,7 @@ export function StandingSimulator({
 
         <div className="grid grid-cols-2 gap-4 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)]">
           <div className="space-y-1">
-            <p className="text-[length:var(--comic-body-xs)] text-comic-black/50">
+            <p className="text-[length:var(--comic-body-xs)] text-comic-black/60">
               {homeTeamName}
             </p>
             <p>
@@ -73,20 +73,20 @@ export function StandingSimulator({
               </span>
             </p>
             {delta && (
-              <p className="text-comic-green">
+              <p className="text-comic-green-text">
                 +{delta.home}pts →{" "}
                 <span className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)]">
                   {homeStanding.points + delta.home}pts
                 </span>
               </p>
             )}
-            <p className="text-[length:var(--comic-body-xs)] text-comic-black/50">
+            <p className="text-[length:var(--comic-body-xs)] text-comic-black/60">
               Currently #{homeStanding.position}
             </p>
           </div>
 
           <div className="space-y-1">
-            <p className="text-[length:var(--comic-body-xs)] text-comic-black/50">
+            <p className="text-[length:var(--comic-body-xs)] text-comic-black/60">
               {awayTeamName}
             </p>
             <p>
@@ -96,21 +96,21 @@ export function StandingSimulator({
               </span>
             </p>
             {delta && (
-              <p className="text-comic-green">
+              <p className="text-comic-green-text">
                 +{delta.away}pts →{" "}
                 <span className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)]">
                   {awayStanding.points + delta.away}pts
                 </span>
               </p>
             )}
-            <p className="text-[length:var(--comic-body-xs)] text-comic-black/50">
+            <p className="text-[length:var(--comic-body-xs)] text-comic-black/60">
               Currently #{awayStanding.position}
             </p>
           </div>
         </div>
 
         {!delta && (
-          <p className="text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+          <p className="text-center font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
             Select a scenario to see projected points.
           </p>
         )}

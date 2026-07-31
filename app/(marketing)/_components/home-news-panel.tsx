@@ -29,7 +29,7 @@ export function HomeNewsPanel({ items }: HomeNewsPanelProps) {
       <div className="mt-3 flex justify-center">
         <Link
           href="/news"
-          className="inline-block rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-yellow px-3 py-1.5 font-[family-name:var(--font-bangers)] text-comic-black transition-transform hover:scale-105"
+          className="inline-block rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-yellow px-3 py-1.5 font-[family-name:var(--font-bangers)] text-comic-yellow-fg transition-transform hover:scale-105"
           style={{ fontSize: "var(--comic-text-sm)" }}
         >
           MORE NEWS →
@@ -51,7 +51,7 @@ function CompactNewsCard({ item }: { item: TransferNewsItem }) {
         <SourceBadge type={item.sourceType} />
         <time
           dateTime={item.publishedAt}
-          className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50"
+          className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60"
         >
           {formatRelativeTime(item.publishedAt)}
         </time>
@@ -74,7 +74,7 @@ function CompactNewsCard({ item }: { item: TransferNewsItem }) {
       )}
 
       {/* 메타 + 소스 링크 */}
-      <div className="mt-1.5 flex items-center gap-3 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+      <div className="mt-1.5 flex items-center gap-3 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
         <span className="inline-flex items-center gap-1">
           <Eye className="size-3" />
           {formatCount(item.viewCount)}
@@ -136,14 +136,14 @@ function EmptyState() {
       <ComicPanelTitle title="NEWS" subtitle="LATEST" />
       <div className="flex flex-col items-center justify-center py-4">
         <span
-          className="font-[family-name:var(--font-bangers)] text-comic-black/30"
+          className="font-[family-name:var(--font-bangers)] text-comic-black/60"
           style={{ fontSize: "var(--comic-text-xl)" }}
         >
           NO NEWS YET
         </span>
         <Link
           href="/news"
-          className="mt-3 inline-block rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-yellow px-3 py-1.5 font-[family-name:var(--font-bangers)] text-comic-black transition-transform hover:scale-105"
+          className="mt-3 inline-block rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-yellow px-3 py-1.5 font-[family-name:var(--font-bangers)] text-comic-yellow-fg transition-transform hover:scale-105"
           style={{ fontSize: "var(--comic-text-sm)" }}
         >
           GO TO NEWS →

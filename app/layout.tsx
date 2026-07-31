@@ -86,10 +86,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="ko" suppressHydrationWarning>
       <body
         className={`${geistSans.className} ${fredoka.variable} ${bangers.variable} ${permanentMarker.variable} antialiased`}
       >
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-[var(--comic-panel-radius)] focus:border-[var(--comic-border-width)] focus:border-comic-black focus:bg-comic-white focus:px-4 focus:py-2 focus:font-[family-name:var(--font-bangers)] focus:text-comic-black focus:shadow-sm"
+        >
+          본문으로 건너뛰기
+        </a>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

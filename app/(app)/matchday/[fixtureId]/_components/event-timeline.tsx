@@ -31,12 +31,12 @@ function EventItem({ event, isHome }: EventItemProps) {
               className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)]"
             />
           </div>
-          <CircleDot className="size-4 text-comic-skyblue" />
+          <CircleDot className="size-4 text-comic-skyblue-text" />
         </>
       )}
       {!isHome && (
         <>
-          <CircleDot className="size-4 text-comic-skyblue" />
+          <CircleDot className="size-4 text-comic-skyblue-text" />
           <div>
             <PlayerNameLink
               playerId={event.playerId}
@@ -60,12 +60,15 @@ export function EventTimeline({ events, homeTeamId }: EventTimelineProps) {
     return (
       <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
         <CardHeader className="pb-2">
-          <CardTitle className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
+          <CardTitle
+            as="h2"
+            className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black"
+          >
             Goals
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] text-comic-black/40">
+          <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] text-comic-black/60">
             No goals.
           </p>
         </CardContent>
@@ -78,7 +81,10 @@ export function EventTimeline({ events, homeTeamId }: EventTimelineProps) {
   return (
     <Card className="rounded-[var(--comic-panel-radius)] border-[var(--comic-border-width)] border-comic-black bg-comic-white">
       <CardHeader className="pb-2">
-        <CardTitle className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black">
+        <CardTitle
+          as="h2"
+          className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-sm)] text-comic-black"
+        >
           Goals
         </CardTitle>
       </CardHeader>
@@ -92,7 +98,7 @@ export function EventTimeline({ events, homeTeamId }: EventTimelineProps) {
             >
               <div>{isHome && <EventItem event={event} isHome />}</div>
 
-              <div className="w-10 text-center font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-xs)] text-comic-black/40">
+              <div className="w-10 text-center font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-xs)] text-comic-black/60">
                 {event.minute}&apos;
               </div>
 

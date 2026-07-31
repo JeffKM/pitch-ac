@@ -2,6 +2,8 @@
 
 // ScoutLab P90/Total + PAdj./Raw 모드 토글
 
+import { useRef } from "react";
+
 import { cn } from "@/lib/utils";
 import type { ScoutlabAdjustment, ScoutlabMode } from "@/types";
 
@@ -55,23 +57,44 @@ function SegmentedToggle<T extends string>({
   onChange: (value: T) => void;
   label: string;
 }) {
+  const buttonRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  // 화살표 키로 라디오 옵션 이동 (roving tabindex)
+  const handleKeyDown = (
+    event: React.KeyboardEvent<HTMLButtonElement>,
+    index: number,
+  ) => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    const delta = event.key === "ArrowRight" ? 1 : -1;
+    const nextIndex = (index + delta + options.length) % options.length;
+    const nextOption = options[nextIndex];
+    onChange(nextOption.value);
+    buttonRefs.current[nextIndex]?.focus();
+  };
+
   return (
     <div
       role="radiogroup"
       aria-label={label}
       className="flex overflow-hidden rounded-[var(--comic-panel-radius)] border-[var(--comic-border-thin)] border-comic-black/20"
     >
-      {options.map((opt) => (
+      {options.map((opt, index) => (
         <button
           key={opt.value}
+          ref={(el) => {
+            buttonRefs.current[index] = el;
+          }}
           type="button"
           role="radio"
           aria-checked={value === opt.value}
+          tabIndex={value === opt.value ? 0 : -1}
           onClick={() => onChange(opt.value)}
+          onKeyDown={(event) => handleKeyDown(event, index)}
           className={cn(
-            "px-3 py-1.5 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] transition-colors",
+            "px-3 py-1.5 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)] transition-colors focus-visible:ring-2 focus-visible:ring-comic-black focus-visible:outline-none",
             value === opt.value
-              ? "bg-comic-skyblue text-white"
+              ? "bg-comic-skyblue text-comic-black"
               : "bg-comic-white text-comic-black/60 hover:bg-comic-cream",
           )}
         >

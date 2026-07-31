@@ -24,12 +24,12 @@ export function TeamFormRow({
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle>Last 5 Matches</CardTitle>
+        <CardTitle as="h2">Last 5 Matches</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+            <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
               {homeTeamName}
             </p>
             <div className="flex gap-1">
@@ -38,7 +38,7 @@ export function TeamFormRow({
                   .filter(isFormResult)
                   .map((result, i) => <TeamFormBadge key={i} result={result} />)
               ) : (
-                <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+                <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
                   No data
                 </p>
               )}
@@ -46,7 +46,7 @@ export function TeamFormRow({
           </div>
 
           <div className="space-y-2">
-            <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+            <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
               {awayTeamName}
             </p>
             <div className="flex gap-1">
@@ -55,7 +55,7 @@ export function TeamFormRow({
                   .filter(isFormResult)
                   .map((result, i) => <TeamFormBadge key={i} result={result} />)
               ) : (
-                <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+                <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
                   No data
                 </p>
               )}

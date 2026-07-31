@@ -64,7 +64,7 @@ export function RankingFilterPanel({
         value={selectedCategory}
         onValueChange={(v) => onCategoryChange(v as ScoutlabCategory)}
       >
-        <SelectTrigger className="w-44">
+        <SelectTrigger className="w-44" aria-label="카테고리 선택">
           <SelectValue placeholder="카테고리" />
         </SelectTrigger>
         <SelectContent>
@@ -77,7 +77,7 @@ export function RankingFilterPanel({
       </Select>
 
       <Select value={selectedMetric} onValueChange={onMetricChange}>
-        <SelectTrigger className="w-52">
+        <SelectTrigger className="w-52" aria-label="지표 선택">
           <SelectValue placeholder="메트릭" />
         </SelectTrigger>
         <SelectContent>

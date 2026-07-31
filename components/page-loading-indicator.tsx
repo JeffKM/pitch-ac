@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 
 export function PageLoadingIndicator() {
   return (
-    <div className="flex items-center gap-2 text-comic-black/50">
+    <div className="flex items-center gap-2 text-comic-black/60">
       <Loader2 className="size-4 animate-spin" />
       <span className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-sm)]">
         Loading...

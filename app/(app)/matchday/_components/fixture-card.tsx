@@ -63,7 +63,7 @@ export function FixtureCard({
                 {homeTeam.shortName}
               </p>
               {homeStanding && (
-                <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+                <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
                   #{homeStanding.position}
                 </p>
               )}
@@ -77,7 +77,7 @@ export function FixtureCard({
                 {fixture.homeScore} – {fixture.awayScore}
               </p>
             ) : (
-              <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-lg)] text-comic-black/40">
+              <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-lg)] text-comic-black/60">
                 vs
               </p>
             )}
@@ -101,7 +101,7 @@ export function FixtureCard({
                 {awayTeam.shortName}
               </p>
               {awayStanding && (
-                <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+                <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
                   #{awayStanding.position}
                 </p>
               )}

@@ -27,7 +27,7 @@ export function MetricPopover({ metricKey }: MetricPopoverProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="size-5 shrink-0 text-comic-black/30 hover:text-comic-black"
+          className="size-5 shrink-0 text-comic-black/60 hover:text-comic-black"
           aria-label={`${term.label} 용어 설명`}
         >
           <CircleHelp className="size-3.5" />
@@ -47,7 +47,7 @@ export function MetricPopover({ metricKey }: MetricPopoverProps) {
           {term.description}
         </p>
         {term.example && (
-          <p className="text-xs leading-relaxed text-comic-black/50 italic">
+          <p className="text-xs leading-relaxed text-comic-black/60 italic">
             예: {term.example}
           </p>
         )}

@@ -24,15 +24,16 @@ export function MobileTabBar() {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={isActive ? "page" : undefined}
               className={cn(
                 "flex flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors",
-                isActive ? "text-comic-black" : "text-comic-black/40",
+                isActive ? "text-comic-black" : "text-comic-black/60",
               )}
             >
               <span
                 className={cn(
                   "rounded-[var(--comic-panel-radius)] p-1",
-                  isActive && "bg-comic-yellow",
+                  isActive && "bg-comic-yellow text-comic-yellow-fg",
                 )}
               >
                 <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />

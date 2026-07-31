@@ -8,13 +8,13 @@ import { Button } from "@/components/ui/button";
 export default function FixtureDetailNotFound() {
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
-      <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-3xl)] text-comic-black/50">
+      <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-3xl)] text-comic-black/60">
         404
       </p>
       <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-text-lg)]">
         Match Not Found
       </p>
-      <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/50">
+      <p className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-base)] text-comic-black/60">
         The requested match doesn&apos;t exist or isn&apos;t available yet.
       </p>
       <Button variant="outline" asChild>

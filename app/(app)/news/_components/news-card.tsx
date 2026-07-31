@@ -24,30 +24,30 @@ export function NewsCard({ item }: NewsCardProps) {
             <SourceTypeBadge type={item.sourceType} />
             <time
               dateTime={item.publishedAt}
-              className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50"
+              className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60"
             >
               {formatRelativeTime(item.publishedAt)}
             </time>
           </div>
 
-          {/* 제목 */}
-          {primaryUrl ? (
-            <a
-              href={primaryUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-comic-blue block font-[family-name:var(--font-bangers)] text-[length:var(--comic-body-base)] leading-snug text-comic-black"
-            >
-              {item.title}
-            </a>
-          ) : (
-            <p className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-body-base)] leading-snug text-comic-black">
-              {item.title}
-            </p>
-          )}
+          {/* 제목 — 목록 항목의 제목이므로 헤딩(h3)으로 노출 */}
+          <h3 className="font-[family-name:var(--font-bangers)] text-[length:var(--comic-body-base)] leading-snug text-comic-black">
+            {primaryUrl ? (
+              <a
+                href={primaryUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-comic-blue block hover:underline"
+              >
+                {item.title}
+              </a>
+            ) : (
+              item.title
+            )}
+          </h3>
 
           {/* 메타 정보 */}
-          <div className="flex items-center gap-3 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/50">
+          <div className="flex items-center gap-3 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60">
             <span className="inline-flex items-center gap-1">
               <Eye className="size-3" />
               {formatCount(item.viewCount)}
@@ -64,14 +64,14 @@ export function NewsCard({ item }: NewsCardProps) {
 
           {/* 소스 링크 목록 */}
           {item.sourceUrls.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {item.sourceUrls.map((url, i) => (
                 <a
                   key={i}
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:border-comic-blue hover:text-comic-blue inline-flex items-center gap-1 rounded border border-comic-black/10 px-2 py-0.5 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60 transition-colors"
+                  className="hover:border-comic-blue hover:text-comic-blue inline-flex min-h-9 items-center gap-1.5 rounded border border-comic-black/10 px-3 py-2 font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] text-comic-black/60 transition-colors"
                 >
                   <ExternalLink className="size-3" />
                   {extractDomainLabel(url)}

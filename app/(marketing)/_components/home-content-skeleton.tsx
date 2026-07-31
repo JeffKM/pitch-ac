@@ -6,7 +6,10 @@ import { ComicPanel, ComicPanelTitle } from "./comic-panel";
 
 export function HomeContentSkeleton() {
   return (
-    <main className="mx-auto max-w-5xl p-[var(--comic-panel-padding)]">
+    <main
+      id="main-content"
+      className="mx-auto max-w-5xl p-[var(--comic-panel-padding)]"
+    >
       <PageLoadingIndicator />
       {/* 2패널 스켈레톤: 경기 | 뉴스 */}
       <div className="grid gap-[var(--comic-panel-gap)] md:grid-cols-2">

@@ -18,7 +18,7 @@ export function PlayerNameLink({
   return (
     <Link
       href={`/scouting?playerId=${playerId}`}
-      className={cn("hover:text-comic-skyblue hover:underline", className)}
+      className={cn("hover:text-comic-skyblue-text hover:underline", className)}
     >
       {playerName}
     </Link>

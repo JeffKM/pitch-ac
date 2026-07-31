@@ -27,7 +27,7 @@ export function MetricContextSubtitle({
   return (
     <p
       data-testid="metric-context-subtitle"
-      className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] tracking-wider text-comic-black/40 uppercase"
+      className="font-[family-name:var(--font-permanent-marker)] text-[length:var(--comic-body-xs)] tracking-wider text-comic-black/60 uppercase"
     >
       PERCENTILE VS {posLabel} · BIG 5 LEAGUES · {modeLabel} · {adjLabel}
     </p>
