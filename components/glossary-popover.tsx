@@ -10,7 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { getGlossaryTermById } from "@/lib/mock";
+import { getGlossaryTermById } from "@/lib/mock/glossary";
 
 interface GlossaryPopoverProps {
   glossaryId: string;

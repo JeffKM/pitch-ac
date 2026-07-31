@@ -109,21 +109,29 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
   - ✅ 디버그 엔드포인트(`/api/debug/*`) 프로덕션 노출 여부 확인 (2026-07-31): 6개 라우트 전부 `NODE_ENV === "production"` 403 가드 확인
   - ✅ CSP Report-Only → enforce 전환 (2026-07-31): `connect-src`에 `*.ingest.us.sentry.io`, `img-src`에 `upload.wikimedia.org`, `worker-src 'self' blob:`(Sentry replay) 추가 후 enforce 전환. Playwright로 홈/매치데이/랭킹/스카우팅/뉴스/로그인 6페이지 CSP 위반 0건 확인
 
-- **Task QA04: 데드코드·구조 정리**
+- **Task QA04: 데드코드·구조 정리** ✅ (2026-07-31)
   - > 적용 스킬: refactor-cleaner
-  - knip/depcheck/ts-prune으로 미사용 코드·의존성 탐지
-  - 피벗 잔재 정리: 카툰 시스템(`lib/services/cartoon/`, `types/cartoon.ts`, cartoon 컴포넌트·테이블), SportMonks/API-Football 잔재, 라이브 시스템 잔재
-  - `.claude/plans/` 임시 파일 정리, `shrimp_data/`·`lively-bubbling-hennessy.md` 등 루트 잡동사니 처리
-  - SR 리뷰 잔여 데드코드 2건 제거: `getPlayerSeasonStats`·`getAllStandings` (~~`toScoutlabSeason`~~은 SR06에서 `toShortSeasonLabel`로 리네이밍 후 랭킹 시즌 배지에 사용 중 — 삭제 대상 아님)
-  - QA01 렌더링 스캔에서 발견된 데드 클라이언트 컴포넌트 6개 삭제: `components/charts/player-radar-chart.tsx`(recharts 연쇄), `components/player-search-combobox.tsx`(cmdk 연쇄), cartoon 3종(`cartoon-avatar`·`mood-transition`·`speech-bubble` — 위 카툰 잔재와 동일 건), `scouting/_components/action-map-overlay.tsx`. `searchScoutlabPlayers`(scoutlab-repository)도 앱 내 호출처 없음 — 삭제 검토
-  - radix-ui 통합 패키지와 `@radix-ui/react-{checkbox,dropdown-menu,label,slot}` 개별 4개 혼재 — 코드가 통합 패키지만 쓰므로 개별 패키지 정리 검토 (QA01 이관분)
-  - 소소한 정리: sync-players dedupe "최신 구단" 주석 정정, `prevSeasonLabel` 리네이밍
+  - ✅ knip/depcheck/ts-prune 탐지 + 전수 참조 검증 후 삭제 실행. 70 files, -7,101줄. type-check/lint/format/vitest 152테스트/build 전부 통과
+  - ✅ 카툰 시스템 전체 삭제: `types/cartoon.ts`, `lib/services/cartoon/`(asset-resolver·mood-engine), `components/cartoon/` 3종(`cartoon-avatar`·`mood-transition`·`speech-bubble`) + `0018_drop_cartoon_assets.sql` 적용. 단 원격 DB엔 cartoon 테이블이 애초에 적용된 적 없어 마이그레이션은 no-op — 히스토리 정합성 목적으로만 유지
+  - ✅ 데드 컴포넌트 삭제: `player-radar-chart`, `player-search-combobox`, `action-map-overlay`, `scoutlab-player-search`(탐지 과정에서 추가 발견), `checkbox`·`dropdown-menu`(shadcn 미사용), `hero-banner`·`news-placeholder`(마케팅 고아), `use-recent-searches`
+  - ✅ 리포지토리 데드 함수 6개 제거: `getPlayerSeasonStats`·`getAllStandings`·`searchScoutlabPlayers`(기재분) + `getAllPlayers`·`getMatchStatsByPlayerId`·`getPlayerSeasonStatsByIds`(knip 추가 발견)
+  - ✅ fmkorea 데드 래퍼(`client.ts`·`rate-limiter.ts`), `gameweek-assigner`(레거시 명시), `PlayerIdMapping` 타입(SportMonks 잔재 최후 1건) 삭제
+  - ✅ `lib/mock` 5개 삭제. **`glossary.ts`+`glossary-popover.tsx`는 유지 결정** — 프로젝트 규칙(용어 팝오버)의 구현체. 백로그에 "glossary 팝오버 실제 DB(glossary 테이블) 연결 및 페이지 배선" 추가(하단 백로그 섹션 참조)
+  - ✅ 패키지 정리: radix 개별 3개 제거(`react-label`만 실사용이라 유지), 누락 의존성 `sharp`·`playwright` devDeps 추가
+  - ✅ 루트 정리: `shrimp_data/`·`.tmp_header_10x.png` 삭제, `lively-bubbling-hennessy.md`·`shrimp-rules.md` git rm(구버전 기획 문서), `.playwright-mcp` 17개 untrack, `.claude/plans/` 74개 정리 + `.gitignore` 등록
+  - ✅ `next.config.ts`의 cartoon-assets `remotePatterns` 제거(계획 외 추가 정리)
+  - ~~`prevSeasonLabel` 리네이밍~~ — 해당 심볼이 코드베이스에 존재하지 않아 무효(이미 처리됐거나 기재 착오)
+  - ✅ sync-players dedupe 주석 정정 — "최신 구단" 표현 삭제, 마지막 항목 덮어쓰기 사실만 기술(최신 이적 보장 아님을 명시)
+  - `server-only-mock.ts`는 `vitest.config.ts:16` alias 참조로 유지 확인(삭제 대상 아님)
+  - **잔여 1건**: `.env.example`의 `SPORTMONKS_API_KEY` 라인 — 에이전트 권한 정책(.env\* 보호)으로 자동 제거 불가, 수동 삭제 필요
 
 ---
 
 ## 백로그 — 새 시즌 개막 후 재평가
 
 > 우선순위는 SR/QA 완료 후 재산정. 아래 순서는 잠정.
+
+- glossary 팝오버 실제 DB(glossary 테이블) 연결 및 페이지 배선 (QA04에서 `glossary.ts`+`glossary-popover.tsx` 유지 결정 시 파생)
 
 ### Phase S8′: 멀티시즌 아카이브 (구 S703 + S8 통합)
 

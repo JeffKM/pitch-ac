@@ -62,12 +62,3 @@ export interface PlayerMatchStats {
   assists: number;
   minutesPlayed: number;
 }
-
-/** 외부 API ID 매핑 */
-export interface PlayerIdMapping {
-  playerId: number;
-  sportmonksId: number | null;
-  footballDataId: number | null;
-  /** 수동 검증 완료 여부 */
-  verified: boolean;
-}

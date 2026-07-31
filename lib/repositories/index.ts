@@ -19,14 +19,7 @@ export type {
   TeamRow,
 } from "./mappers";
 export { getLatestNews } from "./news-repository";
-export {
-  getAllPlayers,
-  getLatestPlayerSeasonStats,
-  getMatchStatsByPlayerId,
-  getPlayerById,
-  getPlayerSeasonStats,
-  getPlayerSeasonStatsByIds,
-} from "./player-repository";
+export { getLatestPlayerSeasonStats, getPlayerById } from "./player-repository";
 export type {
   ScoutlabActionMapRow,
   ScoutlabMetricsRow,
@@ -44,11 +37,9 @@ export {
   getScoutlabProgression,
   getScoutlabRadar,
   getScoutlabSimilarity,
-  searchScoutlabPlayers,
 } from "./scoutlab-repository";
 export {
   getAllLeagueStandings,
-  getAllStandings,
   getLatestStandingSeasons,
   getStandingsByTeamIds,
 } from "./standing-repository";

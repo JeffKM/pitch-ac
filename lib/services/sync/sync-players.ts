@@ -146,7 +146,9 @@ export async function syncPlayers(): Promise<SyncResult> {
     // 시즌 초반 이적 선수가 신구 두 구단 스쿼드에 동시 등재되어 응답에 동일 id가
     // 중복 포함될 수 있다 (실측: Rogers, Garnacho, Diop). 배치 내 동일 id 중복은
     // ON CONFLICT 21000으로 upsert 전체를 실패시키므로 id 기준 중복 제거 후
-    // 적재한다 (Map은 순회 순서를 보존하므로 마지막 등재 = 최신 소속 구단 채택).
+    // 적재한다. Map 특성상 같은 id는 마지막 항목이 이전 항목을 덮어쓰므로,
+    // 동일 선수가 여러 팀 스쿼드에 중복 등장하면 football-data.org 응답에서
+    // 나중에 나온 팀이 채택된다 — 응답 순서 기준일 뿐 최신 이적을 보장하지는 않는다.
     const dedupedPlayerRows = Array.from(
       new Map(playerRows.map((row) => [row.id, row])).values(),
     );

@@ -27,11 +27,6 @@ const nextConfig: NextConfig = {
         hostname: "crests.football-data.org",
         pathname: "/**",
       },
-      {
-        protocol: "https",
-        hostname: "*.supabase.co",
-        pathname: "/storage/v1/object/public/cartoon-assets/**",
-      },
       // football-data.org가 일부 팀 크레스트를 wikimedia URL로 제공 (예: Le Mans FC, 26/27 리그앙 승격)
       {
         protocol: "https",

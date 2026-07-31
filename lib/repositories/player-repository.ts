@@ -4,37 +4,15 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { cache } from "react";
 
-import { MCITY_TEAM_ID } from "@/lib/constants/football";
 import { createPublicClient } from "@/lib/supabase/public";
-import type { Player, PlayerMatchStats, PlayerSeasonStats } from "@/types";
+import type { Player, PlayerSeasonStats } from "@/types";
 
 import {
-  type PlayerMatchStatsRow,
-  playerMatchStatsRowToStats,
   type PlayerRow,
   playerRowToPlayer,
   type PlayerSeasonStatsRow,
   playerSeasonStatsRowToStats,
 } from "./mappers";
-
-/** 맨시티 선수 목록 조회 (이름순 정렬) */
-export const getAllPlayers = cache(async (): Promise<Player[]> => {
-  "use cache";
-  cacheLife("hours");
-  cacheTag("players");
-
-  const supabase = createPublicClient();
-
-  const { data, error } = await supabase
-    .from("players")
-    .select("*")
-    .eq("team_id", MCITY_TEAM_ID)
-    .order("name", { ascending: true });
-
-  if (error) throw new Error(`players 조회 실패: ${error.message}`);
-
-  return (data as PlayerRow[]).map(playerRowToPlayer);
-});
 
 /** ID로 선수 단건 조회 */
 export const getPlayerById = cache(
@@ -55,33 +33,6 @@ export const getPlayerById = cache(
     if (!data) return null;
 
     return playerRowToPlayer(data as PlayerRow);
-  },
-);
-
-/** 선수 ID + 시즌으로 시즌 스탯 조회 */
-export const getPlayerSeasonStats = cache(
-  async (
-    playerId: number,
-    season: string,
-  ): Promise<PlayerSeasonStats | null> => {
-    "use cache";
-    cacheLife("hours");
-    cacheTag("players");
-
-    const supabase = createPublicClient();
-
-    const { data, error } = await supabase
-      .from("player_season_stats")
-      .select("*")
-      .eq("player_id", playerId)
-      .eq("season", season)
-      .maybeSingle();
-
-    if (error)
-      throw new Error(`player_season_stats 조회 실패: ${error.message}`);
-    if (!data) return null;
-
-    return playerSeasonStatsRowToStats(data as PlayerSeasonStatsRow);
   },
 );
 
@@ -107,57 +58,5 @@ export const getLatestPlayerSeasonStats = cache(
     if (!data) return null;
 
     return playerSeasonStatsRowToStats(data as PlayerSeasonStatsRow);
-  },
-);
-
-/** 여러 선수 ID의 시즌 스탯 배치 조회 → Map<playerId, PlayerSeasonStats> (N+1 방지) */
-export async function getPlayerSeasonStatsByIds(
-  playerIds: number[],
-  season: string,
-): Promise<Map<number, PlayerSeasonStats>> {
-  "use cache";
-  cacheLife("hours");
-  cacheTag("players");
-
-  if (playerIds.length === 0) return new Map();
-
-  const supabase = createPublicClient();
-
-  const { data, error } = await supabase
-    .from("player_season_stats")
-    .select("*")
-    .in("player_id", playerIds)
-    .eq("season", season);
-
-  if (error)
-    throw new Error(`player_season_stats 배치 조회 실패: ${error.message}`);
-
-  const map = new Map<number, PlayerSeasonStats>();
-  for (const row of data as PlayerSeasonStatsRow[]) {
-    map.set(row.player_id, playerSeasonStatsRowToStats(row));
-  }
-  return map;
-}
-
-/** 선수 ID로 최근 경기 스탯 조회 (최신순, 최대 10경기) */
-export const getMatchStatsByPlayerId = cache(
-  async (playerId: number): Promise<PlayerMatchStats[]> => {
-    "use cache";
-    cacheLife("hours");
-    cacheTag("players");
-
-    const supabase = createPublicClient();
-
-    const { data, error } = await supabase
-      .from("player_match_stats")
-      .select("*")
-      .eq("player_id", playerId)
-      .order("fixture_id", { ascending: false })
-      .limit(10);
-
-    if (error)
-      throw new Error(`player_match_stats 조회 실패: ${error.message}`);
-
-    return (data as PlayerMatchStatsRow[]).map(playerMatchStatsRowToStats);
   },
 );

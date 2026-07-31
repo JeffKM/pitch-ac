@@ -10,27 +10,6 @@ import type { TeamStanding } from "@/types";
 
 import { type StandingRow, standingRowToStanding } from "./mappers";
 
-/** 시즌 전체 순위 조회 (position 오름차순) */
-export const getAllStandings = cache(
-  async (season: string): Promise<TeamStanding[]> => {
-    "use cache";
-    cacheLife("hours");
-    cacheTag("standings");
-
-    const supabase = createPublicClient();
-
-    const { data, error } = await supabase
-      .from("standings")
-      .select("*")
-      .eq("season", season)
-      .order("position", { ascending: true });
-
-    if (error) throw new Error(`standings 전체 조회 실패: ${error.message}`);
-
-    return (data as StandingRow[]).map(standingRowToStanding);
-  },
-);
-
 /**
  * 대회별 최신 시즌 라벨 조회 → Map<leagueId, season>
  * 시즌 라벨은 "YYYY/YYYY" 형식이라 문자열 내림차순 = 최신순이다.

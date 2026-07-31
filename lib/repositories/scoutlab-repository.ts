@@ -36,36 +36,6 @@ import {
   scoutlabSimilarityRowToSimilarity,
 } from "./scoutlab-mappers";
 
-/** 선수 검색 (필터 기반) */
-export async function searchScoutlabPlayers(
-  filters: ScoutlabSearchFilters,
-): Promise<ScoutlabPlayer[]> {
-  "use cache";
-  cacheLife("hours");
-  cacheTag("scoutlab");
-
-  const supabase = createPublicClient();
-
-  let query = supabase
-    .from("scoutlab_players")
-    .select("*")
-    .order("name", { ascending: true });
-
-  if (filters.season) query = query.eq("season", filters.season);
-  if (filters.league) query = query.eq("league", filters.league);
-  if (filters.team) query = query.eq("team", filters.team);
-  if (filters.position) query = query.eq("position", filters.position);
-  if (filters.minMinutes)
-    query = query.gte("minutes_played", filters.minMinutes);
-  if (filters.maxAge) query = query.lte("age", filters.maxAge);
-
-  const { data, error } = await query;
-
-  if (error) throw new Error(`scoutlab_players 조회 실패: ${error.message}`);
-
-  return (data as ScoutlabPlayerRow[]).map(scoutlabPlayerRowToPlayer);
-}
-
 /** 기본 선수 조회 (playerId 미지정 시 Haaland 표시용) */
 export const getDefaultScoutlabPlayer = cache(
   async (season: string): Promise<ScoutlabPlayer | null> => {
