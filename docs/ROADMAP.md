@@ -102,11 +102,11 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
 
 - **Task QA03: 보안 감사**
   - > 적용 스킬: security-scan, postgres-best-practices
-  - security-scan으로 .claude/ 설정 점검
-  - Supabase advisors(security) + RLS 정책 전 테이블 검증
-  - 인증 플로우 점검 (OAuth 리다이렉트, 세션 갱신, service_role 키 노출 여부)
-  - 디버그 엔드포인트(`/api/debug/*`) 프로덕션 노출 여부 확인
-  - CSP Report-Only → enforce 전환 검토 — 전환 시 `connect-src`에 `*.ingest.us.sentry.io` 추가 필요 (`next.config.ts`)
+  - ✅ security-scan으로 .claude/ 설정 점검 (2026-07-31): AgentShield 32건 중 실질 위험 2건 조치 — `enableAllProjectMcpServers: false` 전환(명시적 `enabledMcpjsonServers` 목록 사용), stale `git push --force` 허용 제거. 나머지는 자체 제작 훅/에이전트 오탐
+  - ✅ Supabase advisors(security) + RLS 정책 전 테이블 검증 (2026-07-31): RLS 16개 테이블 전부 활성(공개 읽기+service_role 쓰기, sync_logs 계열은 service 전용). advisors WARN 3→1 — `0016_security_hardening.sql`로 `update_updated_at` search_path 고정 + action-maps 버킷 listing 정책 제거(객체 GET 200 유지, anon listing 빈 배열 재측정). 잔여 1건: Leaked Password Protection — **대시보드 수동 활성화 필요**
+  - ✅ 인증 플로우 점검 (2026-07-31): `confirm/route.ts`의 `next` 파라미터 open redirect 수정(내부 경로만 허용, callback과 동일 패턴). admin 클라이언트 `server-only` 가드·미들웨어 세션 갱신·크론 `CRON_SECRET` 인증 확인
+  - ✅ 디버그 엔드포인트(`/api/debug/*`) 프로덕션 노출 여부 확인 (2026-07-31): 6개 라우트 전부 `NODE_ENV === "production"` 403 가드 확인
+  - ✅ CSP Report-Only → enforce 전환 (2026-07-31): `connect-src`에 `*.ingest.us.sentry.io`, `img-src`에 `upload.wikimedia.org`, `worker-src 'self' blob:`(Sentry replay) 추가 후 enforce 전환. Playwright로 홈/매치데이/랭킹/스카우팅/뉴스/로그인 6페이지 CSP 위반 0건 확인
 
 - **Task QA04: 데드코드·구조 정리**
   - > 적용 스킬: refactor-cleaner
