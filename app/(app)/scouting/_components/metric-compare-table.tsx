@@ -1,5 +1,3 @@
-"use client";
-
 // ScoutLab Compare — 메트릭 나란히 비교 테이블
 import { cn } from "@/lib/utils";
 import type {

@@ -1,5 +1,3 @@
-"use client";
-
 // ScoutLab 개별 메트릭 행 (팝오버 포함)
 import { PercentileBar } from "@/components/percentile-bar";
 

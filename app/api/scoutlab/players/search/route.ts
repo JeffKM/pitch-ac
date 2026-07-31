@@ -70,7 +70,12 @@ export async function GET(request: Request) {
       );
     }
 
-    return NextResponse.json(data);
+    // 선수 풀은 동기화 주기가 길어 CDN 캐시로 검색 반복 호출 흡수 (URL 단위 캐시)
+    return NextResponse.json(data, {
+      headers: {
+        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+      },
+    });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "서버 오류" },

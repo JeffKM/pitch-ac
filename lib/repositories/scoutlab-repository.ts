@@ -142,28 +142,30 @@ export const getScoutlabMetrics = cache(
 );
 
 /** 시즌 추이 (여러 시즌 메트릭) */
-export async function getScoutlabProgression(
-  playerId: number,
-  mode: ScoutlabMode = "per90",
-  adjustment: ScoutlabAdjustment = "padj",
-  comparisonPosition: ScoutlabComparisonPosition = "AM/W",
-): Promise<ScoutlabMetrics[]> {
-  const supabase = await createClient();
+export const getScoutlabProgression = cache(
+  async (
+    playerId: number,
+    mode: ScoutlabMode = "per90",
+    adjustment: ScoutlabAdjustment = "padj",
+    comparisonPosition: ScoutlabComparisonPosition = "AM/W",
+  ): Promise<ScoutlabMetrics[]> => {
+    const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("scoutlab_metrics")
-    .select("*")
-    .eq("player_id", playerId)
-    .eq("mode", mode)
-    .eq("adjustment", adjustment)
-    .eq("comparison_position", comparisonPosition)
-    .order("season", { ascending: true });
+    const { data, error } = await supabase
+      .from("scoutlab_metrics")
+      .select("*")
+      .eq("player_id", playerId)
+      .eq("mode", mode)
+      .eq("adjustment", adjustment)
+      .eq("comparison_position", comparisonPosition)
+      .order("season", { ascending: true });
 
-  if (error)
-    throw new Error(`scoutlab_metrics 추이 조회 실패: ${error.message}`);
+    if (error)
+      throw new Error(`scoutlab_metrics 추이 조회 실패: ${error.message}`);
 
-  return (data as ScoutlabMetricsRow[]).map(scoutlabMetricsRowToMetrics);
-}
+    return (data as ScoutlabMetricsRow[]).map(scoutlabMetricsRowToMetrics);
+  },
+);
 
 /** 레이더 차트 데이터 조회 */
 export const getScoutlabRadar = cache(

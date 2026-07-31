@@ -17,7 +17,7 @@ import {
 } from "./mappers";
 
 /** 맨시티 선수 목록 조회 (이름순 정렬) */
-export async function getAllPlayers(): Promise<Player[]> {
+export const getAllPlayers = cache(async (): Promise<Player[]> => {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -29,7 +29,7 @@ export async function getAllPlayers(): Promise<Player[]> {
   if (error) throw new Error(`players 조회 실패: ${error.message}`);
 
   return (data as PlayerRow[]).map(playerRowToPlayer);
-}
+});
 
 /** ID로 선수 단건 조회 */
 export const getPlayerById = cache(
@@ -119,19 +119,20 @@ export async function getPlayerSeasonStatsByIds(
 }
 
 /** 선수 ID로 최근 경기 스탯 조회 (최신순, 최대 10경기) */
-export async function getMatchStatsByPlayerId(
-  playerId: number,
-): Promise<PlayerMatchStats[]> {
-  const supabase = await createClient();
+export const getMatchStatsByPlayerId = cache(
+  async (playerId: number): Promise<PlayerMatchStats[]> => {
+    const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("player_match_stats")
-    .select("*")
-    .eq("player_id", playerId)
-    .order("fixture_id", { ascending: false })
-    .limit(10);
+    const { data, error } = await supabase
+      .from("player_match_stats")
+      .select("*")
+      .eq("player_id", playerId)
+      .order("fixture_id", { ascending: false })
+      .limit(10);
 
-  if (error) throw new Error(`player_match_stats 조회 실패: ${error.message}`);
+    if (error)
+      throw new Error(`player_match_stats 조회 실패: ${error.message}`);
 
-  return (data as PlayerMatchStatsRow[]).map(playerMatchStatsRowToStats);
-}
+    return (data as PlayerMatchStatsRow[]).map(playerMatchStatsRowToStats);
+  },
+);

@@ -115,70 +115,74 @@ export const getFixtureById = cache(
 );
 
 /** 게임위크별 리그 전체 경기 조회 (기본값: PL, season 지정 시 해당 시즌만) */
-export async function getFixturesByGameweek(
-  gameweek: number,
-  leagueId: number = PL_LEAGUE_ID,
-  season?: string,
-): Promise<Fixture[]> {
-  const supabase = await createClient();
+export const getFixturesByGameweek = cache(
+  async (
+    gameweek: number,
+    leagueId: number = PL_LEAGUE_ID,
+    season?: string,
+  ): Promise<Fixture[]> => {
+    const supabase = await createClient();
 
-  let query = supabase
-    .from("fixtures")
-    .select("*")
-    .eq("gameweek", gameweek)
-    .eq("league_id", leagueId);
+    let query = supabase
+      .from("fixtures")
+      .select("*")
+      .eq("gameweek", gameweek)
+      .eq("league_id", leagueId);
 
-  // 시즌 미지정 시 과거 시즌의 같은 라운드가 섞일 수 있으므로 가능한 항상 지정한다
-  if (season) query = query.eq("season", season);
+    // 시즌 미지정 시 과거 시즌의 같은 라운드가 섞일 수 있으므로 가능한 항상 지정한다
+    if (season) query = query.eq("season", season);
 
-  const { data, error } = await query.order("date", { ascending: true });
+    const { data, error } = await query.order("date", { ascending: true });
 
-  if (error) throw new Error(`fixtures 조회 실패: ${error.message}`);
+    if (error) throw new Error(`fixtures 조회 실패: ${error.message}`);
 
-  return (data as FixtureRow[]).map(fixtureRowToFixture);
-}
+    return (data as FixtureRow[]).map(fixtureRowToFixture);
+  },
+);
 
 /** 전체 대회에서 다음 예정(NS) 경기 조회 (시즌 종료 시 UCL 결승 등 표시용) */
-export async function getUpcomingFixtures(
-  limit: number = 6,
-): Promise<Fixture[]> {
-  const supabase = await createClient();
+export const getUpcomingFixtures = cache(
+  async (limit: number = 6): Promise<Fixture[]> => {
+    const supabase = await createClient();
 
-  const leagueIds = Array.from(ALL_COMPETITION_IDS);
+    const leagueIds = Array.from(ALL_COMPETITION_IDS);
 
-  const { data, error } = await supabase
-    .from("fixtures")
-    .select("*")
-    .in("league_id", leagueIds)
-    .eq("status", "NS")
-    .gte("date", new Date().toISOString())
-    .order("date", { ascending: true })
-    .limit(limit);
+    const { data, error } = await supabase
+      .from("fixtures")
+      .select("*")
+      .in("league_id", leagueIds)
+      .eq("status", "NS")
+      .gte("date", new Date().toISOString())
+      .order("date", { ascending: true })
+      .limit(limit);
 
-  if (error) throw new Error(`upcoming fixtures 조회 실패: ${error.message}`);
+    if (error) throw new Error(`upcoming fixtures 조회 실패: ${error.message}`);
 
-  return (data as FixtureRow[]).map(fixtureRowToFixture);
-}
+    return (data as FixtureRow[]).map(fixtureRowToFixture);
+  },
+);
 
 /** KST 날짜 기준 전체 대회 경기 조회 (5대 리그 + UCL) */
-export async function getFixturesByDate(dateStr: string): Promise<Fixture[]> {
-  const supabase = await createClient();
+export const getFixturesByDate = cache(
+  async (dateStr: string): Promise<Fixture[]> => {
+    const supabase = await createClient();
 
-  // KST 00:00~23:59:59 → UTC 변환
-  const startKST = new Date(`${dateStr}T00:00:00+09:00`);
-  const endKST = new Date(`${dateStr}T23:59:59.999+09:00`);
+    // KST 00:00~23:59:59 → UTC 변환
+    const startKST = new Date(`${dateStr}T00:00:00+09:00`);
+    const endKST = new Date(`${dateStr}T23:59:59.999+09:00`);
 
-  const leagueIds = Array.from(ALL_COMPETITION_IDS);
+    const leagueIds = Array.from(ALL_COMPETITION_IDS);
 
-  const { data, error } = await supabase
-    .from("fixtures")
-    .select("*")
-    .in("league_id", leagueIds)
-    .gte("date", startKST.toISOString())
-    .lte("date", endKST.toISOString())
-    .order("date", { ascending: true });
+    const { data, error } = await supabase
+      .from("fixtures")
+      .select("*")
+      .in("league_id", leagueIds)
+      .gte("date", startKST.toISOString())
+      .lte("date", endKST.toISOString())
+      .order("date", { ascending: true });
 
-  if (error) throw new Error(`fixtures 조회 실패: ${error.message}`);
+    if (error) throw new Error(`fixtures 조회 실패: ${error.message}`);
 
-  return (data as FixtureRow[]).map(fixtureRowToFixture);
-}
+    return (data as FixtureRow[]).map(fixtureRowToFixture);
+  },
+);
