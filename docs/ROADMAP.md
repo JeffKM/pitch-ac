@@ -16,12 +16,12 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
 - **News**: 이적뉴스 큐레이션 (자동 크롤링, 소스 유형 태깅)
 - **Tactics (장기)**: 중계 영상 기반 CV 전술 시각화
 
-## 현재 상태 (2026-07-30)
+## 현재 상태 (2026-07-31)
 
-- **25/26 시즌 종료** — DB의 fixtures/standings/ScoutLab 메트릭은 모두 25/26 시즌 기준
-- **26/27 시즌 개막 임박 (8월 중순)** → Phase SR(시즌 롤오버)이 최우선
+- **26/27 시즌 개막 임박 (8/21)** — fixtures/standings는 26/27 자동 롤오버 완료(SR01·SR03), ScoutLab 메트릭은 25/26 기준
+- **잔여**: SR06(롤오버 후속 정리), SR04(ScoutLab 시즌 전환은 원본 데이터 제공 대기). SR02(승격/강등 팀) ✅
 - ScoutLab: 5대 리그 1,519명 메트릭+Similarity 완료. Action Maps는 PL 372명만 (4개 리그 미수집 → 백로그 S8′)
-- 자동화 가동 중: 경기결과 동기화(Vercel cron), 이적뉴스 크롤링(self-hosted runner, 하루 3회) — 2개월 방치로 헬스체크 필요(SR05)
+- 자동화 정상 가동 확인(SR05 ✅): 경기결과 동기화(Vercel cron, 07-31 복구 확인), 이적뉴스 크롤링(self-hosted runner, 하루 3회)
 - 백엔드 포트폴리오(`docs/backend-portfolio/`)는 로드맵 미편입 — QA 감사에서 실측 개선이 나오면 소재로만 활용
 
 **진행 순서**: PR ✅ → **SR (개막 전 필수)** → QA (병행 가능) → 백로그 재평가
@@ -38,7 +38,7 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
 
 ---
 
-## Phase SR: 26/27 시즌 롤오버 — 진행 예정 (⏰ 개막 전 필수, ~2주)
+## Phase SR: 26/27 시즌 롤오버 — 진행 중 (⏰ 개막 전 필수, ~2주)
 
 > 적용 스킬: superpowers:systematic-debugging(검증), postgres-best-practices, qa
 > **목표**: 26/27 새 시즌 데이터가 수동 개입 없이 전 화면에 정상 반영되는 상태.
@@ -49,10 +49,11 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
   - 시즌 하드코딩 지점 전수 조사 (grep "25/26", "2025" 등)
   - 실제 동기화 1회 실행 결과: 5대 리그 fixtures/standings에 `2026/2027` 행 자동 생성, UCL(2001)은 `2025/2026` 그대로 유지 — 대회별 시차 자동 반영 확인
 
-- **Task SR02: 승격/강등 팀 반영**
-  - 5대 리그 승격/강등 팀 목록 갱신 (`syncAllLeagueTeams()`)
-  - 신규 팀 크레스트 이미지 확인 (crests.football-data.org)
-  - scoutlab_players의 강등 팀 소속 선수 처리 방침 결정 (유지=아카이브 vs 마킹)
+- **Task SR02: 승격/강등 팀 반영** ✅ (2026-07-31)
+  - ✅ `syncAllLeagueTeams()` 실행 — 6개 대회 전부 성공 (`teams-*` 최초 성공 기록, SR05의 코드 검증 우려 해소). 승격 14팀 전부 teams에 `2026/2027`로 반영: PL(Coventry·Hull·Ipswich), PD(Málaga·Deportivo·Racing Santander), SA(Monza·Frosinone·Venezia), BL1(Schalke·Paderborn·Elversberg), FL1(Troyes·Le Mans)
+  - ✅ 크레스트 14팀 전부 HTTP 200. 단 Le Mans만 API가 wikimedia URL 제공 → `next.config.ts` remotePatterns에 `upload.wikimedia.org/wikipedia/**` 추가로 해결
+  - ✅ scoutlab_players 강등 팀 선수 처리 방침: **유지(아카이브)** — `season` 컬럼('25/26')이 이미 아카이브 메커니즘이므로 삭제·마킹 불필요. SCOUTLAB_ACTIVE_SEASON이 25/26인 동안 강등 팀 선수(리그별 17~22명)도 유효한 25/26 데이터로 노출, SR04에서 26/27 수집 시 자연 배제
+  - 참고: Pisa(25/26 세리에A 승격팀)는 scoutlab_players에 수집 자체가 누락돼 있음 — SR04/S8′ 수집 시 커버리지 확인 필요
 
 - **Task SR03: 26/27 전체 동기화 + 화면 검증** ✅ (2026-07-30)
   - fixtures/teams/standings 전체 동기화 실행 (6개 대회)
@@ -65,11 +66,20 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
   - ScoutLab 원본(Streamlit)의 26/27 데이터 제공 시점 모니터링 → 제공 시 26/27 스크래핑 착수
   - `toScoutlabSeason()` 등 시즌 변환 유틸 26/27 대응 확인
 
-- **Task SR05: 방치 기간 헬스체크**
-  - 뉴스 크롤러 self-hosted runner 생존 확인 (`~/actions-runner` launchd, 최근 워크플로우 성공 여부)
-  - FMKorea DOM 구조 변경 여부 확인 (크롤러 파서 정상 동작)
-  - Sentry 에러 백로그 검토, Vercel cron 실행 이력 확인
-  - `npm run validate` + `npm run build` 통과 확인 (2개월간 의존성/환경 변화 점검)
+- **Task SR05: 방치 기간 헬스체크** ✅ (2026-07-31)
+  - ✅ football-data 동기화 65일 중단 발견(Vercel `FOOTBALL_DATA_API_KEY` 오설정) → 키 교체+재배포, 07-31 13:00 KST sync-fixtures cron 6개 대회 전부 성공으로 복구 확인
+  - ✅ 뉴스 크롤러 파서 정상. 러너 불안정은 절전 아닌 수동 종료가 원인 → 절전 영구 비활성화 적용, `sync-news.yml` timeout 20→30분
+  - ✅ Sentry DSN이 Vercel에 미설정이었음(65일 무알림의 원인) → DSN 발급·등록·재배포 완료
+  - ✅ `npm run validate` + `npm run build` 통과
+  - 참고: 07-31 08:00 KST sync-results는 구 배포 코드+0015 시차로 FL1 season NOT NULL 위반 1회 발생 — 머지 배포 후 해소 예상, 다음 실행에서 확인(SR06)
+
+- **Task SR06: 롤오버 후속 정리** (SR01·SR03 리뷰 잔여 백로그)
+  - stuck 25/26 행 2건 결과 백필: fixtures id 538145(LIVE), 542704(NS) — 삭제 금지, 결과 반영으로 해소
+  - `getPendingResultLeagues()` 시즌 인식 추가 (`lib/services/sync/schedule-calculator.ts`) — FL1 잔존 NS 행 탓에 sync-results가 매 실행 API 2회 낭비 중
+  - sync-results cron 정상 동작 확인 (season NOT NULL 위반 재발 여부)
+  - 리포지토리 시즌 파생 로직 테스트 추가 (`getLatestStandingSeasons`, `getCurrentGameweek`, `resolveStatsSeasons`)
+  - 시즌 모순 가드 스킵 시 sync_logs 가시성 확보 (스킵 사유를 errorMessage에 기록)
+  - 랭킹 화면 시즌 배지·빈 표 fallback (개막 8/21 전까지 SA·FL1은 0경기 빈 표 노출)
 
 ---
 
@@ -96,12 +106,15 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
   - Supabase advisors(security) + RLS 정책 전 테이블 검증
   - 인증 플로우 점검 (OAuth 리다이렉트, 세션 갱신, service_role 키 노출 여부)
   - 디버그 엔드포인트(`/api/debug/*`) 프로덕션 노출 여부 확인
+  - CSP Report-Only → enforce 전환 검토 — 전환 시 `connect-src`에 `*.ingest.us.sentry.io` 추가 필요 (`next.config.ts`)
 
 - **Task QA04: 데드코드·구조 정리**
   - > 적용 스킬: refactor-cleaner
   - knip/depcheck/ts-prune으로 미사용 코드·의존성 탐지
   - 피벗 잔재 정리: 카툰 시스템(`lib/services/cartoon/`, `types/cartoon.ts`, cartoon 컴포넌트·테이블), SportMonks/API-Football 잔재, 라이브 시스템 잔재
   - `.claude/plans/` 임시 파일 정리, `shrimp_data/`·`lively-bubbling-hennessy.md` 등 루트 잡동사니 처리
+  - SR 리뷰 잔여 데드코드 3건 제거: `toScoutlabSeason`·`getPlayerSeasonStats`·`getAllStandings`
+  - 소소한 정리: sync-players dedupe "최신 구단" 주석 정정, `prevSeasonLabel` 리네이밍
 
 ---
 
@@ -257,7 +270,7 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
 | F208    | 포메이션 추론                   | Task CV301~CV302 |
 | F223    | RANKING 선수 순위               | Task RK301~RK303 |
 | F224    | MATCHDAY 매치픽                 | Task MP101~MP104 |
-| F226    | 26/27 시즌 롤오버               | Task SR01~SR05   |
+| F226    | 26/27 시즌 롤오버               | Task SR01~SR06   |
 | F227    | 코드 품질 감사                  | Task QA01~QA04   |
 
 ---
