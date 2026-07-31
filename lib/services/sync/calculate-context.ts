@@ -21,7 +21,7 @@ interface ResolvedSeasons {
  * player_season_stats에 적재된 시즌 중 최신/직전 시즌을 파생한다.
  * 시즌 라벨은 "YYYY/YYYY" 형식이라 문자열 내림차순 = 최신순이다.
  */
-async function resolveStatsSeasons(
+export async function resolveStatsSeasons(
   supabase: ReturnType<typeof createAdminClient>,
 ): Promise<ResolvedSeasons> {
   const { data: latest, error: latestError } = await supabase
