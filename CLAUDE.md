@@ -2,7 +2,7 @@
 
 유럽 5대 리그(PL, La Liga, Serie A, Bundesliga, Ligue 1) 경기·순위·선수 데이터를 맥락과 함께 시각화하는 축구 데이터 플랫폼.
 핵심 기능: 매치데이 대시보드, Ranking(5대 리그+UCL 순위표), ScoutLab(60+ 메트릭 스카우팅 분석), News(이적뉴스 큐레이션).
-현재 상태: 5대 리그 데이터 인프라·ScoutLab 1,519명 완료. 로드맵은 `docs/ROADMAP.md` 참조.
+현재 상태: 5대 리그 데이터 인프라 완료, ScoutLab 메트릭 1,519명·Action Maps 1,843명(5대 리그 전체). 로드맵은 `docs/ROADMAP.md` 참조.
 
 ## 모델 운용 정책 (IMPORTANT — 모든 세션에서 강제)
 

@@ -16,11 +16,11 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
 - **News**: 이적뉴스 큐레이션 (자동 크롤링, 소스 유형 태깅)
 - **Tactics (장기)**: 중계 영상 기반 CV 전술 시각화
 
-## 현재 상태 (2026-07-31)
+## 현재 상태 (2026-08-01)
 
 - **26/27 시즌 개막 임박 (8/21)** — fixtures/standings는 26/27 자동 롤오버 완료(SR01·SR03), ScoutLab 메트릭은 25/26 기준
 - **잔여**: SR06(롤오버 후속 정리), SR04(ScoutLab 시즌 전환은 원본 데이터 제공 대기). SR02(승격/강등 팀) ✅
-- ScoutLab: 5대 리그 1,519명 메트릭+Similarity 완료. Action Maps는 PL 372명만 (4개 리그 미수집 → 백로그 S8′)
+- ScoutLab: Action Maps 5대 리그 1,843명 완료(S8′01 ✅, 08-01). 메트릭+Similarity는 1,519명 기준 — Action Maps 수집 중 소스 로스터가 확장되어 신규 upsert된 ~325명(Serie A 13팀 ~261명, Ligue 1 ~59명 등)은 메트릭 미수집 → 신규 Task S8′06
 - 자동화 정상 가동 확인(SR05 ✅): 경기결과 동기화(Vercel cron, 07-31 복구 확인), 이적뉴스 크롤링(self-hosted runner, 하루 3회)
 - 백엔드 포트폴리오(`docs/backend-portfolio/`)는 로드맵 미편입 — QA 감사에서 실측 개선이 나오면 소재로만 활용
 
@@ -154,9 +154,16 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
 > 적용 스킬: superpowers:writing-plans (장시간 스크래핑 배치 계획)
 > 25/26 시즌이 "지난 시즌"이 되면서 기존 S703(Action Maps 4개 리그)과 S8(멀티시즌)이 동일 성격의 아카이브 수집으로 통합됨.
 
-- **Task S8′01: Action Maps 4개 리그 수집 (구 S703)**
-  - La Liga/Serie A/Bundesliga/Ligue 1 순차 실행 (예상 ~20시간)
-  - 25/26 시즌 아카이브로 수집 (ScoutLab 원본이 25/26 데이터를 유지하는 동안)
+- **Task S8′01: Action Maps 4개 리그 수집 (구 S703)** ✅ (2026-08-01)
+  - 결과: 4개 리그 1,471명 × 3타입 = 4,413행 수집 (La Liga 395 / Serie A 398 / Bundesliga 334 / Ligue 1 344), 이미지 100%, OCR count/p90 1,555건 전량 성공
+  - 실측 소요: 수집 배치 8시간 49분(선수당 ~22초) + 재시도(Marseille 팀 스킵 21명·Lyon 3명·Zerbin 1명 전량 복구) + OCR 42분
+  - 러너: `scripts/scraper/run-action-maps-batch.sh` (순차 실행 + 리그당 10h 워치독 + 로그 + 잔존 프로세스 정리) — S8′02~04 재사용 가능
+  - 계획 문서: `docs/superpowers/plans/2026-07-31-s8-01-action-maps-4-leagues.md`
+
+- **Task S8′06: 신규 upsert 선수 메트릭·Similarity 수집 (S8′01 후속, 신규)**
+  - S8′01 중 소스 로스터 기준으로 upsert된 ~325명은 Action Maps만 있고 60+ 메트릭·Similarity 없음 (QA02 "Radar 빈 화면"과 동일 계열)
+  - 대상: Serie A 13팀(과거 player-card 수집이 7/20팀에서 중단된 것을 S8′01에서 발견) ~261명, Ligue 1 ~59명, 기타 소수
+  - `npm run scrape:scoutlab -- --league="Serie A" --season="25/26"` (action-maps-only 없이) 등으로 수집
 
 - **Task S8′02: 24/25 시즌 PL 전체 스크래핑 (구 S801)**
   - 현재 10명만 → 전체 확장 (예상 ~4시간)
