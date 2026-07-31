@@ -1,6 +1,7 @@
 // Repository 레이어 re-export
 import "server-only";
 
+export type { CurrentGameweek } from "./fixture-repository";
 export {
   getCurrentGameweek,
   getFixtureById,
@@ -20,6 +21,7 @@ export type {
 export { getLatestNews } from "./news-repository";
 export {
   getAllPlayers,
+  getLatestPlayerSeasonStats,
   getMatchStatsByPlayerId,
   getPlayerById,
   getPlayerSeasonStats,
@@ -47,6 +49,7 @@ export {
 export {
   getAllLeagueStandings,
   getAllStandings,
+  getLatestStandingSeasons,
   getStandingsByTeamIds,
 } from "./standing-repository";
 export { getAllTeams, getTeamsByIds } from "./team-repository";

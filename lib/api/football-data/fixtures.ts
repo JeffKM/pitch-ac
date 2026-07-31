@@ -4,23 +4,18 @@ import "server-only";
 import { footballDataFetch } from "./client";
 import type { FdMatch, FdMatchesResponse } from "./types";
 
-/** 리그 시즌 전체 경기 조회 */
+/**
+ * 리그 현재 시즌 전체 경기 조회
+ * season 파라미터를 넘기지 않아 API가 판단한 currentSeason을 그대로 사용한다.
+ * 시즌 라벨은 응답의 matches[i].season에서 파생한다.
+ */
 export async function getCompetitionMatches(
   code: string,
-  season?: number,
-): Promise<FdMatch[]> {
-  const params: Record<string, string | number> = {};
-  if (season) params.season = season;
-
-  const res = await footballDataFetch<FdMatchesResponse>(
-    `/competitions/${code}/matches`,
-    {
-      params,
-      revalidate: 3600,
-      tags: [`season-matches-${code}`],
-    },
-  );
-  return res.matches;
+): Promise<FdMatchesResponse> {
+  return footballDataFetch<FdMatchesResponse>(`/competitions/${code}/matches`, {
+    revalidate: 3600,
+    tags: [`season-matches-${code}`],
+  });
 }
 
 /** 특정 경기 조회 */

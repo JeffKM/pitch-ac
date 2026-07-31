@@ -45,6 +45,7 @@ describe("fixtureRowToFixture", () => {
     ],
     league_id: 2021,
     competition_name: null,
+    season: "2025/2026",
   };
 
   it("snake_case → camelCase 변환", () => {

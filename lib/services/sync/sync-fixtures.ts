@@ -1,21 +1,16 @@
 import "server-only";
 
 import {
+  deriveSeasonLabelFromMatches,
   getCompetitionMatches,
   mapFdMatchToFixture,
 } from "@/lib/api/football-data";
 import type { FdMatch } from "@/lib/api/football-data/types";
-import {
-  ALL_COMPETITIONS,
-  CURRENT_SEASON,
-  PL_LEAGUE_ID,
-} from "@/lib/constants/football";
+import { ALL_COMPETITIONS, PL_LEAGUE_ID } from "@/lib/constants/football";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 import { fixtureToDbRow, teamToDbRow } from "./db-mappers";
 import { extractErrorMessage, type SyncResult, writeSyncLog } from "./log";
-
-const SEASON_LABEL = "2025/2026";
 
 /**
  * 단일 리그 시즌 전체 경기 동기화
@@ -38,7 +33,15 @@ export async function syncLeagueFixtures(
       .eq("league_id", leagueId);
     const postpIds = new Set((postpRows ?? []).map((r) => r.id));
 
-    const allMatches = await getCompetitionMatches(leagueCode, CURRENT_SEASON);
+    const { matches: allMatches } = await getCompetitionMatches(leagueCode);
+
+    // 시즌 라벨은 응답에서 파생 — 대회마다 롤오버 시점이 다르다
+    const seasonLabel = deriveSeasonLabelFromMatches(allMatches);
+    if (!seasonLabel) {
+      throw new Error(
+        `${leagueCode} 경기 응답에서 시즌 정보를 확인할 수 없습니다`,
+      );
+    }
 
     // 팀 정보 upsert — matches에서 추출
     const seenTeamIds = new Set<number>();
@@ -56,7 +59,7 @@ export async function syncLeagueFixtures(
                 teamRef.shortName ??
                 teamRef.name.substring(0, 3).toUpperCase(),
               logoUrl: teamRef.crest,
-              season: SEASON_LABEL,
+              season: seasonLabel,
             }),
           );
         }

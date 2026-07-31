@@ -28,6 +28,7 @@ export interface FixtureRow {
   events: FixtureEvent[] | null;
   league_id: number;
   competition_name: string | null;
+  season: string;
 }
 
 /** teams 테이블 행 타입 */
@@ -70,6 +71,7 @@ export function fixtureRowToFixture(row: FixtureRow): Fixture {
     events: row.events ?? [],
     leagueId: row.league_id,
     competitionName: row.competition_name ?? null,
+    season: row.season,
   };
 }
 

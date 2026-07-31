@@ -43,20 +43,22 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
 > 적용 스킬: superpowers:systematic-debugging(검증), postgres-best-practices, qa
 > **목표**: 26/27 새 시즌 데이터가 수동 개입 없이 전 화면에 정상 반영되는 상태.
 
-- **Task SR01: 시즌 자동 처리 검증**
+- **Task SR01: 시즌 자동 처리 검증** ✅ (2026-07-30)
   - football-data.org의 26/27 시즌 데이터 제공 상태 확인 (fixtures/standings/teams 엔드포인트)
   - 현행 sync 파이프라인이 새 시즌을 자동 처리하는지 검증: season 컬럼 처리, `getCurrentGameweek()` 로직, standings UNIQUE 제약 `(team_id, season, league_id)` 동작
   - 시즌 하드코딩 지점 전수 조사 (grep "25/26", "2025" 등)
+  - 실제 동기화 1회 실행 결과: 5대 리그 fixtures/standings에 `2026/2027` 행 자동 생성, UCL(2001)은 `2025/2026` 그대로 유지 — 대회별 시차 자동 반영 확인
 
 - **Task SR02: 승격/강등 팀 반영**
   - 5대 리그 승격/강등 팀 목록 갱신 (`syncAllLeagueTeams()`)
   - 신규 팀 크레스트 이미지 확인 (crests.football-data.org)
   - scoutlab_players의 강등 팀 소속 선수 처리 방침 결정 (유지=아카이브 vs 마킹)
 
-- **Task SR03: 26/27 전체 동기화 + 화면 검증**
+- **Task SR03: 26/27 전체 동기화 + 화면 검증** ✅ (2026-07-30)
   - fixtures/teams/standings 전체 동기화 실행 (6개 대회)
   - 홈(오프시즌 fallback → 새 시즌 전환), 매치데이(GW1 표시), 랭킹(순위표 리셋) 검증
-  - 개막 후 첫 라운드에서 sync-results cron 자동 반영 확인
+  - 개막 후 첫 라운드에서 sync-results cron 자동 반영 확인 — 다음 개막 후 재검증 필요
+  - 실행 결과: `/`, `/ranking`, `/matchday`, `/api/matchday/fixtures` 전부 200, ranking 화면에서 5대 리그는 26/27 탭, UCL은 25/26 최종 순위 정상 렌더. football-data.org standings 응답이 26/27 신규 시즌에도 25/26 최종 스탯(played=38)을 그대로 반환하는 업스트림 이슈 발견 — fixtures는 380건 전부 `NS`로 정상이라 시즌 라벨링 로직 자체는 정상, 콘텐츠 정합성은 후속 확인 필요
 
 - **Task SR04: ScoutLab 시즌 전환**
   - 시즌 셀렉터 기본값 처리: 26/27 데이터 없는 동안 25/26 유지, 수집 후 전환

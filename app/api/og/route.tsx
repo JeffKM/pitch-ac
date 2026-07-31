@@ -4,10 +4,9 @@
 import { ImageResponse } from "next/og";
 import { type NextRequest, NextResponse } from "next/server";
 
-import { CURRENT_SEASON_LABEL } from "@/lib/constants/football";
 import {
+  getLatestPlayerSeasonStats,
   getPlayerById,
-  getPlayerSeasonStats,
   getTeamsByIds,
 } from "@/lib/repositories";
 
@@ -45,8 +44,8 @@ export async function GET(request: NextRequest) {
   }
 
   const [stats1, stats2] = await Promise.all([
-    getPlayerSeasonStats(player1.id, CURRENT_SEASON_LABEL),
-    getPlayerSeasonStats(player2.id, CURRENT_SEASON_LABEL),
+    getLatestPlayerSeasonStats(player1.id),
+    getLatestPlayerSeasonStats(player2.id),
   ]);
 
   if (!stats1 || !stats2) {

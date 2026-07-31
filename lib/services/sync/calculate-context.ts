@@ -11,8 +11,45 @@ import { extractErrorMessage, type SyncResult, writeSyncLog } from "./log";
 
 // ─── 상수 ────────────────────────────────────────────────
 
-const CURRENT_SEASON = "2025/2026";
-const PREV_SEASON = "2024/2025";
+/** 맥락 계산 대상 시즌 (DB에서 파생) */
+interface ResolvedSeasons {
+  currentSeason: string | null;
+  prevSeason: string | null;
+}
+
+/**
+ * player_season_stats에 적재된 시즌 중 최신/직전 시즌을 파생한다.
+ * 시즌 라벨은 "YYYY/YYYY" 형식이라 문자열 내림차순 = 최신순이다.
+ */
+async function resolveStatsSeasons(
+  supabase: ReturnType<typeof createAdminClient>,
+): Promise<ResolvedSeasons> {
+  const { data: latest, error: latestError } = await supabase
+    .from("player_season_stats")
+    .select("season")
+    .order("season", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (latestError) throw latestError;
+  const currentSeason = (latest?.season as string | undefined) ?? null;
+  if (!currentSeason) return { currentSeason: null, prevSeason: null };
+
+  const { data: prev, error: prevError } = await supabase
+    .from("player_season_stats")
+    .select("season")
+    .lt("season", currentSeason)
+    .order("season", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (prevError) throw prevError;
+
+  return {
+    currentSeason,
+    prevSeason: (prev?.season as string | undefined) ?? null,
+  };
+}
 
 /** 맥락 계산 대상 메트릭 (xG/xA는 Starter 플랜 미지원으로 항상 null — 제외) */
 const CONTEXT_METRICS = [
@@ -155,13 +192,27 @@ export async function calculateContext(): Promise<SyncResult> {
   let totalUpdated = 0;
 
   try {
+    // Step 0: 대상 시즌 파생 (전역 상수 대신 DB 최신 시즌 사용)
+    const { currentSeason, prevSeason } = await resolveStatsSeasons(supabase);
+
+    if (!currentSeason) {
+      const result: SyncResult = {
+        entity: "context_calculation",
+        status: "success",
+        recordsSynced: 0,
+        errorMessage: "시즌 스탯 데이터 없음 — sync-stats 먼저 실행 필요",
+      };
+      await writeSyncLog(supabase, result);
+      return result;
+    }
+
     // Step 1: 현재 시즌 전체 스탯 + 포지션 JOIN 조회
     const { data: rawStats, error: fetchError } = await supabase
       .from("player_season_stats")
       .select(
         "id, player_id, goals, assists, key_passes, dribbles, average_rating, radar_data, players!inner(position)",
       )
-      .eq("season", CURRENT_SEASON);
+      .eq("season", currentSeason);
 
     if (fetchError) throw fetchError;
 
@@ -170,7 +221,7 @@ export async function calculateContext(): Promise<SyncResult> {
         entity: "context_calculation",
         status: "success",
         recordsSynced: 0,
-        errorMessage: "현재 시즌 스탯 데이터 없음 — sync-stats 먼저 실행 필요",
+        errorMessage: `${currentSeason} 시즌 스탯 데이터 없음`,
       };
       await writeSyncLog(supabase, result);
       return result;
@@ -190,15 +241,19 @@ export async function calculateContext(): Promise<SyncResult> {
         "MID") as PlayerPosition,
     }));
 
-    // Step 2: 전년 시즌 스탯 조회 (prevSeason 비교용)
-    const { data: prevRaw } = await supabase
-      .from("player_season_stats")
-      .select("player_id, goals, assists, key_passes, dribbles, average_rating")
-      .eq("season", PREV_SEASON);
-
+    // Step 2: 전년 시즌 스탯 조회 (prevSeason 비교용 — 없으면 건너뜀)
     const prevMap = new Map<number, PrevSeasonRow>();
-    for (const p of prevRaw ?? []) {
-      prevMap.set(p.player_id as number, p as PrevSeasonRow);
+    if (prevSeason) {
+      const { data: prevRaw } = await supabase
+        .from("player_season_stats")
+        .select(
+          "player_id, goals, assists, key_passes, dribbles, average_rating",
+        )
+        .eq("season", prevSeason);
+
+      for (const p of prevRaw ?? []) {
+        prevMap.set(p.player_id as number, p as PrevSeasonRow);
+      }
     }
 
     // Step 3: 포지션별 그룹핑
@@ -270,7 +325,7 @@ export async function calculateContext(): Promise<SyncResult> {
       upsertRows.push({
         id: row.id,
         player_id: row.player_id,
-        season: CURRENT_SEASON,
+        season: currentSeason,
         context,
         ...(updatedRadar ? { radar_data: updatedRadar } : {}),
       });

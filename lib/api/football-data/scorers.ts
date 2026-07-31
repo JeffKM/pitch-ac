@@ -4,16 +4,11 @@ import "server-only";
 import { footballDataFetch } from "./client";
 import type { FdScorersResponse } from "./types";
 
-/** 리그 득점 순위 조회 */
+/** 리그 현재 시즌 득점 순위 조회 (응답의 season 필드로 시즌 판별) */
 export async function getCompetitionScorers(
   code: string,
-  season?: number,
 ): Promise<FdScorersResponse> {
-  const params: Record<string, string | number> = {};
-  if (season) params.season = season;
-
   return footballDataFetch<FdScorersResponse>(`/competitions/${code}/scorers`, {
-    params,
     revalidate: 3600,
     tags: [`scorers-${code}`],
   });

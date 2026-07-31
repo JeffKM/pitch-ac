@@ -2,7 +2,7 @@
 
 import { connection } from "next/server";
 
-import { CURRENT_SEASON_LABEL, PL_LEAGUE_ID } from "@/lib/constants/football";
+import { PL_LEAGUE_ID } from "@/lib/constants/football";
 import { getTodayDateKey } from "@/lib/date-utils";
 import {
   getCurrentGameweek,
@@ -49,18 +49,19 @@ export async function HomeContent() {
   const [todayFixtures, standingsMap, currentGameweek, latestNews] =
     await Promise.all([
       getFixturesByDate(todayDate),
-      getAllLeagueStandings(CURRENT_SEASON_LABEL),
+      getAllLeagueStandings(),
       getCurrentGameweek(PL_LEAGUE_ID),
       getLatestNews(3),
     ]);
 
-  // 오늘 경기가 없으면 다음 라운드 경기 조회
+  // 오늘 경기가 없으면 다음 라운드 경기 조회 (현재 게임위크의 시즌으로 한정)
   let nextRoundFixtures: Fixture[] = [];
   let upcomingFixtures: Fixture[] = [];
   if (todayFixtures.length === 0) {
     nextRoundFixtures = await getFixturesByGameweek(
-      currentGameweek,
+      currentGameweek.gameweek,
       PL_LEAGUE_ID,
+      currentGameweek.season ?? undefined,
     );
 
     // PL 라운드 경기가 모두 종료됐으면 전체 대회에서 다음 예정 경기 조회
@@ -87,7 +88,7 @@ export async function HomeContent() {
       upcomingFixtures={upcomingFixtures}
       standingsMap={standingsMap}
       teamsMap={teamsMap}
-      currentGameweek={currentGameweek}
+      currentGameweek={currentGameweek.gameweek}
       latestNews={latestNews}
     />
   );
