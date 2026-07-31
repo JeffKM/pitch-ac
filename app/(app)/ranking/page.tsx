@@ -4,7 +4,11 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { PageLoadingIndicator } from "@/components/page-loading-indicator";
-import { getAllLeagueStandings, getAllTeams } from "@/lib/repositories";
+import {
+  getAllLeagueStandings,
+  getAllTeams,
+  getLatestStandingSeasons,
+} from "@/lib/repositories";
 import type { Team, TeamStanding } from "@/types";
 
 import { RankingContent } from "./_components/ranking-content";
@@ -15,9 +19,10 @@ export const metadata: Metadata = {
 };
 
 async function RankingData() {
-  const [standingsMap, teams] = await Promise.all([
+  const [standingsMap, teams, seasonsMap] = await Promise.all([
     getAllLeagueStandings(),
     getAllTeams(),
+    getLatestStandingSeasons(),
   ]);
 
   // Map은 RSC → Client Component 직렬화 불가 → Record로 변환
@@ -31,8 +36,18 @@ async function RankingData() {
     teamRecord[t.id] = t;
   }
 
+  // 대회별 최신 시즌 라벨 (UCL 롤오버 시차로 대회마다 다를 수 있음)
+  const seasonRecord: Record<number, string> = {};
+  for (const [leagueId, season] of seasonsMap) {
+    seasonRecord[leagueId] = season;
+  }
+
   return (
-    <RankingContent standingsRecord={standingsRecord} teamRecord={teamRecord} />
+    <RankingContent
+      standingsRecord={standingsRecord}
+      teamRecord={teamRecord}
+      seasonRecord={seasonRecord}
+    />
   );
 }
 

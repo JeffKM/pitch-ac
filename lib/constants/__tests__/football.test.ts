@@ -1,8 +1,8 @@
-// SCOUTLAB_POSITION_MAP, toScoutlabSeason 단위 테스트
+// SCOUTLAB_POSITION_MAP, toShortSeasonLabel 단위 테스트
 
 import { describe, expect, it } from "vitest";
 
-import { SCOUTLAB_POSITION_MAP, toScoutlabSeason } from "../football";
+import { SCOUTLAB_POSITION_MAP, toShortSeasonLabel } from "../football";
 
 // ─── SCOUTLAB_POSITION_MAP ──────────────────────
 
@@ -51,18 +51,18 @@ describe("SCOUTLAB_POSITION_MAP", () => {
   });
 });
 
-// ─── toScoutlabSeason ───────────────────────────
+// ─── toShortSeasonLabel ───────────────────────────
 
-describe("toScoutlabSeason", () => {
+describe("toShortSeasonLabel", () => {
   it("2025/2026 → 25/26", () => {
-    expect(toScoutlabSeason("2025/2026")).toBe("25/26");
+    expect(toShortSeasonLabel("2025/2026")).toBe("25/26");
   });
 
   it("2024/2025 → 24/25", () => {
-    expect(toScoutlabSeason("2024/2025")).toBe("24/25");
+    expect(toShortSeasonLabel("2024/2025")).toBe("24/25");
   });
 
   it("2023/2024 → 23/24", () => {
-    expect(toScoutlabSeason("2023/2024")).toBe("23/24");
+    expect(toShortSeasonLabel("2023/2024")).toBe("23/24");
   });
 });

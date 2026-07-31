@@ -203,8 +203,8 @@ export const SCOUTLAB_POSITION_MAP: Record<string, string | null> = {
   "Right-Back": "FB",
 };
 
-/** 시즌 레이블 → ScoutLab 시즌 형식 ("2025/2026" → "25/26") */
-export function toScoutlabSeason(seasonLabel: string): string {
+/** 시즌 레이블 → 짧은 표기 ("2025/2026" → "25/26") — UI 배지·ScoutLab 시즌 형식 공용 */
+export function toShortSeasonLabel(seasonLabel: string): string {
   const [start, end] = seasonLabel.split("/");
   return `${start.slice(-2)}/${end.slice(-2)}`;
 }
