@@ -245,10 +245,13 @@ export async function getScatterData(
 ): Promise<ScoutlabScatterPoint[]> {
   const supabase = await createClient();
 
-  // 메트릭 + 선수 전체 조회 후 클라이언트에서 JSONB 추출
+  // 필요 컬럼만 조회 — JSONB 11개 전체(행당 ~3.4KB)가 아닌 x/y 카테고리 2개만
+  const categories = [...new Set([xCategory, yCategory])].join(", ");
   let query = supabase
     .from("scoutlab_metrics")
-    .select("*, scoutlab_players!inner(*)")
+    .select(
+      `comparison_position, ${categories}, scoutlab_players!inner(id, name, team, league, position)`,
+    )
     .eq("mode", "per90")
     .eq("adjustment", "padj");
 
@@ -268,7 +271,9 @@ export async function getScatterData(
   type MetricValue = { value: number; percentile: number };
   type CategoryMetrics = Record<string, MetricValue>;
 
-  const points: ScoutlabScatterPoint[] = [];
+  // 한 선수가 여러 comparison_position 버킷을 가질 수 있어 player 단위로 dedupe
+  // (선수의 대표 포지션과 일치하는 버킷 우선)
+  const pointsByPlayer = new Map<number, ScoutlabScatterPoint>();
   for (const row of data ?? []) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const r = row as Record<string, any>;
@@ -276,22 +281,28 @@ export async function getScatterData(
     const yCat = r[yCategory] as CategoryMetrics | null;
     const xVal = xCat?.[xMetric];
     const yVal = yCat?.[yMetric];
-    const player = r.scoutlab_players as ScoutlabPlayerRow;
+    const player = r.scoutlab_players as Pick<
+      ScoutlabPlayerRow,
+      "id" | "name" | "team" | "league" | "position"
+    >;
 
     if (xVal && yVal && player) {
-      points.push({
-        playerId: player.id,
-        name: player.name,
-        team: player.team,
-        league: player.league as ScoutlabLeague,
-        position: player.position as ScoutlabPosition,
-        x: xVal.value,
-        y: yVal.value,
-      });
+      const isCanonical = r.comparison_position === player.position;
+      if (!pointsByPlayer.has(player.id) || isCanonical) {
+        pointsByPlayer.set(player.id, {
+          playerId: player.id,
+          name: player.name,
+          team: player.team,
+          league: player.league as ScoutlabLeague,
+          position: player.position as ScoutlabPosition,
+          x: xVal.value,
+          y: yVal.value,
+        });
+      }
     }
   }
 
-  return points;
+  return [...pointsByPlayer.values()];
 }
 
 /** 메트릭별 랭킹 데이터 */
@@ -305,9 +316,10 @@ export async function getRankingData(
 > {
   const supabase = await createClient();
 
+  // 매퍼가 선수 전체 행을 요구하므로 선수는 *, 메트릭은 요청 카테고리 JSONB만 조회
   let query = supabase
     .from("scoutlab_metrics")
-    .select("*, scoutlab_players!inner(*)")
+    .select(`comparison_position, ${category}, scoutlab_players!inner(*)`)
     .eq("mode", "per90")
     .eq("adjustment", "padj")
     .limit(2000);
@@ -327,11 +339,12 @@ export async function getRankingData(
   type MetricValue = { value: number; percentile: number };
   type CategoryMetrics = Record<string, MetricValue>;
 
-  const results: Array<{
-    player: ScoutlabPlayer;
-    value: number;
-    percentile: number;
-  }> = [];
+  // 한 선수가 여러 comparison_position 버킷을 가질 수 있어 player 단위로 dedupe
+  // (선수의 대표 포지션과 일치하는 버킷 우선)
+  const resultsByPlayer = new Map<
+    number,
+    { player: ScoutlabPlayer; value: number; percentile: number }
+  >();
 
   for (const row of data ?? []) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -341,15 +354,19 @@ export async function getRankingData(
     const playerRow = r.scoutlab_players as ScoutlabPlayerRow;
 
     if (metricData && playerRow) {
-      results.push({
-        player: scoutlabPlayerRowToPlayer(playerRow),
-        value: metricData.value,
-        percentile: metricData.percentile,
-      });
+      const isCanonical = r.comparison_position === playerRow.position;
+      if (!resultsByPlayer.has(playerRow.id) || isCanonical) {
+        resultsByPlayer.set(playerRow.id, {
+          player: scoutlabPlayerRowToPlayer(playerRow),
+          value: metricData.value,
+          percentile: metricData.percentile,
+        });
+      }
     }
   }
 
   // 백분위 내림차순 정렬 + limit
+  const results = [...resultsByPlayer.values()];
   results.sort((a, b) => b.value - a.value);
   return results.slice(0, limit);
 }

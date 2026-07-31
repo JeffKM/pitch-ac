@@ -43,7 +43,12 @@ export async function GET(request: Request) {
       },
       50,
     );
-    return NextResponse.json(data);
+    // ScoutLab 데이터는 동기화 주기가 길어 CDN 캐시로 반복 재조회 흡수
+    return NextResponse.json(data, {
+      headers: {
+        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+      },
+    });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "서버 오류" },

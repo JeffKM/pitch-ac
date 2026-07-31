@@ -40,32 +40,37 @@ export async function getPendingResultLeagues(): Promise<LeagueConfig[]> {
     pendingSeasonsByLeague.set(row.league_id, seasons);
   }
 
-  const leagues: LeagueConfig[] = [];
-  for (const [leagueId, pendingSeasons] of pendingSeasonsByLeague) {
-    const league = COMPETITION_BY_ID[leagueId];
-    if (!league) continue;
+  // 리그별 최신 시즌 조회는 서로 독립 — 병렬 실행 (최대 6개 리그)
+  const leagueResults = await Promise.all(
+    [...pendingSeasonsByLeague].map(
+      async ([leagueId, pendingSeasons]): Promise<LeagueConfig | null> => {
+        const league = COMPETITION_BY_ID[leagueId];
+        if (!league) return null;
 
-    // 리그 최신 시즌 파생 — "YYYY/YYYY" 고정폭 문자열 내림차순 = 최신
-    const { data: latestRows, error: latestError } = await supabase
-      .from("fixtures")
-      .select("season")
-      .eq("league_id", leagueId)
-      .order("season", { ascending: false })
-      .limit(1);
+        // 리그 최신 시즌 파생 — "YYYY/YYYY" 고정폭 문자열 내림차순 = 최신
+        const { data: latestRows, error: latestError } = await supabase
+          .from("fixtures")
+          .select("season")
+          .eq("league_id", leagueId)
+          .order("season", { ascending: false })
+          .limit(1);
 
-    const latestSeason = latestRows?.[0]?.season;
+        const latestSeason = latestRows?.[0]?.season;
 
-    // 최신 시즌 조회 실패 시 기존 동작 유지 (fail-open: 동기화 시도)
-    if (latestError || !latestSeason || pendingSeasons.has(latestSeason)) {
-      leagues.push(league);
-      continue;
-    }
+        // 최신 시즌 조회 실패 시 기존 동작 유지 (fail-open: 동기화 시도)
+        if (latestError || !latestSeason || pendingSeasons.has(latestSeason)) {
+          return league;
+        }
 
-    console.warn(
-      `[getPendingResultLeagues] ${league.code}: 구시즌 잔존 NS 행 스킵 ` +
-        `(잔존 시즌 ${[...pendingSeasons].join(", ")} / 최신 시즌 ${latestSeason})`,
-    );
-  }
+        console.warn(
+          `[getPendingResultLeagues] ${league.code}: 구시즌 잔존 NS 행 스킵 ` +
+            `(잔존 시즌 ${[...pendingSeasons].join(", ")} / 최신 시즌 ${latestSeason})`,
+        );
+        return null;
+      },
+    ),
+  );
+  const leagues = leagueResults.filter((l): l is LeagueConfig => l !== null);
 
   return leagues;
 }

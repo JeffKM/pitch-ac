@@ -5,6 +5,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   useTransition,
 } from "react";
@@ -82,7 +83,13 @@ export function RankingView({
   const metricLabel = useMemo(() => formatMetricLabel(metric), [metric]);
 
   // 카테고리/메트릭/리그 변경 시 서버에서 랭킹 데이터 재조회
+  // 첫 렌더는 서버가 동일 파라미터로 initialEntries를 이미 조회했으므로 스킵
+  const isFirstRun = useRef(true);
   useEffect(() => {
+    if (isFirstRun.current) {
+      isFirstRun.current = false;
+      return;
+    }
     if (!metric) return;
 
     startTransition(async () => {
