@@ -54,3 +54,6 @@ shrimp_data/
 /*.yml
 /test-results/
 /scripts/retry-*.sh
+
+# 스크래퍼 배치 로그
+/scripts/scraper/logs/
