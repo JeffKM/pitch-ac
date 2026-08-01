@@ -5,6 +5,7 @@
 //   npm run scrape:scoutlab -- --player="Mohamed Salah" --headless=false
 //   npm run scrape:scoutlab -- --team="Arsenal" --league="Premier League"
 //   npm run scrape:scoutlab -- --dry-run
+//   npm run scrape:scoutlab -- --team="Lazio" --league="Serie A" --metrics-only --match-position
 
 import path from "node:path";
 import { parseArgs } from "node:util";
@@ -92,6 +93,7 @@ function parseCliArgs(): ScraperOptions {
       positions: { type: "string" },
       "similarity-only": { type: "boolean", default: false },
       "action-maps-only": { type: "boolean", default: false },
+      "metrics-only": { type: "boolean", default: false },
       "dump-action-maps-dom": { type: "boolean", default: false },
       "extract-lines": { type: "boolean", default: false },
     },
@@ -122,6 +124,7 @@ function parseCliArgs(): ScraperOptions {
     positions: parsePositionsArg(values.positions as string | undefined),
     similarityOnly: Boolean(values["similarity-only"]),
     actionMapsOnly: Boolean(values["action-maps-only"]),
+    metricsOnly: Boolean(values["metrics-only"]),
     dumpDom: Boolean(values["dump-action-maps-dom"]),
     extractLines: Boolean(values["extract-lines"]),
   };
@@ -311,17 +314,19 @@ async function scrapeAllCombinations(
     opts.dryRun,
   );
 
-  // Action Maps 탭에서 1회 수집 (메트릭 루프 전)
-  await scrapeActionMaps(
-    iframe,
-    page,
-    supabase,
-    playerName,
-    league,
-    season,
-    opts.dryRun,
-    opts.extractLines,
-  );
+  // Action Maps 탭에서 1회 수집 (메트릭 루프 전) — --metrics-only 시 스킵 (Vision OCR 비용 절약)
+  if (!opts.metricsOnly) {
+    await scrapeActionMaps(
+      iframe,
+      page,
+      supabase,
+      playerName,
+      league,
+      season,
+      opts.dryRun,
+      opts.extractLines,
+    );
+  }
 
   const modes = opts.mode ? [opts.mode] : [...ALL_MODES];
   const adjustments = opts.adjustment
@@ -446,7 +451,9 @@ async function main(): Promise<void> {
       ? "action-maps-only"
       : opts.similarityOnly
         ? "similarity-only"
-        : `mode=${opts.mode ?? "all"}, adj=${opts.adjustment ?? "all"}, positions=${posStr}`;
+        : opts.metricsOnly
+          ? `metrics-only, mode=${opts.mode ?? "all"}, adj=${opts.adjustment ?? "all"}, positions=${posStr}`
+          : `mode=${opts.mode ?? "all"}, adj=${opts.adjustment ?? "all"}, positions=${posStr}`;
   logInfo(
     `설정: season=${opts.season}, league=${opts.league}, team=${opts.team ?? "전체"}, player=${opts.player ?? "전체"}, ${modeStr}, headless=${opts.headless}, dryRun=${opts.dryRun}`,
   );
@@ -597,7 +604,9 @@ async function main(): Promise<void> {
           ? "action-maps"
           : opts.similarityOnly
             ? "similarity"
-            : "player-card",
+            : opts.metricsOnly
+              ? "metrics"
+              : "player-card",
         season: opts.season,
         league: opts.league,
         status: stats.failCount === 0 ? "success" : "error",

@@ -23,6 +23,8 @@ export interface ScraperOptions {
   similarityOnly: boolean;
   /** action maps만 수집 */
   actionMapsOnly: boolean;
+  /** 메트릭+similarity만 수집 (action maps 탭 이동·Vision OCR 스킵) — action-maps-only의 반대 개념 */
+  metricsOnly: boolean;
   /** Action Maps 탭 DOM 구조 덤프 (탐색용) */
   dumpDom: boolean;
   /** Vision API로 액션 라인 좌표 추출 활성화 */
