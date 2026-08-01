@@ -20,7 +20,7 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
 
 - **26/27 시즌 개막 임박 (8/21)** — fixtures/standings는 26/27 자동 롤오버 완료(SR01·SR03), ScoutLab 메트릭은 25/26 기준
 - **잔여**: SR06(롤오버 후속 정리), SR04(ScoutLab 시즌 전환은 원본 데이터 제공 대기). SR02(승격/강등 팀) ✅
-- ScoutLab: Action Maps 5대 리그 1,843명 완료(S8′01 ✅, 08-01). 메트릭+Similarity는 1,519명 기준 — Action Maps 수집 중 소스 로스터가 확장되어 신규 upsert된 ~325명(Serie A 13팀 ~261명, Ligue 1 ~59명 등)은 메트릭 미수집 → 신규 Task S8′06
+- ScoutLab: Action Maps+메트릭 5대 리그 1,843명 전원 완료(S8′01 ✅ 08-01, S8′06 ✅ 08-01, 메트릭 갭 363명 → 0명). Similarity는 리그별로 일부 누락(예: Serie A 387/399) — 원인 확인 필요, 백로그 등록
 - 자동화 정상 가동 확인(SR05 ✅): 경기결과 동기화(Vercel cron, 07-31 복구 확인), 이적뉴스 크롤링(self-hosted runner, 하루 3회)
 - 백엔드 포트폴리오(`docs/backend-portfolio/`)는 로드맵 미편입 — QA 감사에서 실측 개선이 나오면 소재로만 활용
 
@@ -137,6 +137,12 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
 
 - glossary 팝오버 실제 DB(glossary 테이블) 연결 및 페이지 배선 (QA04에서 `glossary.ts`+`glossary-popover.tsx` 유지 결정 시 파생)
 
+### S8′06 이관 — 검색·데이터 품질 (우선순위 낮음)
+
+- 선수 검색 DB 레벨 개선: `unaccent` 확장 + 정규화 생성 컬럼 + `pg_trgm` 인덱스로 악센트 무시 검색을 DB에서 처리(현재는 앱 레벨 페이지네이션+정규화로 해결됨, 데이터 규모 증가 시 전량 전송 부담 해소 목적). 참고: PostgREST `db-max-rows`(1000) 하드 캡 존재
+- 소스 로스터엔 있으나 DB엔 없는 선수 3명(Eivind Helland/Bologna, Kail Boudache/Nice, Kieron Bowie/Verona) — 소스에 플레이어 카드 데이터 자체가 없는 신규/유스 선수로 추정, 소스에 데이터 생기면 수집
+- Similarity 부분 누락 확인: 메트릭은 1,843명 전원 보유하나 Similarity는 리그별 일부만 존재(예: Serie A 387/399) — 출전시간 부족 선수는 소스가 Similarity 탭을 제공하지 않는 것으로 추정, 원인 확인 후 필요시 보충
+
 ### QA02 이관 — UI·데이터 개선
 
 - Radar 탭 기본 진입 빈 화면(레이더 데이터셋 결손 — 데이터 수집 필요)
@@ -160,10 +166,11 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
   - 러너: `scripts/scraper/run-action-maps-batch.sh` (순차 실행 + 리그당 10h 워치독 + 로그 + 잔존 프로세스 정리) — S8′02~04 재사용 가능
   - 계획 문서: `docs/superpowers/plans/2026-07-31-s8-01-action-maps-4-leagues.md`
 
-- **Task S8′06: 신규 upsert 선수 메트릭·Similarity 수집 (S8′01 후속, 신규)**
-  - S8′01 중 소스 로스터 기준으로 upsert된 ~325명은 Action Maps만 있고 60+ 메트릭·Similarity 없음 (QA02 "Radar 빈 화면"과 동일 계열)
-  - 대상: Serie A 13팀(과거 player-card 수집이 7/20팀에서 중단된 것을 S8′01에서 발견) ~261명, Ligue 1 ~59명, 기타 소수
-  - `npm run scrape:scoutlab -- --league="Serie A" --season="25/26"` (action-maps-only 없이) 등으로 수집
+- **Task S8′06: 신규 upsert 선수 메트릭 수집 (S8′01 후속)** ✅ (2026-08-01)
+  - 결과: 25/26 시즌 5대 리그 1,843명 전원 메트릭 확보 완료(메트릭 갭 363명 → 0명), Action Maps만 있고 메트릭 없는 선수 완전 해소
+  - 실제 갭 재산정: 최초 예상(Serie A·Ligue 1 위주 ~325명)과 달리 PL 14명·La Liga 2명도 포함된 4개 리그 29팀 363명으로 확인
+  - 수행 방식: `--metrics-only` 플래그 신설(Action Maps 재수집 없이 메트릭만 수집) → `run-s8-06-batch.sh`(29팀 순차 수집, 8시간 20분) → `run-s8-06-fixup.sh`(로그 파싱 기반 실패 건 재수집, 48건, 2시간) → 잔여 4명은 전역 검색 모드로 개별 수집
+  - 후속 발견 3건은 백로그 "S8′06 이관" 섹션에 등록: DB 레벨 선수 검색 개선, 소스 미보유 선수 3명, Similarity 일부 누락 원인 확인
 
 - **Task S8′02: 24/25 시즌 PL 전체 스크래핑 (구 S801)**
   - 현재 10명만 → 전체 확장 (예상 ~4시간)
@@ -309,5 +316,5 @@ pitch-ac는 5대 리그 데이터 허브로 다음 기능을 제공한다:
 
 ---
 
-**최종 업데이트**: 2026-07-31 (SR06 착수 — stuck 행 2건 백필 완료, AWARDED 상태 매핑 보강)
+**최종 업데이트**: 2026-08-01 (S8′06 완료 — 5대 리그 1,843명 전원 메트릭 확보, 갭 363명 → 0명)
 **진행 상황**: PR ✅ → **SR (개막 전 필수)** → QA (병행) → 백로그(S8′ → SF → RK3 → MP → S804 → CV)
