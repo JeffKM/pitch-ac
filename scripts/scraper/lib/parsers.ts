@@ -1,6 +1,8 @@
 // ScoutLab DOM → 데이터 파싱 (선수 정보 + 메트릭 + 유사 선수)
 
-import type { FrameLocator, Page } from "@playwright/test";
+import type { FrameLocator, Locator, Page } from "@playwright/test";
+
+import { normalizeForSearch } from "@/lib/search-utils";
 
 import { logInfo, logWarn } from "./logger";
 import type {
@@ -10,9 +12,252 @@ import type {
   ParsedSimilarPlayer,
 } from "./types";
 
-/** 선수 기본 정보 파싱 */
+/**
+ * 카드 검증 실패 계열의 공통 부모.
+ * 이 계열 에러가 던져지면 해당 선수는 어떤 테이블에도 저장하지 않고 실패로 집계한다
+ * (요청과 다른 카드를 읽은 상태이므로 저장하면 데이터가 오염된다).
+ * 호출부에서 절대 삼키지 말 것 — `instanceof CardValidationError`로 재throw한다.
+ */
+export class CardValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "CardValidationError";
+  }
+}
+
+/** 카드 헤더 시즌이 요청 시즌과 끝내 일치하지 않음 */
+export class SeasonMismatchError extends CardValidationError {
+  constructor(message: string) {
+    super(message);
+    this.name = "SeasonMismatchError";
+  }
+}
+
+/** 카드에 표시된 선수가 요청 선수와 끝내 일치하지 않음 (이전 선수 카드 잔존 등) */
+export class PlayerMismatchError extends CardValidationError {
+  constructor(message: string) {
+    super(message);
+    this.name = "PlayerMismatchError";
+  }
+}
+
+/** 메트릭이 0개 — 빈 행을 "수집 완료"로 저장하지 않기 위한 실패 신호 */
+export class EmptyMetricsError extends CardValidationError {
+  constructor(message: string) {
+    super(message);
+    this.name = "EmptyMetricsError";
+  }
+}
+
+// ─── 카드 검증 (시즌 + 선수명) ───
+//
+// 카드는 Streamlit 재렌더 중 "combobox는 새 선수 / 카드 본문은 이전 선수" 상태를 거친다.
+// 단발 판정은 이 순간에 걸려 오탐을 내므로(실측 4% 실패), 아래 3가지로 방어한다.
+//   1) `.first()` 단일 요소가 아니라 매치 전체를 모아 "요청 시즌이 존재하는가"로 판정
+//   2) 폴링 재시도 — 몇 초 뒤 다시 읽으면 정상값이 나오므로 단발 실패로 선수를 버리지 않음
+//   3) 로케이터를 카드에 앵커링 — 페이지 다른 곳의 "20XX/YY" 텍스트를 집지 않게 함(근본 방어)
+
+/** 카드 검증 폴링 기본 횟수/간격 */
+const CARD_POLL_ATTEMPTS = 6;
+const CARD_POLL_INTERVAL_MS = 500;
+
+/** "NATION:" 기준으로 위로 탐색할 조상 최대 깊이 (카드 컨테이너 탐색용) */
+const CARD_SCOPE_MAX_DEPTH = 8;
+
+/** 카드 헤더 시즌 텍스트 로케이터 ("2025/26" 형태) */
+const SEASON_SELECTOR = "text=/20\\d\\d\\/\\d\\d/";
+
+/** 폴링 간 대기 */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/** 텍스트에서 "2024/25" 형태를 모두 찾아 "24/25" 목록으로 변환 */
+function extractSeasonsFromText(text: string): string[] {
+  return [...text.matchAll(/20(\d\d)\/(\d\d)/g)].map((m) => `${m[1]}/${m[2]}`);
+}
+
+/**
+ * 스코프 안의 "보이는" 시즌 텍스트를 전부 수집한다 (중복 제거).
+ * count() 기반 판정은 숨겨진/stale 요소까지 세므로 isVisible()로 거른다.
+ */
+async function collectVisibleSeasons(
+  scope: FrameLocator | Locator,
+): Promise<string[]> {
+  const found = new Set<string>();
+  let elements: Locator[];
+  try {
+    elements = await scope.locator(SEASON_SELECTOR).all();
+  } catch {
+    return [];
+  }
+
+  for (const el of elements) {
+    try {
+      if (!(await el.isVisible())) continue;
+      const text = await el.textContent({ timeout: 1000 });
+      if (!text) continue;
+      for (const season of extractSeasonsFromText(text)) found.add(season);
+    } catch {
+      // 재렌더로 요소가 사라짐 — 다음 요소로 진행
+    }
+  }
+  return [...found];
+}
+
+/**
+ * 카드 스코프 해석 — "NATION:" 요소의 조상 중 시즌 텍스트를 포함하는 "가장 작은" 컨테이너.
+ * 이 스코프 안에서만 시즌을 찾으면 페이지 다른 곳의 텍스트에 걸리지 않는다.
+ * 찾지 못하면 null (호출부에서 페이지 전체 폴백).
+ */
+async function resolveCardScope(iframe: FrameLocator): Promise<Locator | null> {
+  const nation = iframe.locator('text="NATION:"').first();
+  try {
+    if ((await nation.count()) === 0) return null;
+  } catch {
+    return null;
+  }
+
+  for (let depth = 1; depth <= CARD_SCOPE_MAX_DEPTH; depth++) {
+    const container = nation.locator(`xpath=ancestor::*[${depth}]`);
+    try {
+      if ((await container.locator(SEASON_SELECTOR).count()) > 0) {
+        return container;
+      }
+    } catch {
+      // 조상이 없거나 재렌더 중 — 다음 깊이로
+    }
+  }
+  return null;
+}
+
+/** 카드에 표시된 시즌 목록 수집 (카드 앵커 우선, 실패 시 페이지 전체 폴백) */
+export async function collectCardSeasons(
+  iframe: FrameLocator,
+): Promise<{ seasons: string[]; scope: "card" | "page" }> {
+  const cardScope = await resolveCardScope(iframe);
+  if (cardScope) {
+    const seasons = await collectVisibleSeasons(cardScope);
+    if (seasons.length > 0) return { seasons, scope: "card" };
+  }
+  return { seasons: await collectVisibleSeasons(iframe), scope: "page" };
+}
+
+/** 악센트·대소문자·구두점 차이를 무시한 선수명 정규화 */
+function normalizePlayerName(name: string): string {
+  return normalizeForSearch(name)
+    .replace(/[.'\-_]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * 요청 선수명과 카드 선수명이 같은 선수를 가리키는지 판정.
+ * 글로벌 검색(--player)에서는 사용자가 일부만 입력할 수 있으므로 포함 관계도 허용한다.
+ */
+function namesMatch(cardName: string, requestedName: string): boolean {
+  const a = normalizePlayerName(cardName);
+  const b = normalizePlayerName(requestedName);
+  if (!a || !b) return false;
+  return a === b || a.includes(b) || b.includes(a);
+}
+
+export interface CardWaitOptions {
+  /** 폴링 시도 횟수 (기본 6) */
+  attempts?: number;
+  /** 시도 간 대기 ms (기본 500) */
+  intervalMs?: number;
+}
+
+/**
+ * 카드가 "요청 시즌 + 요청 선수"로 안정화될 때까지 폴링 검증한다.
+ * @param expectedPlayerName 생략 시 선수명 대조를 건너뛴다 (시즌 선택 직후 등 선수 맥락이 없는 경우)
+ * @returns 검증을 통과한 카드의 선수명
+ */
+async function waitForStableCard(
+  iframe: FrameLocator,
+  expectedSeason: string,
+  expectedPlayerName?: string,
+  options: CardWaitOptions = {},
+): Promise<string> {
+  const attempts = options.attempts ?? CARD_POLL_ATTEMPTS;
+  const intervalMs = options.intervalMs ?? CARD_POLL_INTERVAL_MS;
+
+  let lastSeasons: string[] = [];
+  let lastScope: "card" | "page" = "page";
+  let lastName = "";
+
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    const { seasons, scope } = await collectCardSeasons(iframe);
+    lastSeasons = seasons;
+    lastScope = scope;
+    const seasonOk = seasons.includes(expectedSeason);
+
+    let name = "";
+    try {
+      name = await extractPlayerName(iframe);
+    } catch {
+      name = "";
+    }
+    lastName = name;
+    const nameOk =
+      expectedPlayerName === undefined
+        ? true
+        : name !== "" && namesMatch(name, expectedPlayerName);
+
+    if (seasonOk && nameOk) {
+      if (attempt > 1) {
+        logInfo(
+          `  → 카드 검증 통과 (${attempt}/${attempts}회차 재시도, scope=${scope}, 시즌=${expectedSeason}${
+            expectedPlayerName === undefined ? "" : `, 선수=${name}`
+          })`,
+        );
+      }
+      return name;
+    }
+
+    const reason = !seasonOk
+      ? `시즌 불일치 (요청=${expectedSeason}, 카드=[${seasons.join(", ") || "없음"}], scope=${scope})`
+      : `선수명 불일치 (요청=${expectedPlayerName}, 카드=${name || "없음"})`;
+    logWarn(`  ⟳ 카드 검증 재시도 ${attempt}/${attempts} — ${reason}`);
+
+    if (attempt < attempts) await sleep(intervalMs);
+  }
+
+  if (!lastSeasons.includes(expectedSeason)) {
+    throw new SeasonMismatchError(
+      `시즌 검증 실패 (${attempts}회 재시도) — 요청=${expectedSeason}, 카드=[${lastSeasons.join(", ") || "없음"}], scope=${lastScope}`,
+    );
+  }
+  throw new PlayerMismatchError(
+    `선수명 검증 실패 (${attempts}회 재시도) — 요청=${expectedPlayerName}, 카드=${lastName || "없음"}`,
+  );
+}
+
+/**
+ * 카드 헤더 시즌이 요청 시즌과 일치하는지 검증 (폴링 재시도 포함).
+ * 선수 맥락이 없는 호출(시즌 선택 직후)에서 사용한다.
+ * @returns 검증된 시즌 문자열(= expectedSeason)
+ */
+export async function assertCardSeason(
+  iframe: FrameLocator,
+  expectedSeason: string,
+  options: CardWaitOptions = {},
+): Promise<string> {
+  await waitForStableCard(iframe, expectedSeason, undefined, options);
+  return expectedSeason;
+}
+
+/**
+ * 선수 기본 정보 파싱
+ * @param expectedSeason CLI `--season` 값 ("25/26" 형식)
+ * @param expectedPlayerName 요청 선수명. 카드가 이전 선수 상태이면 재시도 후 실패 처리한다.
+ * @throws SeasonMismatchError | PlayerMismatchError (폴백 없음 — 저장 금지 신호)
+ */
 export async function parsePlayerInfo(
   iframe: FrameLocator,
+  expectedSeason: string,
+  expectedPlayerName: string,
 ): Promise<ParsedPlayerInfo> {
   // Player Card 렌더링 대기
   await iframe
@@ -20,10 +265,16 @@ export async function parsePlayerInfo(
     .first()
     .waitFor({ state: "visible", timeout: 15_000 });
 
-  // 선수명: Player combobox의 aria-label에서 추출
-  const name = await extractPlayerName(iframe);
+  // 시즌·선수명 검증을 다른 필드 파싱보다 먼저 수행 — 잘못된/이전 카드면 즉시 중단
+  const name = await waitForStableCard(
+    iframe,
+    expectedSeason,
+    expectedPlayerName,
+  );
+  const season = expectedSeason;
+  logInfo(`  → 카드 검증 통과: 시즌=${season}, 선수명 대조=${name}`);
+
   const position = await extractCurrentPosition(iframe);
-  const season = await extractSeasonFromCard(iframe);
   const nationality = await extractField(iframe, "NATION:");
   const club = await extractField(iframe, "CLUB:");
   const ageText = await extractField(iframe, "AGE:");
@@ -73,21 +324,6 @@ async function extractCurrentPosition(iframe: FrameLocator): Promise<string> {
   return "AM/W"; // 최종 fallback
 }
 
-/** 시즌 추출 — 카드 헤더의 "2025/26" 텍스트에서 */
-async function extractSeasonFromCard(iframe: FrameLocator): Promise<string> {
-  const seasonEl = iframe.locator("text=/20\\d\\d\\/\\d\\d/").first();
-  try {
-    const text = await seasonEl.textContent({ timeout: 3000 });
-    if (text) {
-      const match = text.match(/20(\d\d)\/(\d\d)/);
-      if (match) return `${match[1]}/${match[2]}`;
-    }
-  } catch {
-    // fallback
-  }
-  return "25/26";
-}
-
 /** 필드 값 추출 ("NATION:", "CLUB:" 등) */
 async function extractField(
   iframe: FrameLocator,
@@ -131,7 +367,12 @@ const CATEGORY_KEY_MAP: Record<string, string> = {
   "SET PIECES": "set_pieces",
 };
 
-/** 카테고리별 메트릭 파싱 */
+/**
+ * 카테고리별 메트릭 파싱.
+ * 파싱 도중 오류가 나면 그때까지 수집된 것만 반환한다(부분 결과 허용).
+ * 단, 결과가 비어 있으면 호출부(parseAndSave)가 저장하지 않고 실패로 처리해야 한다
+ * — 빈 JSONB 행이 저장되면 "수집 완료"로 보여 갭 탐지 쿼리가 무력화된다.
+ */
 export async function parseMetrics(
   iframe: FrameLocator,
 ): Promise<ParsedMetric[]> {
@@ -179,7 +420,9 @@ export async function parseMetrics(
       }
     }
   } catch (e) {
-    logWarn(`메트릭 파싱 실패: ${e instanceof Error ? e.message : "unknown"}`);
+    logWarn(
+      `메트릭 파싱 중 오류(수집분 ${metrics.length}개만 반환): ${e instanceof Error ? e.message : "unknown"}`,
+    );
   }
 
   return metrics;

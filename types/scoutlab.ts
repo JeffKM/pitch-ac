@@ -11,7 +11,20 @@ export type ScoutlabLeague =
   | "Bundesliga"
   | "Ligue 1";
 
-export type ScoutlabSeason = "25/26" | "24/25" | "23/24" | "22/23" | "21/22";
+/**
+ * 지원 시즌 목록 (런타임 검증용 단일 출처).
+ * 스크래퍼 CLI `--season` 검증이 이 배열을 그대로 사용하므로
+ * 새 시즌 추가 시 여기만 수정하면 타입과 런타임 검증이 함께 갱신된다.
+ */
+export const SCOUTLAB_SEASONS = [
+  "25/26",
+  "24/25",
+  "23/24",
+  "22/23",
+  "21/22",
+] as const;
+
+export type ScoutlabSeason = (typeof SCOUTLAB_SEASONS)[number];
 
 export type ScoutlabMode = "per90" | "total";
 

@@ -3,25 +3,65 @@
 import type { FrameLocator, Page } from "@playwright/test";
 
 import { STREAMLIT_LOAD_TIMEOUT } from "./constants";
-import { logInfo } from "./logger";
+import { logInfo, logWarn } from "./logger";
+import {
+  assertCardSeason,
+  collectCardSeasons,
+  SeasonMismatchError,
+} from "./parsers";
 
-/** 시즌 선택 (radiogroup 버튼) — 이미 선택된 경우 건너뜀 */
+/** 시즌 전환 직후 카드 재렌더가 느릴 수 있어 검증 폴링을 넉넉히 잡는다 (12 × 500ms = 6s) */
+const SEASON_SELECT_POLL_ATTEMPTS = 12;
+
+/**
+ * 시즌 선택 (radiogroup 버튼) — 이미 선택된 경우 클릭은 건너뛰되 검증은 항상 수행.
+ * 선택 후 카드 헤더가 요청 시즌과 다르면 SeasonMismatchError를 던진다
+ * (조용히 진행하면 DOM 파싱 시즌으로 잘못된 행이 저장된다).
+ *
+ * "이미 선택됨" 판정과 사후 검증은 같은 헬퍼(collectCardSeasons — 가시 요소 기반)를 쓴다.
+ * 예전처럼 count() exact 매칭으로 판정하면 숨겨진/stale 요소 때문에 클릭을 건너뛴 뒤
+ * 곧바로 검증에 실패해 배치가 시작조차 못 하고 abort될 수 있다.
+ */
 export async function selectSeason(
   iframe: FrameLocator,
   page: Page,
   season: string,
 ): Promise<void> {
   logInfo(`시즌 선택: ${season}`);
-  // 이미 선택된 시즌인지 확인 (카드 헤더에 표시)
-  const seasonText = `20${season}`;
-  const alreadySelected = await iframe.locator(`text="${seasonText}"`).count();
-  if (alreadySelected > 0) {
-    logInfo(`  → 이미 ${season} 선택됨, 건너뜀`);
-    return;
+
+  // 카드 렌더 대기 (실패해도 진행 — 아래 판정/검증에서 다시 확인한다)
+  try {
+    await iframe
+      .locator('text="NATION:"')
+      .first()
+      .waitFor({ state: "visible", timeout: STREAMLIT_LOAD_TIMEOUT });
+  } catch {
+    logWarn("  → 카드(NATION:) 렌더 대기 실패, 시즌 판정을 계속 진행");
   }
-  const btn = iframe.locator(`button:has-text("${season}")`).first();
-  await btn.click();
-  await waitForStreamlitUpdate(iframe, page);
+
+  const { seasons, scope } = await collectCardSeasons(iframe);
+  if (seasons.includes(season)) {
+    logInfo(`  → 이미 ${season} 선택됨 (scope=${scope}), 클릭 건너뜀`);
+  } else {
+    logInfo(
+      `  → 현재 카드 시즌=[${seasons.join(", ") || "없음"}] (scope=${scope}), ${season} 버튼 클릭`,
+    );
+    const btn = iframe.locator(`button:has-text("${season}")`).first();
+    await btn.click();
+    await waitForStreamlitUpdate(iframe, page);
+  }
+
+  try {
+    await assertCardSeason(iframe, season, {
+      attempts: SEASON_SELECT_POLL_ATTEMPTS,
+    });
+  } catch (e) {
+    if (e instanceof SeasonMismatchError) {
+      throw new SeasonMismatchError(`시즌 선택 검증 불통 — ${e.message}`);
+    }
+    throw e;
+  }
+  logInfo(`  → 시즌 검증 통과: 20${season}`);
 }
 
 /** 사이드바 탭 선택 */

@@ -18,6 +18,9 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 import type { FrameLocator, Page } from "@playwright/test";
 
+import type { ScoutlabSeason } from "@/types/scoutlab";
+import { SCOUTLAB_SEASONS } from "@/types/scoutlab";
+
 import {
   launchBrowser,
   navigateToScoutLab,
@@ -56,6 +59,8 @@ import {
   toggleMode,
 } from "./lib/navigation";
 import {
+  CardValidationError,
+  EmptyMetricsError,
   groupMetricsByCategory,
   parseActionMaps,
   parseMetrics,
@@ -74,6 +79,18 @@ import {
 const ALL_MODES = ["per90", "total"] as const;
 const ALL_ADJUSTMENTS = ["padj", "raw"] as const;
 const ALL_COMPARISON_POSITIONS = ["CB", "FB", "MF", "AM/W", "FW"] as const;
+
+/**
+ * 배치를 즉시 중단시켜야 하는 치명적 상태.
+ * 이 에러는 어디서도 삼키지 않고 main 밖으로 전파되어 프로세스가 exit(1)로 죽는다
+ * (조용히 계속 도는 것보다 죽어서 러너가 감지하게 하는 편이 낫다).
+ */
+class FatalScraperError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "FatalScraperError";
+  }
+}
 
 /** CLI 인자 파싱 */
 function parseCliArgs(): ScraperOptions {
@@ -104,7 +121,7 @@ function parseCliArgs(): ScraperOptions {
   const adjVal = values.adjustment as string | undefined;
 
   return {
-    season: String(values.season ?? DEFAULT_SEASON),
+    season: parseSeasonArg(String(values.season ?? DEFAULT_SEASON)),
     league: String(values.league ?? DEFAULT_LEAGUE),
     team: values.team != null ? String(values.team) : undefined,
     player: values.player != null ? String(values.player) : undefined,
@@ -128,6 +145,22 @@ function parseCliArgs(): ScraperOptions {
     dumpDom: Boolean(values["dump-action-maps-dom"]),
     extractLines: Boolean(values["extract-lines"]),
   };
+}
+
+/**
+ * --season 값 검증.
+ * 저장되는 season의 단일 진실 공급원이므로 값이 어긋나면 즉시 중단한다.
+ * 정규식 형식 검사(`^\d{2}\/\d{2}$`)만 하면 "42/25"처럼 연속 연도가 아닌 값도
+ * 통과하므로, 실제 지원 시즌 목록(SCOUTLAB_SEASONS)으로 검증한다.
+ */
+function parseSeasonArg(raw: string): ScoutlabSeason {
+  const valid = SCOUTLAB_SEASONS as readonly string[];
+  if (!valid.includes(raw)) {
+    throw new Error(
+      `유효하지 않은 시즌: "${raw}" (가능: ${SCOUTLAB_SEASONS.join(", ")})`,
+    );
+  }
+  return raw as ScoutlabSeason;
 }
 
 /** --positions=CB,FB,MF,FW → 유효성 검증 후 배열 반환 */
@@ -157,20 +190,29 @@ async function parseAndSave(
   adjustment: "padj" | "raw" = "padj",
   comparisonPosition: string = "AM/W",
 ): Promise<boolean> {
-  const playerInfo = await parsePlayerInfo(iframe);
+  const playerInfo = await parsePlayerInfo(iframe, season, playerName);
   const metrics = await parseMetrics(iframe);
 
   logInfo(
     `  ${playerInfo.name} | ${mode}/${adjustment}/${comparisonPosition} | 메트릭 ${metrics.length}개`,
   );
 
+  // 빈 메트릭을 저장하면 "수집 완료"로 보이는 빈 JSONB 행이 남아 갭 탐지가 무력화된다
+  if (metrics.length === 0) {
+    throw new EmptyMetricsError(
+      `메트릭 0개 (${playerInfo.name}, ${mode}/${adjustment}/${comparisonPosition}) — 저장하지 않고 실패 처리`,
+    );
+  }
+
   if (dryRun) {
-    logWarn("  [DRY-RUN] DB 쓰기 스킵");
+    logWarn(
+      `  [DRY-RUN] DB 쓰기 스킵 (저장 대상 season=${season}, 카드 season=${playerInfo.season})`,
+    );
     return true;
   }
 
   const grouped = groupMetricsByCategory(metrics);
-  const playerId = await upsertPlayer(supabase, playerInfo, league);
+  const playerId = await upsertPlayer(supabase, playerInfo, league, season);
   await upsertMetrics(
     supabase,
     playerId,
@@ -185,7 +227,12 @@ async function parseAndSave(
   return true;
 }
 
-/** 현재 선수에 대해 Similarity Score 탭 파싱 → DB 저장 (1회) */
+/**
+ * 현재 선수에 대해 Similarity Score 탭 파싱 → DB 저장 (1회)
+ * @returns 실제 저장(dry-run은 파싱)에 성공했는지 여부.
+ *   에러를 삼키고 성공으로 집계하면 8시간 배치 요약과 sync_logs가 거짓이 되므로
+ *   반드시 이 반환값으로 호출부에서 분기한다.
+ */
 async function scrapeSimilarity(
   iframe: FrameLocator,
   page: Page,
@@ -194,33 +241,47 @@ async function scrapeSimilarity(
   league: string,
   season: string,
   dryRun: boolean,
-): Promise<void> {
+): Promise<boolean> {
   try {
-    // 선수 기본 정보에서 playerId 확보
-    const playerInfo = await parsePlayerInfo(iframe);
+    // 선수 기본 정보에서 playerId 확보 (시즌·선수명 검증 포함)
+    const playerInfo = await parsePlayerInfo(iframe, season, playerName);
     const playerId = dryRun
       ? 0
-      : await upsertPlayer(supabase, playerInfo, league);
+      : await upsertPlayer(supabase, playerInfo, league, season);
 
     // Similarity Score 탭 → 20명 파싱 → Player Card 복귀
     const similar = await parseSimilarPlayersFromTab(iframe, page);
 
-    if (similar.length > 0 && !dryRun) {
-      await upsertSimilarity(supabase, playerId, season, similar);
-      logSuccess(
-        `  ${playerName} similarity 저장 완료 (${similar.length}명, id: ${playerId})`,
-      );
-    } else if (dryRun) {
-      logWarn(
-        `  [DRY-RUN] similarity ${similar.length}명 파싱됨, DB 쓰기 스킵`,
-      );
+    if (similar.length === 0) {
+      logError(`  ${playerName} similarity 0명 파싱 — 저장 없음(실패 처리)`);
+      return false;
     }
+
+    if (dryRun) {
+      logWarn(
+        `  [DRY-RUN] similarity ${similar.length}명 파싱됨, DB 쓰기 스킵 (저장 대상 season=${season})`,
+      );
+      return true;
+    }
+
+    await upsertSimilarity(supabase, playerId, season, similar);
+    logSuccess(
+      `  ${playerName} similarity 저장 완료 (${similar.length}명, id: ${playerId})`,
+    );
+    return true;
   } catch (error) {
+    // 카드 검증 실패(시즌·선수명 불일치)는 삼키지 않는다 — 선수 전체를 스킵
+    if (error instanceof CardValidationError) throw error;
     logError(`  ${playerName} similarity 수집 실패`, error);
+    return false;
   }
 }
 
-/** 현재 선수에 대해 Action Maps 탭 파싱 → DB 저장 */
+/**
+ * 현재 선수에 대해 Action Maps 탭 파싱 → DB 저장
+ * @returns 실제 저장(dry-run은 파싱)에 성공했는지 여부.
+ *   0개 파싱·Storage 업로드 실패·탭 미발견을 성공으로 집계하지 않기 위한 반환값이다.
+ */
 async function scrapeActionMaps(
   iframe: FrameLocator,
   page: Page,
@@ -230,13 +291,13 @@ async function scrapeActionMaps(
   season: string,
   dryRun: boolean,
   extractLines: boolean = false,
-): Promise<void> {
+): Promise<boolean> {
   try {
-    // 선수 기본 정보에서 playerId 확보
-    const playerInfo = await parsePlayerInfo(iframe);
+    // 선수 기본 정보에서 playerId 확보 (시즌·선수명 검증 포함)
+    const playerInfo = await parsePlayerInfo(iframe, season, playerName);
     const playerId = dryRun
       ? 0
-      : await upsertPlayer(supabase, playerInfo, league);
+      : await upsertPlayer(supabase, playerInfo, league, season);
 
     // Action Maps 탭 이동 → 파싱 → Player Card 복귀
     await navigateToActionMapsTab(iframe, page);
@@ -265,30 +326,35 @@ async function scrapeActionMaps(
         }
       }
 
-      if (actionMaps.length > 0 && !dryRun) {
-        await upsertActionMaps(supabase, playerId, season, actionMaps);
-        const totalLines = actionMaps.reduce(
-          (sum, m) => sum + m.lines.length,
-          0,
-        );
-        logSuccess(
-          `  ${playerName} action maps 저장 완료 (${actionMaps.length}개 타입, ${totalLines}개 라인, id: ${playerId})`,
-        );
-      } else if (dryRun) {
-        const totalLines = actionMaps.reduce(
-          (sum, m) => sum + m.lines.length,
-          0,
-        );
-        logWarn(
-          `  [DRY-RUN] action maps ${actionMaps.length}개 타입, ${totalLines}개 라인 파싱됨, DB 쓰기 스킵`,
-        );
+      if (actionMaps.length === 0) {
+        logError(`  ${playerName} action maps 0개 파싱 — 저장 없음(실패 처리)`);
+        return false;
       }
+
+      const totalLines = actionMaps.reduce((sum, m) => sum + m.lines.length, 0);
+
+      if (dryRun) {
+        logWarn(
+          `  [DRY-RUN] action maps ${actionMaps.length}개 타입, ${totalLines}개 라인 파싱됨, DB 쓰기 스킵 (저장 대상 season=${season})`,
+        );
+        return true;
+      }
+
+      // Storage 업로드 실패도 여기서 throw되어 아래 catch → false로 집계된다
+      await upsertActionMaps(supabase, playerId, season, actionMaps);
+      logSuccess(
+        `  ${playerName} action maps 저장 완료 (${actionMaps.length}개 타입, ${totalLines}개 라인, id: ${playerId})`,
+      );
+      return true;
     } finally {
       // 항상 Player Card 복귀 보장
       await navigateBackToPlayerCard(iframe, page);
     }
   } catch (error) {
+    // 카드 검증 실패(시즌·선수명 불일치)는 삼키지 않는다 — 선수 전체를 스킵
+    if (error instanceof CardValidationError) throw error;
     logError(`  ${playerName} action maps 수집 실패`, error);
+    return false;
   }
 }
 
@@ -304,7 +370,9 @@ async function scrapeAllCombinations(
   stats: ScrapeStats,
 ): Promise<void> {
   // Similarity Score 탭에서 1회 수집 (메트릭 루프 전)
-  await scrapeSimilarity(
+  // 이 경로의 성공/실패 집계는 메트릭 조합 루프가 담당하므로, 부가 수집 실패는
+  // stats.auxFailures에 기록해 요약에서 드러나게 한다 (조용한 성공 집계 방지)
+  const similarityOk = await scrapeSimilarity(
     iframe,
     page,
     supabase,
@@ -313,10 +381,11 @@ async function scrapeAllCombinations(
     season,
     opts.dryRun,
   );
+  if (!similarityOk) stats.auxFailures.push(`${playerName}(similarity)`);
 
   // Action Maps 탭에서 1회 수집 (메트릭 루프 전) — --metrics-only 시 스킵 (Vision OCR 비용 절약)
   if (!opts.metricsOnly) {
-    await scrapeActionMaps(
+    const actionMapsOk = await scrapeActionMaps(
       iframe,
       page,
       supabase,
@@ -326,6 +395,7 @@ async function scrapeAllCombinations(
       opts.dryRun,
       opts.extractLines,
     );
+    if (!actionMapsOk) stats.auxFailures.push(`${playerName}(action-maps)`);
   }
 
   const modes = opts.mode ? [opts.mode] : [...ALL_MODES];
@@ -337,7 +407,7 @@ async function scrapeAllCombinations(
   let positions: string[];
   if (opts.matchPosition) {
     // 선수 본인 포지션 감지 후 해당 포지션만 사용
-    const playerInfo = await parsePlayerInfo(iframe);
+    const playerInfo = await parsePlayerInfo(iframe, season, playerName);
     const ownPosition = playerInfo.position;
     if ((ALL_COMPARISON_POSITIONS as readonly string[]).includes(ownPosition)) {
       positions = [ownPosition];
@@ -400,8 +470,8 @@ async function scrapePlayer(
   stats: ScrapeStats,
 ): Promise<void> {
   if (opts.actionMapsOnly) {
-    // action maps만 수집
-    await scrapeActionMaps(
+    // action maps만 수집 — 실제 저장 성공 여부로 분기 (무조건 성공 집계 금지)
+    const ok = await scrapeActionMaps(
       iframe,
       page,
       supabase,
@@ -411,10 +481,15 @@ async function scrapePlayer(
       opts.dryRun,
       opts.extractLines,
     );
-    stats.successCount++;
+    if (ok) {
+      stats.successCount++;
+    } else {
+      stats.failCount++;
+      stats.failedPlayers.push(`${playerName}(action-maps)`);
+    }
   } else if (opts.similarityOnly) {
-    // similarity만 수집 (메트릭 스킵)
-    await scrapeSimilarity(
+    // similarity만 수집 (메트릭 스킵) — 실제 저장 성공 여부로 분기
+    const ok = await scrapeSimilarity(
       iframe,
       page,
       supabase,
@@ -423,7 +498,12 @@ async function scrapePlayer(
       season,
       opts.dryRun,
     );
-    stats.successCount++;
+    if (ok) {
+      stats.successCount++;
+    } else {
+      stats.failCount++;
+      stats.failedPlayers.push(`${playerName}(similarity)`);
+    }
   } else {
     await scrapeAllCombinations(
       iframe,
@@ -436,6 +516,24 @@ async function scrapePlayer(
       stats,
     );
   }
+}
+
+/**
+ * sync_logs.error_message 구성.
+ * 부가 수집(similarity/action maps) 실패는 status를 뒤집지 않지만,
+ * 로그에는 반드시 남겨 "성공으로 보이는 배치"가 실제로 무엇을 놓쳤는지 추적 가능하게 한다.
+ */
+function buildSyncErrorMessage(stats: ScrapeStats): string | undefined {
+  const parts: string[] = [];
+  if (stats.failedPlayers.length > 0) {
+    parts.push(`실패 선수: ${stats.failedPlayers.join(", ")}`);
+  }
+  if (stats.auxFailures.length > 0) {
+    parts.push(
+      `부가 수집 실패(${stats.auxFailures.length}건): ${stats.auxFailures.join(", ")}`,
+    );
+  }
+  return parts.length > 0 ? parts.join(" | ") : undefined;
 }
 
 /** 메인 실행 */
@@ -464,6 +562,7 @@ async function main(): Promise<void> {
     successCount: 0,
     failCount: 0,
     failedPlayers: [],
+    auxFailures: [],
     startTime: Date.now(),
   };
 
@@ -584,13 +683,39 @@ async function main(): Promise<void> {
             }
           } catch (error) {
             logError(`팀 ${team} 처리 중 오류, 페이지 새로고침`, error);
+
             try {
               iframe = await refreshAndReconnect(page);
               await selectSidebarTab(iframe, page, "Player Card");
-              await selectSeason(iframe, page, opts.season);
-              await selectLeague(iframe, page, opts.league);
             } catch (refreshError) {
               logError("페이지 복구 실패, 다음 팀으로 건너뜀", refreshError);
+              continue;
+            }
+
+            // 새로고침하면 페이지가 기본 시즌으로 리셋된다. 여기서 시즌 재선택이
+            // 실패한 채로 계속 돌면 남은 배치 전원이 검증 실패로 쌓여 시간을 통째로
+            // 헛돈다 → 조용히 넘어가지 않고 프로세스를 종료해 러너가 감지하게 한다.
+            try {
+              await selectSeason(iframe, page, opts.season);
+            } catch (seasonError) {
+              logError(
+                `복구 후 시즌(${opts.season}) 재선택 실패 — 배치를 중단합니다`,
+                seasonError,
+              );
+              throw new FatalScraperError(
+                `복구 경로 시즌 재선택 실패 (season=${opts.season}, team=${team}): ${
+                  seasonError instanceof Error ? seasonError.message : "unknown"
+                }`,
+              );
+            }
+
+            try {
+              await selectLeague(iframe, page, opts.league);
+            } catch (leagueError) {
+              logError(
+                "복구 후 리그 재선택 실패, 다음 팀으로 건너뜀",
+                leagueError,
+              );
             }
           }
         }
@@ -612,10 +737,7 @@ async function main(): Promise<void> {
         status: stats.failCount === 0 ? "success" : "error",
         recordsSynced: stats.successCount,
         recordsFailed: stats.failCount,
-        errorMessage:
-          stats.failedPlayers.length > 0
-            ? `실패 선수: ${stats.failedPlayers.join(", ")}`
-            : undefined,
+        errorMessage: buildSyncErrorMessage(stats),
         durationMs: Date.now() - stats.startTime,
       });
     }
@@ -628,6 +750,10 @@ async function main(): Promise<void> {
 }
 
 main().catch((error) => {
-  logError("스크래퍼 치명적 오류", error);
+  if (error instanceof FatalScraperError) {
+    logError("배치 중단 (복구 불가 상태) — 러너가 감지하도록 exit(1)", error);
+  } else {
+    logError("스크래퍼 치명적 오류", error);
+  }
   process.exit(1);
 });

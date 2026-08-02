@@ -35,6 +35,7 @@ export interface ScraperOptions {
 export interface ParsedPlayerInfo {
   name: string;
   position: string;
+  /** 카드 헤더에서 읽어 요청 시즌과 일치함이 검증된 값 (저장 값의 출처는 CLI --season) */
   season: string;
   nationality: string;
   club: string;
@@ -87,5 +88,12 @@ export interface ScrapeStats {
   successCount: number;
   failCount: number;
   failedPlayers: string[];
+  /**
+   * 부가 수집(similarity / action maps) 실패 목록.
+   * 메트릭 조합 루프가 성공/실패를 집계하는 전체 모드에서, 부가 수집 실패가
+   * 조용히 묻히지 않도록 별도 기록한다 (`--similarity-only`/`--action-maps-only`
+   * 모드에서는 이 실패가 곧 선수 실패이므로 failedPlayers에 들어간다).
+   */
+  auxFailures: string[];
   startTime: number;
 }

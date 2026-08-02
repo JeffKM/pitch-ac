@@ -55,6 +55,11 @@ export function logSummary(stats: ScrapeStats): void {
   if (stats.failedPlayers.length > 0) {
     console.log(`실패 선수: ${stats.failedPlayers.join(", ")}`);
   }
+  if (stats.auxFailures.length > 0) {
+    console.log(
+      `${COLORS.yellow}부가 수집 실패(${stats.auxFailures.length}건): ${stats.auxFailures.join(", ")}${COLORS.reset}`,
+    );
+  }
   console.log(`소요 시간: ${duration}s`);
   console.log("=".repeat(50));
 }

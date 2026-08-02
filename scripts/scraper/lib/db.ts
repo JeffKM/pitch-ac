@@ -10,12 +10,24 @@ import type {
   ParsedSimilarPlayer,
 } from "./types";
 
-/** 선수 upsert → scoutlab_players (반환: player id) */
+/**
+ * 선수 upsert → scoutlab_players (반환: player id)
+ * season은 CLI `--season` 값을 그대로 사용한다 (단일 진실 공급원).
+ * DOM에서 읽은 player.season은 저장에 쓰지 않고, 불일치 시 방어적으로 차단만 한다
+ * — 정상 흐름에서는 parsePlayerInfo가 이미 검증하므로 여기 도달하지 않는다.
+ */
 export async function upsertPlayer(
   supabase: SupabaseClient,
   player: ParsedPlayerInfo,
   league: string,
+  season: string,
 ): Promise<number> {
+  if (player.season !== season) {
+    throw new Error(
+      `시즌 불일치로 저장 차단 (${player.name}) — 요청=${season}, 카드=${player.season}`,
+    );
+  }
+
   const { data, error } = await supabase
     .from("scoutlab_players")
     .upsert(
@@ -24,7 +36,7 @@ export async function upsertPlayer(
         team: player.club,
         league,
         position: player.position,
-        season: player.season,
+        season,
         nationality: player.nationality,
         age: player.age,
         height: player.height,
@@ -124,7 +136,10 @@ export async function upsertSimilarity(
 
 /**
  * ScoutLab Action Maps 이미지를 다운로드하여 Supabase Storage에 업로드
- * 반환: public URL (업로드 실패 시 원본 URL 반환)
+ * 반환: Storage public URL
+ *
+ * 실패 시 원본(만료되는 ScoutLab) URL로 폴백하지 않고 throw한다 —
+ * 폴백하면 업로드 실패가 "저장 성공"으로 집계되어 배치 요약이 거짓이 된다.
  */
 async function uploadActionMapImage(
   supabase: SupabaseClient,
@@ -132,40 +147,34 @@ async function uploadActionMapImage(
   playerId: number,
   season: string,
 ): Promise<string> {
-  try {
-    const response = await fetch(imageUrl);
-    if (!response.ok) {
-      logError(`이미지 다운로드 실패: ${response.status}`, null);
-      return imageUrl;
-    }
-
-    const buffer = Buffer.from(await response.arrayBuffer());
-    const fileName = `${playerId}_${season.replace("/", "-")}.png`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("scoutlab-action-maps")
-      .upload(fileName, buffer, {
-        contentType: "image/png",
-        upsert: true,
-      });
-
-    if (uploadError) {
-      logError(`Storage 업로드 실패: ${uploadError.message}`, null);
-      return imageUrl;
-    }
-
-    const { data: publicUrlData } = supabase.storage
-      .from("scoutlab-action-maps")
-      .getPublicUrl(fileName);
-
-    return publicUrlData.publicUrl;
-  } catch (e) {
-    logError(
-      `이미지 업로드 중 오류: ${e instanceof Error ? e.message : "unknown"}`,
-      null,
+  const response = await fetch(imageUrl);
+  if (!response.ok) {
+    throw new Error(
+      `Action Maps 이미지 다운로드 실패 (playerId: ${playerId}): HTTP ${response.status}`,
     );
-    return imageUrl;
   }
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  const fileName = `${playerId}_${season.replace("/", "-")}.png`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("scoutlab-action-maps")
+    .upload(fileName, buffer, {
+      contentType: "image/png",
+      upsert: true,
+    });
+
+  if (uploadError) {
+    throw new Error(
+      `Action Maps 이미지 Storage 업로드 실패 (playerId: ${playerId}): ${uploadError.message}`,
+    );
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from("scoutlab-action-maps")
+    .getPublicUrl(fileName);
+
+  return publicUrlData.publicUrl;
 }
 
 /** 액션 맵 upsert → scoutlab_action_maps (이미지 다운로드 + Storage 업로드 포함) */
