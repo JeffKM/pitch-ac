@@ -10,6 +10,7 @@
 //   npx tsx scripts/extract-action-text.ts --player-id=42    # 특정 선수
 //   npx tsx scripts/extract-action-text.ts --limit=10        # 10개만
 //   npx tsx scripts/extract-action-text.ts --dry-run         # DB 저장 안 함
+//   npx tsx scripts/extract-action-text.ts --season=24/25    # 특정 시즌만 (다른 시즌 데이터 보호)
 
 import { execSync } from "node:child_process";
 import fs from "node:fs";
@@ -32,6 +33,8 @@ const { values } = parseArgs({
     limit: { type: "string" },
     "dry-run": { type: "boolean", default: false },
     force: { type: "boolean", default: false },
+    /** 시즌 필터 (예: "24/25"). 미지정 시 기존과 동일하게 전 시즌 대상 */
+    season: { type: "string" },
   },
   strict: false,
 });
@@ -40,6 +43,7 @@ const playerId = values["player-id"] ? Number(values["player-id"]) : null;
 const limit = values["limit"] ? Number(values["limit"]) : null;
 const dryRun = values["dry-run"] ?? false;
 const force = values["force"] ?? false;
+const season = values["season"] ?? null;
 
 // ── Supabase ──
 
@@ -161,7 +165,7 @@ async function main() {
     `${C.cyan}=== Action Maps 텍스트 메타데이터 추출 (Tesseract OCR) ===${C.reset}`,
   );
   console.log(
-    `옵션: playerId=${playerId}, limit=${limit}, dryRun=${dryRun}, force=${force}`,
+    `옵션: playerId=${playerId}, limit=${limit}, dryRun=${dryRun}, force=${force}, season=${season}`,
   );
 
   // Tesseract 설치 확인
@@ -192,6 +196,9 @@ async function main() {
     }
     if (playerId) {
       query = query.eq("player_id", playerId);
+    }
+    if (season) {
+      query = query.eq("season", season);
     }
 
     const { data: rows, error: qErr } = await query

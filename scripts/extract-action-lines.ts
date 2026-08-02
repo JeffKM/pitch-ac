@@ -5,6 +5,7 @@
 //   npm run extract:action-lines -- --player-id=42     # 특정 선수
 //   npm run extract:action-lines -- --limit=50         # 50개만
 //   npm run extract:action-lines -- --dry-run          # API 호출만, DB 저장 안 함
+//   npm run extract:action-lines -- --season=24/25     # 특정 시즌만 (다른 시즌 데이터 보호)
 
 import path from "node:path";
 import { parseArgs } from "node:util";
@@ -33,6 +34,8 @@ const { values } = parseArgs({
     "dry-run": { type: "boolean", default: false },
     /** 재추출 (기존 lines 덮어쓰기) */
     force: { type: "boolean", default: false },
+    /** 시즌 필터 (예: "24/25"). 미지정 시 기존과 동일하게 전 시즌 대상 */
+    season: { type: "string" },
   },
   strict: false,
 });
@@ -43,6 +46,7 @@ const playerId = values["player-id"]
 const limit = values.limit ? parseInt(String(values.limit), 10) : undefined;
 const dryRun = Boolean(values["dry-run"]);
 const force = Boolean(values.force);
+const season = values["season"] ? String(values["season"]) : undefined;
 
 // ── Supabase 클라이언트 ──
 
@@ -85,7 +89,7 @@ interface ActionMapRow {
 
 async function main(): Promise<void> {
   console.log(
-    `${C.cyan}[INFO]${C.reset} 액션 라인 배치 추출 시작 (dryRun=${dryRun}, force=${force})`,
+    `${C.cyan}[INFO]${C.reset} 액션 라인 배치 추출 시작 (dryRun=${dryRun}, force=${force}, season=${season})`,
   );
 
   const supabase = createAdminClient();
@@ -104,6 +108,10 @@ async function main(): Promise<void> {
 
   if (playerId) {
     query = query.eq("player_id", playerId);
+  }
+
+  if (season) {
+    query = query.eq("season", season);
   }
 
   query = query.order("player_id", { ascending: true });
